@@ -1,0 +1,7 @@
+<events xmlns="http://jelix.org/ns/events/1.0">
+   <listener name="wps">
+       <event name="getMapAdditions" />
+       <event name="mapDockable" />
+       <event name="mapRightDockable" />
+   </listener>
+</events>

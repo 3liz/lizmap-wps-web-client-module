@@ -1,0 +1,238 @@
+<?php
+/**
+* Php proxy to access map services
+* @package   lizmap
+* @subpackage wps
+* @author    3liz
+* @copyright 2017 3liz
+* @link      http://3liz.com
+* @license Mozilla Public License : http://www.mozilla.org/MPL/
+*/
+
+class serviceCtrl extends jController {
+
+    protected $params = null;
+    protected $xml_post = null;
+
+    function index() {
+
+        // Variable stored to log lizmap metrics
+        $_SERVER['LIZMAP_BEGIN_TIME'] = microtime(true);
+
+        if ( isset($_SERVER['PHP_AUTH_USER']) ) {
+          $ok = jAuth::login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+        }
+
+        // Get and normalize the passed parameters
+        $pParams = jApp::coord()->request->params;
+        $params = lizmapProxy::normalizeParams($pParams);
+        foreach ( $pParams as $k=>$v ) {
+            if ( strtolower($k) === 'repository' || strtolower($k) === 'project' ){
+                $params[strtolower($k)] = $v;
+            }
+        }
+        $this->params = $params;
+
+        // Get and parsed xml post
+        $requestXml = null;
+        global $HTTP_RAW_POST_DATA;
+        if(isset($HTTP_RAW_POST_DATA)){
+            $requestXml = $HTTP_RAW_POST_DATA;
+        }else{
+            $requestXml = file('php://input');
+            $requestXml = implode("\n",$requestXml);
+        }
+        if ( $requestXml ) {
+            $xml = simplexml_load_string( $requestXml );
+            if ( $xml !== FALSE ) {
+                $attrs = $xml->attributes();
+                if ( isset($attrs['service']) ) {
+                    $params['service'] = (string) $attrs['service'];
+                    if ( isset($attrs['version']) )
+                        $params['version'] = (string) $attrs['version'];
+                    $xml_request = $xml->getName();
+                    if ( strpos($xml_request, ':') !== false) {
+                        $xml_request = explode(':', $xml_request)[1];
+                    }
+                    $params['request'] = (string) $xml_request;
+                    $this->xml_post = $requestXml;
+                }
+            }
+        }
+
+        // Return the appropriate action
+        if ( !array_key_exists('service', $params) ) {
+            jMessage::add('SERVICE parameter is mandatory!', 'InvalidRequest');
+            return $this->serviceException();
+        }
+        $service = strtoupper($params['service']);
+        if ( $service != 'WPS' ) {
+            jMessage::add('SERVICE '.$service.' is not supported!', 'InvalidRequest');
+            return $this->serviceException();
+        }
+        if ( !array_key_exists('request', $params) ) {
+            jMessage::add('REQUEST parameter is mandatory!', 'InvalidRequest');
+            return $this->serviceException();
+        }
+        $request = strtolower($params['request']);
+        $wpsRequest = null;
+        if ( $request == 'getcapabilities' ) {
+            $wpsRequest = new lizmapWPSRequest( array(
+                    'service'=>'WPS',
+                    'request'=>'GetCapabilities'
+                )
+            );
+        } else if ( $request == 'describeprocess' ) {
+            $wpsRequest = new lizmapWPSRequest( $params, $this->xml_post );
+        } else if ( $request == 'execute' ) {
+            $wpsRequest = new lizmapWPSRequest( $params, $this->xml_post );
+        } else if ( $request == 'getresults' ) {
+            $wpsRequest = new lizmapWPSRequest( $params, $this->xml_post );
+        }
+
+        if ( $wpsRequest === null ) {
+            jMessage::add('REQUEST '.$request.' not supported', 'InvalidRequest');
+            return $this->serviceException();
+        }
+
+        $result = $wpsRequest->process();
+
+        $rep = $this->getResponse('binary');
+        $rep->mimeType = $result->mime;
+        $rep->content = $result->data;
+        $rep->doDownload  =  false;
+        $rep->outputFileName  =  'wps_'.$request;
+        return $rep;
+    }
+
+    /**
+     * Send an OGC service Exception
+     * @param $SERVICE the OGC service
+     * @return XML OGC Service Exception.
+     */
+    function serviceException(){
+        $messages = jMessage::getAll();
+        if (!$messages) {
+            $messages = array();
+        }
+        $rep = $this->getResponse('xml');
+        $rep->contentTpl = 'wps~wps_exception';
+        $rep->content->assign('messages', $messages);
+        jMessage::clearAll();
+
+        foreach( $messages as $code=>$msg ){
+            if( $code == 'AuthorizationRequired' )
+                $rep->setHttpStatus(401, $code);
+            else if( $code == 'ProjectNotDefined' )
+                $rep->setHttpStatus(404, 'Not Found');
+            else if( $code == 'RepositoryNotDefined' )
+                $rep->setHttpStatus(404, 'Not Found');
+        }
+
+        return $rep;
+    }
+
+    function store() {
+        $rep = $this->getResponse('binary');
+        $rep->outputFileName = 'wps_store.json';
+        $rep->mimeType = 'application/json';
+        $content = 'null';
+        $rep->content = $content;
+
+        $uuid = $this->param('uuid');
+        if ( !$uuid ) {
+          return $rep;
+        }
+
+        $file = $this->param('file');
+        if ( !$file ) {
+          return $rep;
+        }
+
+        $localConfig = jApp::configPath('localconfig.ini.php');
+        $localConfig = new jIniFileModifier($localConfig);
+        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = ltrim($wps_url, '/');
+        if ( substr($wps_url, -1) != '/' )
+            $wps_url .= '/';
+
+        $url = $wps_url .'store/'. $uuid .'/'. $file .'?service=WPS';
+
+        $getRemoteData = lizmapProxy::getRemoteData(
+          $url//,
+          //$this->services->proxyMethod,
+          //$this->services->debugMode
+        );
+        $data = $getRemoteData[0];
+        $mime = $getRemoteData[1];
+        $code = $getRemoteData[2];
+
+        $rep->outputFileName = $file;
+        $rep->mimeType = $mime;
+        $rep->content = $data;
+        $rep->doDownload  =  false;
+        return $rep;
+    }
+
+    function status() {
+        $rep = $this->getResponse('binary');
+        $rep->outputFileName = 'wps_store.json';
+        $rep->mimeType = 'application/json';
+        $content = 'null';
+        $rep->content = $content;
+
+        $localConfig = jApp::configPath('localconfig.ini.php');
+        $localConfig = new jIniFileModifier($localConfig);
+        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = ltrim($wps_url, '/');
+        if ( substr($wps_url, -1) != '/' )
+            $wps_url .= '/';
+
+        $url = $wps_url .'status/';
+
+        $uuid = $this->param('uuid');
+        if ( $uuid )
+            $url.= $uuid;
+
+        $url.= '?SERVICE=WPS';
+
+        $getRemoteData = lizmapProxy::getRemoteData(
+          $url//,
+          //$this->services->proxyMethod,
+          //$this->services->debugMode
+        );
+        $data = $getRemoteData[0];
+        $mime = $getRemoteData[1];
+        $code = $getRemoteData[2];
+
+        if ( empty( $data ) or floor( $code / 100 ) >= 4 ) {
+            $rep->setHttpStatus($code, 'Not Found');
+            return $rep;
+        }
+
+        $sUrl = jUrl::getFull(
+              "wps~service:index"
+        );
+        $data = json_decode( $data );
+
+        if ( property_exists($data, 'status') ) {
+            if ( property_exists($data->status, 'status_url') ) {
+                $oUrl = $data->status->status_url;
+                $data->status->status_url = $sUrl .'?'. explode('?', $oUrl)[1];
+            } else {
+                $uuids = array();
+                foreach( $data->status as $s ) {
+                    $uuids[] = $s->uuid;
+                }
+                $data = $uuids;
+            }
+        }
+
+        $rep->mimeType = $mime;
+        $rep->content = json_encode($data);
+        $rep->doDownload  =  false;
+        return $rep;
+    }
+}
+
+?>

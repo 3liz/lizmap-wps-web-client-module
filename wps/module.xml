@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://jelix.org/ns/module/1.0">
+    <info id="lizmap-wps-web-client" name="wps" createdate="2017-12-16">
+        <version date="2017-12-16">0.1pre</version>
+        <label lang="en_US">PETRA Web Client</label>
+        <description lang="en_US" />
+        <license URL="">All rights reserved</license>
+        <copyright>2017 3liz</copyright>
+        <creator name="your name" email="your-email@yourwebsite.undefined" active="true"/>
+        <!--<contributor name="hisname" email="hisemail@yoursite.undefined" active="true" since="" role=""/>-->
+        <homepageURL>http://3liz.com</homepageURL>
+    </info>
+    <dependencies>
+        <jelix minversion="1.6.14" maxversion="1.6.*"/>
+        <module name="lizmap" />
+    </dependencies>
+    <autoload>
+        <class name="lizmapWPSRequest" file="classes/lizmapWPSRequest.class.php" />
+        <class name="wpsWMSRequest" file="classes/wpsWMSRequest.class.php" />
+        <class name="wpsWFSRequest" file="classes/wpsWFSRequest.class.php" />
+        <class name="wpsWCSRequest" file="classes/wpsWCSRequest.class.php" />
+        <class name="processStatus" file="classes/processStatus.class.php" />
+    </autoload>
+</module>

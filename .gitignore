@@ -1,0 +1,12 @@
+# OSX garbage
+.DS_Store
+
+*.pyc
+
+factory.manifest
+/docker/wps
+
+.ignore
+
+.run/
+

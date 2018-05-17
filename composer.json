@@ -1,0 +1,24 @@
+{
+    "name": "lizmap/lizmap-wps-web-client",
+    "type": "jelix-module",
+    "description": "Jelix modules to add WPS Web Client.",
+    "keywords": ["module", "jelix", "lizmap", "wps"],
+    "homepage": "http://3liz.com",
+    "license": "Mozilla Public License 2.0 (MPL 2.0)",
+    "authors": [
+        {
+            "name": "René-Luc Dhont",
+            "email": "rldhont@3liz.com"
+        }
+    ],
+    "require": {
+    },
+    "minimum-stability": "stable",
+    "extra" : {
+        "jelix" : {
+            "modules": [
+                "wps/"
+            ]
+        }
+    }
+}

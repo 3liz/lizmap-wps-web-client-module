@@ -1,0 +1,160 @@
+<?php
+/**
+* Manage OGC request.
+* @package   lizmap
+* @subpackage lizmap
+* @author    3liz
+* @copyright 2015 3liz
+* @link      http://3liz.com
+* @license Mozilla Public License : http://www.mozilla.org/MPL/
+*/
+
+class processStatus {
+
+    static protected $profile = 'wpsProcessStatus';
+    protected $db = null;
+
+    /**
+     * constructor
+     * project : the project has a lizmapProject Class
+     * params : the params array
+     */
+    public function __construct () {
+        self::declareRedisProfile();
+        $this->db = jKVDb::getConnection( self::$profile );
+
+        $localConfig = jApp::configPath('localconfig.ini.php');
+        $localConfig = new jIniFileModifier($localConfig);
+        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = ltrim($wps_url, '/');
+        if ( substr($wps_url, -1) != '/' )
+            $wps_url .= '/';
+
+        $this->url = $wps_url .'status/';
+    }
+
+    public function saved ( $identifier, $repository, $project ) {
+        $url = $this->url.'?SERVICE=WPS';
+        $getRemoteData = lizmapProxy::getRemoteData(
+          $url//,
+          //$this->services->proxyMethod,
+          //$this->services->debugMode
+        );
+        $data = $getRemoteData[0];
+        $mime = $getRemoteData[1];
+        $code = $getRemoteData[2];
+        if ( empty( $data ) or floor( $code / 100 ) >= 4 )
+            $data = array();
+
+        $data = json_decode( $data );
+
+        if ( property_exists($data, 'status') ) {
+            $uuids = array();
+            foreach( $data->status as $s ) {
+                $uuids[] = $s->uuid;
+            }
+            $data = $uuids;
+        } else
+            $data = array();
+
+        $saved = $this->db->get( $identifier.':'.$repository.':'.$project );
+
+        if ( !$saved )
+            return array();
+
+        $saved = explode( ',', $saved );
+        if ( count( $saved ) > 0 ) {
+            $uuids = array();
+            foreach( $saved as $s ) {
+                if ( in_array($s, $data) )
+                    $uuids[] = $s;
+            }
+            return $uuids;
+        } else
+            return array();
+    }
+
+    public function get( $identifier, $repository, $project, $uuid ) {
+        $url = $this->url.$uuid.'?SERVICE=WPS';
+        $getRemoteData = lizmapProxy::getRemoteData(
+          $url//,
+          //$this->services->proxyMethod,
+          //$this->services->debugMode
+        );
+        $data = $getRemoteData[0];
+        $mime = $getRemoteData[1];
+        $code = $getRemoteData[2];
+
+        $saved = $this->saved( $identifier, $repository, $project );
+
+        $status = $this->db->get( $uuid );
+        if ( empty( $data ) or floor( $code / 100 ) >= 4 )
+            $status = null;
+
+        if ( !$status ) {
+            unset( $saved[array_search($uuid, $saved)] );
+            $this->db->set( $identifier.':'.$repository.':'.$project, implode( ',', $saved ) );
+            return null;
+        }
+
+        $status = json_decode( $status );
+        return $status;
+    }
+
+    public function update( $identifier, $repository, $project, $uuid, $status ) {
+        $saved = $this->saved( $identifier, $repository, $project );
+
+        if ( !in_array( $uuid, $saved ) )
+            $saved[] = $uuid;
+
+        if ( is_object( $status ) || is_array( $status ) )
+            $this->db->set( $uuid, json_encode( $status ) );
+        else
+            $this->db->set( $uuid, $status );
+
+        $this->db->set( $identifier.':'.$repository.':'.$project, implode( ',', $saved ) );
+        return true;
+    }
+
+    public function delete( $identifier, $repository, $project, $uuid ) {
+        $saved = $this->saved( $identifier, $repository, $project );
+
+        if ( !in_array( $uuid, $saved ) )
+            return false;
+
+        $this->db->delete( $uuid );
+        unset( $saved[array_search($uuid, $saved)] );
+
+        $this->db->set( $identifier.':'.$repository.':'.$project, implode( ',', $saved ) );
+        return true;
+    }
+
+    static protected function declareRedisProfile() {
+        $localConfig = jApp::configPath('localconfig.ini.php');
+        $localConfig = new jIniFileModifier($localConfig);
+
+        $statusRedisHost = $localConfig->getValue('redis_host', 'wps');
+        $statusRedisPort = $localConfig->getValue('redis_port', 'wps');
+        $statusRedisKeyPrefix = $localConfig->getValue('redis_key_prefix', 'wps');
+        $statusRedisDb = $localConfig->getValue('redis_db', 'wps');
+
+        if (extension_loaded('redis')) {
+            $driver = 'redis_ext';
+        }
+        else {
+            $driver = 'redis_php';
+        }
+
+        // Virtual status profile parameter
+        $statusParams = array(
+            "driver"=>$driver,
+            "host"=>$statusRedisHost,
+            "port"=>$statusRedisPort,
+            "key_prefix"=>$statusRedisKeyPrefix,
+            "db"=>$statusRedisDb
+        );
+
+        // Create the virtual status profile
+        jProfiles::createVirtualProfile('jkvdb', self::$profile, $statusParams);
+    }
+}
