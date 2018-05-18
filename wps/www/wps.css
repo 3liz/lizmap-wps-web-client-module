@@ -1,3 +1,7 @@
+#processing-form-container label.checkbox.inline.disabled {
+  color: #ccc;
+}
+
 #processing-results > div.menu-content {
   background-color: transparent; /* remove color for atlas */
   font-size: 12px;

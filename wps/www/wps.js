@@ -1,4 +1,4 @@
-var Wps = function() {
+var Petra = function() {
 
     var config = null;
     var map = null;
@@ -317,6 +317,10 @@ var Wps = function() {
         field.title = input.title;
         fieldDiv.appendChild(field);
 
+        // Add simple class
+        var fieldClass = 'qgisType-'+qgisType;
+        field.setAttribute('class', fieldClass);
+
         previousSibling && previousSibling.nextSibling ?
             container.insertBefore(field, previousSibling.nextSibling) :
             container.appendChild(control);
@@ -349,7 +353,8 @@ var Wps = function() {
             option = document.createElement("option");
             option.innerHTML = '---';
             field.appendChild(option);
-            var fieldClass = 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName;
+            fieldClass += ' ';
+            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName;
             fieldClass += ' ';
             fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
             field.setAttribute('class', fieldClass);
@@ -377,12 +382,36 @@ var Wps = function() {
             field.onchange = function() {
                 createCopy(input, field, addLiteralInput);
                 updateQgisFieldInput(input, field);
-                input.data = this.selectedIndex ? {
+                updateSelectFeaturesCheckbox(input, field);
+                var l = this.options[this.selectedIndex].value;
+                input.data = ( !l || l == '' ) ? undefined : {
                     literalData: {
-                        value: this.options[this.selectedIndex].value
+                        value: l
                     }
-                } : undefined;
+                };
             };
+            if ( qgisType == 'source' ) {
+                $(field).after('<label class="checkbox inline disabled"><input id="processing-input-'+name+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
+                $(field).parent().find('input[type="checkbox"].selection').change(function(){
+                    var cbx = $(this);
+                    if ( cbx.is(':checked') ) {
+                        cbx.attr('checked', 'checked');
+                        var aName = input.data.literalData.value;
+                        var lConfig = lizMap.config.layers[aName];
+                        if ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) {
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' ) ')
+                        } else if ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) {
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' ) ')
+                        }
+                        input.data.literalData.value = aName;
+                    } else {
+                        if ( cbx.attr('checked') != undefined )
+                            cbx.removeAttr('checked');
+                        var aName = cbx.parent().parent().find('select').val();
+                        input.data.literalData.value = aName;
+                    }
+                });
+            }
         } else if ( qgisType == 'raster' ) {
             var option;
             option = document.createElement("option");
@@ -428,6 +457,29 @@ var Wps = function() {
         }
     }
 
+    function updateSelectFeaturesCheckbox(input, field, fn) {
+        var cbx = $(field).parent().find('input[type="checkbox"].selection');
+        if ( cbx.length == 0 )
+            return;
+
+        var aName = $(field).val();
+        if ( !aName || aName == '' )
+            return;
+
+        var lConfig = lizMap.config.layers[aName];
+        cbx.attr('disabled', 'disabled');
+        cbx.parent().addClass('disabled');
+        if ( cbx.attr('checked') != undefined )
+            cbx.removeAttr('checked');
+
+        if ( ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) ||
+             ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) ) {
+            cbx.removeAttr('disabled');
+            cbx.parent().removeClass('disabled');
+         }
+        return;
+    }
+
     function updateQgisFieldInput(input, field, fn) {
         var qgisFieldInputs = $('#processing-input select.fieldParentLayerParameterName-'+input.identifier);
         if ( qgisFieldInputs.length == 0 )
@@ -450,7 +502,7 @@ var Wps = function() {
              ,'TYPENAME':aName
              ,'OUTPUTFORMAT':'JSON'
         }, function(describe) {
-            console.log(describe);
+            //console.log(describe);
             var aliases = describe.aliases;
             var types = {};
             if ('types' in describe)
@@ -488,7 +540,6 @@ var Wps = function() {
               */
 
         },'json');
-        console.log();
     }
 
     // if maxOccurs is > 1, this will add a copy of the field
@@ -761,7 +812,7 @@ var Wps = function() {
             // LAYERS
             // reference Data with mimeType application/x-ogc-wms
             var hasLayer = false;
-            console.log('has layer BEGIN');
+            //console.log('has layer BEGIN');
             if ($('#processing-results-layer-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                     var output = processExecuted.processOutputs[i];
@@ -789,14 +840,14 @@ var Wps = function() {
                     continue;
                 var url = output.reference.href;
                 var mapParam = getQueryParam(url, 'map');
-                console.log(mapParam);
+                //console.log(mapParam);
                 var layerParam = getQueryParam(url, 'layer');
 
                 var layerName = uuid+'-'+output.identifier;
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                   ,OpenLayers.Util.getParameterString({map:mapParam})
                 );
-                console.log(serviceUrl );
+                //console.log(serviceUrl );
                 var layerWmsParams = {
                     version:'1.3.0'
                     ,layers: layerParam
@@ -834,7 +885,7 @@ var Wps = function() {
                         zIndex = vZIndex;
                 }
                 lizMap.map.setLayerIndex(wmsLayer, zIndex);
-                console.log(layerName);
+                //console.log(layerName);
 
                 var td = '<td class="'+uuid+'">';
                 td+= '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
@@ -1243,6 +1294,17 @@ var Wps = function() {
             OpenLayers.Format.WPSExecute.prototype.readers.wps.ProcessPaused = function(node,obj) {
                 obj.processPaused = true;
             };
+        },
+
+        'layerSelectionChanged': function(e) {
+
+            $('#processing-form-container select.qgisType-source').each(function(idx, elt){
+                elt = $(elt);
+                if ( elt.val() != e.featureType )
+                    return;
+                elt.change();
+            });
+
         }
 
     });
