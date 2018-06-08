@@ -100,7 +100,7 @@ var Petra = function() {
                                     updateLogTable( d[uuid] );
                                 }
                             }
-                            intervalStatusProcesses = window.setInterval( updateStatusProcesses, 10000 );
+                            scheduleUpdateStatusProcesses()
                         });
                 }
             });
@@ -1111,7 +1111,16 @@ var Petra = function() {
         });
     }
 
-    function updateStatusProcesses() {
+    function scheduleUpdateStatusProcesses() {
+       // Use closure to track the number of call
+       var count = 5
+       intervalStatusProcesses = window.setInterval( function() {
+                count -= 1;
+                updateStatusProcesses(count) 
+       }, 1000 );
+    }
+
+    function updateStatusProcesses(count) {
         var updated = 0;
         for ( var uuid in executedProcesses ) {
             var executedProcess = executedProcesses[uuid];
@@ -1122,9 +1131,19 @@ var Petra = function() {
             updateStatusProcess( uuid );
             updated += 1;
         }
-        if ( intervalStatusProcesses && updated == 0 ) {
-            window.clearInterval( intervalStatusProcesses );
-            intervalStatusProcesses = null;
+        if ( intervalStatusProcesses ) {
+            if( updated == 0 ) {
+                window.clearInterval( intervalStatusProcesses );
+                intervalStatusProcesses = null;
+            } else {
+                // Processes still running, slow down
+                // the interval 
+                if( count < 0 ) {
+                    window.clearInterval( intervalStatusProcesses );
+                    intervalStatusProcesses = window.setInterval( function() { 
+                        updateStatusProcesses(1); }, 10000 );
+                }    
+            }
         }
     }
 
@@ -1190,7 +1209,7 @@ var Petra = function() {
         updateLogTable( pToSave );
         storeStatusProcess( uuid );
         updateStatusProcess( uuid );
-        intervalStatusProcesses = window.setInterval( updateStatusProcesses, 10000 );
+        scheduleUpdateStatusProcesses();
     }
 
     function manageExceptionReport( exceptionReport, requestTime ) {
