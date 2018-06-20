@@ -93,7 +93,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         if ( $this->xml_post !== null )
             $result = $this->post();
         else
-            $result = parent::getcapabilities();
+            $result = $this->get();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -269,15 +269,22 @@ class lizmapWPSRequest extends lizmapOGCRequest {
     protected function get(){
         $querystring = $this->constructUrl();
 
-        // Get remote data
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $querystring,
-          $this->services->proxyMethod,
-          $this->services->debugMode
-        );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
+        // Get data form server
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL, $querystring);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Connection: close'
+        ));
+        $data = curl_exec($ch);
+        $info = curl_getinfo($ch);
+        $mime = $info['content_type'];
+        $code = (int) $info['http_code'];
+        curl_close($ch);
+
 
         return (object) array(
             'code' => $code,
@@ -285,6 +292,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             'data' => $data,
             'cached' => False
         );
+
     }
 
     /**
@@ -301,7 +309,10 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Connection: close',
+            'Content-Type: text/xml'
+        ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->xml_post);
         $data = curl_exec($ch);
