@@ -888,7 +888,7 @@ var Petra = function() {
                 //console.log(layerName);
 
                 var td = '<td class="'+uuid+'">';
-                td+= '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
+                td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
                 td += '<button style="display:none;" class="btn btn-mini layerDownload" value="'+layerName+'" title="'+layerParam+'">';
                 td += '<i class="icon-download-alt"></i>';
                 td += '</button>';
@@ -896,7 +896,28 @@ var Petra = function() {
                 $('#processing-results-layer-table tr.'+output.identifier+' td:last').after(td);
 
                 hasLayer = true;
+
+                var trResults = $('#switcher table.tree #group-wps-results');
+                if ( trResults.length == 0 ) {
+                    $('<tr id="group-wps-results" class="liz-group expanded parent initialized"><td><a href="#" title="Réduire" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox partial checked" name="group" value="wps-results" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">Résultats</span></td><td></td><td></td><td></td></tr>')
+                        .insertBefore('#switcher table.tree tr:first');
+                    trResults = $('#switcher table.tree #group-wps-results');
+                }
+                trResults.after('<tr id="layer-wps-results-'+layerName+'" class="liz-layer child-of-group-wps-results '+uuid+' initialized parent collapsed visible"><td style="padding-left: 20px;"><a href="#" title="Déployer" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox checked" name="layer" value="'+layerName+'" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">'+layerParam+'</span></td><td><span class="loading">&nbsp;</span></td><td></td><td></td></tr>');
+
+                $('#switcher table.tree #layer-wps-results-'+layerName+' button[name="layer"]').click(function() {
+                    var btn = $(this);
+                    if ( btn.hasClass('checked') ) {
+                        btn.removeClass('checked');
+                        lizMap.map.getLayersByName(btn.val())[0].setVisibility(false);
+                    } else {
+                        btn.addClass('checked');
+                        lizMap.map.getLayersByName(btn.val())[0].setVisibility(true);
+                    }
+                    return false;
+                });
             }
+
             $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerView').click(function() {
                 var btn = $(this);
                 if ( btn.hasClass('checked') ) {
@@ -953,6 +974,12 @@ var Petra = function() {
 
         } else {
             $('#processing-results-plot > div[class="'+uuid+'"]').remove();
+
+            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').unbind('click');
+            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid).remove();
+            if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
+                $('#switcher table.tree #group-wps-results').remove();
+
             $('#processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
             $('#processing-results-layer-table tr td[class="'+uuid+'"] button').each(function(i, b){
                 var layerName = $(b).val();
@@ -1116,7 +1143,7 @@ var Petra = function() {
        var count = 5
        intervalStatusProcesses = window.setInterval( function() {
                 count -= 1;
-                updateStatusProcesses(count) 
+                updateStatusProcesses(count)
        }, 1000 );
     }
 
@@ -1137,12 +1164,12 @@ var Petra = function() {
                 intervalStatusProcesses = null;
             } else {
                 // Processes still running, slow down
-                // the interval 
+                // the interval
                 if( count < 0 ) {
                     window.clearInterval( intervalStatusProcesses );
-                    intervalStatusProcesses = window.setInterval( function() { 
+                    intervalStatusProcesses = window.setInterval( function() {
                         updateStatusProcesses(1); }, 10000 );
-                }    
+                }
             }
         }
     }
