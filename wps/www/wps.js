@@ -77,7 +77,9 @@ var Petra = function() {
                     "SERVICE": "WPS",
                     "REQUEST": "DescribeProcess",
                     "VERSION": capabilities.version,
-                    "IDENTIFIER": selection
+                    "IDENTIFIER": selection,
+                    "repository": lizUrls.params.repository,
+                    "project": lizUrls.params.project
                 },
                 success: function(response) {
                     process = new OpenLayers.Format.WPSDescribeProcess().read(
