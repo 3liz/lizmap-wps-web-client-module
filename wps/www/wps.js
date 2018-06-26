@@ -911,6 +911,7 @@ var Petra = function() {
                         var child = $('#switcher table.tree tr.child-of-'+tgroup.attr('id'));
                         if( tgroup.hasClass('expanded') ) {
                             tgroup.removeClass('expanded').addClass('collapsed');
+                            btn.attr('title', lizDict['tree.button.expand']);
                             child.each(function() {
                                 if( $(this).is(".expanded.parent") )
                                     $(this).find('td a.expander').click();
@@ -918,6 +919,7 @@ var Petra = function() {
                             });
                         } else if( tgroup.hasClass('collapsed') ) {
                             tgroup.removeClass('collapsed').addClass('expanded');
+                            btn.attr('title', lizDict['tree.button.collapse']);
                             child.each(function() {
                                 $(this).removeClass('ui-helper-hidden');
                             });
