@@ -890,7 +890,8 @@ var Petra = function() {
                 //console.log(layerName);
 
                 var td = '<td class="'+uuid+'">';
-                td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
+                //td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
+                td += '<span>'+layerParam+'</span>'
                 td += '<button style="display:none;" class="btn btn-mini layerDownload" value="'+layerName+'" title="'+layerParam+'">';
                 td += '<i class="icon-download-alt"></i>';
                 td += '</button>';
@@ -904,7 +905,52 @@ var Petra = function() {
                     $('<tr id="group-wps-results" class="liz-group expanded parent initialized"><td><a href="#" title="Réduire" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox partial checked" name="group" value="wps-results" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">Résultats</span></td><td></td><td></td><td></td></tr>')
                         .insertBefore('#switcher table.tree tr:first');
                     trResults = $('#switcher table.tree #group-wps-results');
+                    trResults.find(' td a.expander').click(function() {
+                        var btn = $(this);
+                        var tgroup = btn.parent().parent();
+                        var child = $('#switcher table.tree tr.child-of-'+tgroup.attr('id'));
+                        if( tgroup.hasClass('expanded') ) {
+                            tgroup.removeClass('expanded').addClass('collapsed');
+                            child.each(function() {
+                                if( $(this).is(".expanded.parent") )
+                                    $(this).find('td a.expander').click();
+                                $(this).addClass('ui-helper-hidden');
+                            });
+                        } else if( tgroup.hasClass('collapsed') ) {
+                            tgroup.removeClass('collapsed').addClass('expanded');
+                            child.each(function() {
+                                $(this).removeClass('ui-helper-hidden');
+                            });
+                        }
+                        return false;
+                    });
                 }
+
+                var legendParams = {SERVICE: "WMS",
+                              VERSION: "1.3.0",
+                              REQUEST: "GetLegendGraphic",
+                              LAYER: layerParam,
+                              STYLE: '',
+                              SLD_VERSION: "1.1.0",
+                              EXCEPTIONS: "application/vnd.ogc.se_inimage",
+                              FORMAT: "image/png",
+                              TRANSPARENT: "TRUE",
+                              WIDTH: 150,
+                              LAYERFONTSIZE: 9,
+                              ITEMFONTSIZE: 9,
+                              SYMBOLSPACE: 1,
+                              ICONLABELSPACE: 2,
+                              LAYERFONTSIZE: 0,
+                              LAYERSPACE: 0,
+                              LAYERFONTBOLD: "FALSE",
+                              LAYERTITLE: "FALSE",
+                              DPI: 96};
+
+                var legendParamsString = OpenLayers.Util.getParameterString(
+                     legendParams
+                    );
+                legendParamsString = OpenLayers.Util.urlAppend(serviceUrl, legendParamsString);
+                trResults.after('<tr id="legend-wps-results-'+layerName+'" class="liz-layer child-of-layer-wps-results-'+layerName+' '+uuid+' legendGraphics initialized collapsed ui-helper-hidden"><td colspan="2" style="padding-left: 39px;"><div class="legendGraphics"><img data-src="" src="'+legendParamsString+'"></div></td></tr>');
                 trResults.after('<tr id="layer-wps-results-'+layerName+'" class="liz-layer child-of-group-wps-results '+uuid+' initialized parent collapsed visible"><td style="padding-left: 20px;"><a href="#" title="Déployer" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox checked" name="layer" value="'+layerName+'" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">'+layerParam+'</span></td><td><span class="loading">&nbsp;</span></td><td></td><td></td></tr>');
 
                 $('#switcher table.tree #layer-wps-results-'+layerName+' button[name="layer"]').click(function() {
@@ -918,9 +964,26 @@ var Petra = function() {
                     }
                     return false;
                 });
+                $('#switcher table.tree #layer-wps-results-'+layerName+' td a.expander').click(function() {
+                    var btn = $(this);
+                    var tlayer = btn.parent().parent();
+                    var child = $('#switcher table.tree tr.child-of-'+tlayer.attr('id'));
+                    if( tlayer.hasClass('expanded') ) {
+                        tlayer.removeClass('expanded').addClass('collapsed');
+                        child.each(function() {
+                            $(this).addClass('ui-helper-hidden');
+                        });
+                    } else if( tlayer.hasClass('collapsed') ) {
+                        tlayer.removeClass('collapsed').addClass('expanded');
+                        child.each(function() {
+                            $(this).removeClass('ui-helper-hidden');
+                        });
+                    }
+                    return false;
+                });
             }
 
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerView').click(function() {
+            /*$('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerView').click(function() {
                 var btn = $(this);
                 if ( btn.hasClass('checked') ) {
                     btn.removeClass('checked');
@@ -930,7 +993,7 @@ var Petra = function() {
                     lizMap.map.getLayersByName(btn.val())[0].setVisibility(true);
                 }
                 return false;
-            });
+            });*/
             $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
                 var btn = $(this);
                 var btnVal = btn.val();
@@ -978,17 +1041,24 @@ var Petra = function() {
             $('#processing-results-plot > div[class="'+uuid+'"]').remove();
 
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').unbind('click');
-            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid).remove();
-            if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
-                $('#switcher table.tree #group-wps-results').remove();
-
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button').each(function(i, b){
+            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' a.expander').unbind('click');
+            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').each(function(i, b){
                 var layerName = $(b).val();
                 var layers = lizMap.map.getLayersByName( layerName );
                 if ( layers.length > 0 )
                     lizMap.map.removeLayer( layers[0] );
             });
+            $('#switcher table.tree tr.liz-layer.'+uuid).remove();
+            if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
+                $('#switcher table.tree #group-wps-results').remove();
+
+            $('#processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
+            /*$('#processing-results-layer-table tr td[class="'+uuid+'"] button').each(function(i, b){
+                var layerName = $(b).val();
+                var layers = lizMap.map.getLayersByName( layerName );
+                if ( layers.length > 0 )
+                    lizMap.map.removeLayer( layers[0] );
+            });*/
             $('#processing-results-layer-table tr td[class="'+uuid+'"]').remove();
             $('#processing-results-layer-table tr th[class="'+uuid+'"]').remove();
             $('#processing-results-literal-table tr td[class="'+uuid+'"]').remove();
