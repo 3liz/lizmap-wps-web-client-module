@@ -168,7 +168,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             return $this->serviceException();
         }
 
-        preg_match_all('/wps:Reference.*xlink:href="([^"]+)"/i', $data, $matches);
+        preg_match_all('/wps:Reference.*(?:xlink:)?href="([^"]+)"/i', $data, $matches);
         if ( count( $matches ) > 0 ) {
             $wps_url = ltrim($this->wps_url, '/');
             $store_url = $wps_url.'store/';
@@ -224,7 +224,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             return $this->serviceException();
         }
 
-        preg_match_all('/wps:Reference.*xlink:href="([^"]+)"/i', $data, $matches);
+        preg_match_all('/wps:Reference.*(?:xlink:)?href="([^"]+)"/i', $data, $matches);
         if ( count( $matches ) > 0 ) {
             $ows_url = ltrim($this->ows_url, '/');
             $wps_url = ltrim($this->wps_url, '/');
