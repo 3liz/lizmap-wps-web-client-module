@@ -276,9 +276,12 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Connection: close'
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(
+            array(
+                'Connection: close'
+            ),
+            $this->userHttpHeader()
+        );
         $data = curl_exec($ch);
         $info = curl_getinfo($ch);
         $mime = $info['content_type'];
@@ -309,10 +312,13 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            'Connection: close',
-            'Content-Type: text/xml'
-        ));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(
+            array(
+                'Connection: close',
+                'Content-Type: text/xml'
+            ),
+            $this->userHttpHeader()
+        );
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->xml_post);
         $data = curl_exec($ch);
@@ -327,6 +333,22 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             'mime' => $mime,
             'data' => $data,
             'cached' => False
+        );
+    }
+
+    protected function userHttpHeader(){
+        // Check if a user is authenticated
+        if ( !jAuth::isConnected() ) {
+            // return empty header array
+            return array();
+        }
+
+        $user = jAuth::getUserSession();
+        $userGroups = jAcl2DbUserGroup::getGroups();
+
+        return array(
+            'X-Lizmap-User: '. $user,
+            'X-Lizmap-User-Groups: '. implode(', ', $userGroups)
         );
     }
 
