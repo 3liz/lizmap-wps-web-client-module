@@ -4,9 +4,10 @@
 *.pyc
 
 factory.manifest
-/docker/wps
 
 .ignore
 
-.run/
+tests/lizmap/www
+tests/lizmap/var
+tests/lizmap/wps-data
 
