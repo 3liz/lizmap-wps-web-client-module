@@ -1,9 +1,0 @@
-2019-11-28 17:30:33	172.20.0.1	warning	2019-11-28 17:30:33	[2]	SQLite3::query(): Unable to prepare statement: 1, no such table: lizmap_search	/www/lib/jelix/plugins/db/sqlite3/sqlite3.dbconnection.php	112
-
-2019-11-28 17:30:33	172.20.0.1	warning	2019-11-28 17:30:33	[2]	file_get_contents(http://map:8080/ows/?service=WMS&amp;request=GetCapabilitiesAtlas&amp;map=test%5Ffrance%5Fparts%2Ffrance%5Fparts%2Eqgs): failed to open stream: HTTP request failed! HTTP/1.1 501 Not Implemented
-	/www/lizmap/modules/lizmap/classes/lizmapProxy.class.php	236
-
-2019-11-28 17:30:33	172.20.0.1	notice	2019-11-28 17:30:33	[8]	A non well formed numeric value encountered	/www/lizmap/modules/proj4php/classes/proj4phpProj.php	528
-
-2019-11-28 17:30:33	172.20.0.1	notice	2019-11-28 17:30:33	[8]	A non well formed numeric value encountered	/www/lizmap/modules/proj4php/classes/proj4phpProj.php	530
-
