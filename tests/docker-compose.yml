@@ -1,0 +1,78 @@
+version: '3'
+services:
+  lizmap:
+    image: ${REG_PREFIX}lizmap-web-client:${LIZMAP_VERSION_TAG}
+    environment:
+      LIZMAP_CACHEREDISDB: '1'
+      LIZMAP_CACHEREDISHOST: redis
+      LIZMAP_CACHESTORAGETYPE: redis
+      LIZMAP_HOME: /srv/lizmap
+      LIZMAP_USER: ${LIZMAP_USER_ID}
+      LIZMAP_WMSSERVERURL: http://map:8080/ows/
+      LIZMAP_WPS_URL: http://wps:8080/
+    volumes:
+      - ${LIZMAP_DIR}/instances:/srv/projects
+      - ${LIZMAP_DIR}/var/lizmap-theme-config:/www/lizmap/var/lizmap-theme-config
+      - ${LIZMAP_DIR}/var/lizmap-config:/www/lizmap/var/config
+      - ${LIZMAP_DIR}/var/lizmap-db:/www/lizmap/var/db
+      - ${LIZMAP_DIR}/www:/www/lizmap/www
+      - ${LIZMAP_DIR}/www/var/log:/www/lizmap/var/log
+      - ${LIZMAP_DIR}/etc:/srv/etc:ro
+      - ${WPS_MODULE_SRC}/wps:/www/lizmap/lizmap-modules/wps
+    command:
+      - php-fpm
+    restart: unless-stopped
+  map:
+    image: ${REG_PREFIX}qgis-map-server:${QGIS_VERSION_TAG}
+    environment:
+      QGSRV_CACHE_ROOTDIR: /srv/projects
+      QGSRV_CACHE_SIZE: '20'
+      QGSRV_LOGGING_LEVEL: DEBUG
+      QGSRV_USER: ${LIZMAP_USER_ID}:${LIZMAP_USER_GID}
+      QGSRV_SERVER_WORKERS: ${QGIS_MAP_WORKERS}
+      QGSRV_SERVER_PLUGINPATH: /srv/plugins
+      QGSRV_WPS_RESULTS_PROTOCOL: /srv/data
+      PGSERVICEFILE: /srv/etc/pg_service.conf
+      PGSPASSFILE: /srv/etc/pgpass.conf
+    volumes:
+      - ${LIZMAP_DIR}/instances:/srv/projects
+      - ${LIZMAP_DIR}/etc:/srv/etc:ro
+      - ${LIZMAP_DIR}/wps-data:/srv/data
+    ports:
+      - ${OWS_PORT}:8080
+    restart: unless-stopped
+  wps:
+    image: ${REG_PREFIX}qgis-wps:${QGIS_VERSION_TAG}
+    volumes:
+      - '${LIZMAP_DIR}/processing:/srv/processing/:ro'
+      - '${LIZMAP_DIR}/instances:/srv/projects'
+      - '${LIZMAP_DIR}/etc:/srv/etc:ro'
+      - '${LIZMAP_DIR}/wps-data:/srv/data'
+    environment:
+        QYWPS_SERVER_PARALLELPROCESSES: ${WPS_NUM_WORKERS}
+        QYWPS_PROCESSING_PROVIDERS_MODULE_PATH: /srv/processing
+        QYWPS_CACHE_ROOTDIR: /srv/projects
+        QYWPS_SERVER_WORKDIR: /srv/data
+        QYWPS_OUTPUTPATH: /srv/data
+        QYWPS_REDIS_HOST: redis
+        QYWPS_USER: '${LIZMAP_USER_ID}:${LIZMAP_USER_GID}'
+        QYWPS_SERVER_WMS_SERVICE_URL: http://map:8080/ows/
+        QYWPS_SERVER_RESPONSE_TIMEOUT: 1800
+        QYWPS_SERVER_RESPONSE_EXPIRATION: 86400
+        QGSRV_LIZMAP_POLICY: /srv/etc/processing/policy.yml
+        PGSERVICEFILE: /srv/etc/pg_service.conf
+    ports:
+      - ${WPS_PORT}:8080
+  redis:
+    image: redis:5
+  web:
+    image: nginx:1
+    volumes:
+      - ${LIZMAP_DIR}/etc/nginx.conf:/etc/nginx/nginx.conf
+      - ${LIZMAP_DIR}/var/log/nginx:/var/log/nginx
+      - ${LIZMAP_DIR}:/srv/lizmap
+    ports:
+      - ${LIZMAP_PORT}:80
+    depends_on:
+      - lizmap
+

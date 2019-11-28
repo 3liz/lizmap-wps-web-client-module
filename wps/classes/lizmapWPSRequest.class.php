@@ -281,7 +281,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
                 'Connection: close'
             ),
             $this->userHttpHeader()
-        );
+        ));
         $data = curl_exec($ch);
         $info = curl_getinfo($ch);
         $mime = $info['content_type'];
@@ -318,7 +318,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
                 'Content-Type: text/xml'
             ),
             $this->userHttpHeader()
-        );
+        ));
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->xml_post);
         $data = curl_exec($ch);
@@ -343,7 +343,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             return array();
         }
 
-        $user = jAuth::getUserSession();
+        $user = jAuth::getUserSession()->login;
         $userGroups = jAcl2DbUserGroup::getGroups();
 
         return array(
