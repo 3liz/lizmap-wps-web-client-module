@@ -343,11 +343,11 @@ class lizmapWPSRequest extends lizmapOGCRequest {
             return array();
         }
 
-        $user = jAuth::getUserSession()->login;
+        $user = jAuth::getUserSession();
         $userGroups = jAcl2DbUserGroup::getGroups();
 
         return array(
-            'X-Lizmap-User: '. $user,
+            'X-Lizmap-User: '. $user->login,
             'X-Lizmap-User-Groups: '. implode(', ', $userGroups)
         );
     }
