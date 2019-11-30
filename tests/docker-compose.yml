@@ -59,7 +59,8 @@ services:
         QYWPS_SERVER_WMS_SERVICE_URL: http://map:8080/ows/
         QYWPS_SERVER_RESPONSE_TIMEOUT: 1800
         QYWPS_SERVER_RESPONSE_EXPIRATION: 86400
-        QGSRV_LIZMAP_POLICY: /srv/etc/processing/policy.yml
+        QYWPS_LOGLEVEL: DEBUG
+        QGSRV_LIZMAP_POLICY: /srv/processing/policy.yml
         PGSERVICEFILE: /srv/etc/pg_service.conf
     ports:
       - ${WPS_PORT}:8080

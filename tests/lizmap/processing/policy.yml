@@ -1,0 +1,24 @@
+
+---
+
+autoreload: yes
+
+# Define access policies
+policies:
+    # Global policy
+    - deny: all
+
+    # Policy for groups operator
+    - allow:  'pyqgiswps_test:*'
+      groups:
+        - operator
+
+    # Policy for groups admin and operator
+    - allow: all
+      groups:
+        - admins
+
+# Include other policies
+#include_policies:
+#    - policy/*/*.yml
+
