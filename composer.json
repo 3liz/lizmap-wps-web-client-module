@@ -4,7 +4,7 @@
     "description": "Jelix modules to add WPS Web Client.",
     "keywords": ["module", "jelix", "lizmap", "wps"],
     "homepage": "http://3liz.com",
-    "license": "Mozilla Public License 2.0 (MPL 2.0)",
+    "license": "MPL-2.0",
     "authors": [
         {
             "name": "René-Luc Dhont",
