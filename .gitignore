@@ -1,5 +1,6 @@
 # OSX garbage
 .DS_Store
+.idea/
 
 *.pyc
 
