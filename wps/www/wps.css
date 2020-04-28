@@ -34,6 +34,12 @@
     animation: slide-hidden 5000ms infinite linear;
 }
 
+#processing-results-plot > div{
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+}
+
 @-webkit-keyframes slide {
     0%   { width:   0%; }
     50%  { width: 100%; }
