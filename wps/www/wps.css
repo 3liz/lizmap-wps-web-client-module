@@ -37,7 +37,6 @@
 #processing-results-plot > div{
     display: inline-block;
     vertical-align: top;
-    width: 50%;
 }
 
 @-webkit-keyframes slide {

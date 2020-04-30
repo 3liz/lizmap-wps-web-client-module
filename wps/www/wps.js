@@ -1017,6 +1017,7 @@ var Petra = function() {
             div+= '<h5>'+(new Date(processExecuted.startTime)).toLocaleString()+'</h5>';
             div+= '</div>';
             $('#processing-results-plot').append(div);
+
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.reference )
@@ -1036,9 +1037,6 @@ var Petra = function() {
             }
             // Hide or show content depending on results
             $('#processing-results-plot').toggle(hasPlot);
-
-
-
         } else {
             $('#processing-results-plot > div[class="'+uuid+'"]').remove();
 
@@ -1069,12 +1067,27 @@ var Petra = function() {
         }
 
         // open dock
-        if ( !$('#button-processing-results').parent().hasClass('active') )
+        if ( !$('#button-processing-results').parent().hasClass('active') ){
             $('#button-processing-results').click();
+        }
 
         if ( $('#processing-results-literal-table tr:first th').length == 1
-            && $('#button-processing-results').parent().hasClass('active') )
+            && $('#button-processing-results').parent().hasClass('active') ){
             $('#button-processing-results').click();
+            }
+
+        refreshPlotsWidth();
+    }
+
+    function refreshPlotsWidth(){
+        const plotDivs = document.querySelectorAll('#processing-results-plot > div .js-plotly-plot');
+        const divWidth = parseInt((document.querySelector('#processing-results').clientWidth - 10) / (plotDivs.length));
+
+        for (const plotDiv of plotDivs) {
+            Plotly.relayout(plotDiv.id, {
+                width: divWidth
+            });
+        }
     }
 
     function updateLogTable( executedProcess ) {
@@ -1151,8 +1164,9 @@ var Petra = function() {
                 }
 
             }
-            else
+            else{
                 console.log('unknown uuid');
+            }
         });
     }
 
@@ -1425,6 +1439,9 @@ var Petra = function() {
                 elt.change();
             });
 
+        },
+        'datavizplotloaded': function () {
+            refreshPlotsWidth();
         }
 
     });
