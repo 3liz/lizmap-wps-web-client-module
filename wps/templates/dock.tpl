@@ -19,7 +19,7 @@
 
         <div id="processing-log-tab" class="tab-pane">
             <div id="processing-log">
-                <table id="processing-log-table" class="table table-condensed table-striped">
+                <table id="processing-log-table" class="table table-condensed table-striped tree">
                     <tbody>
                         <tr>
                             <th>Start</th>
