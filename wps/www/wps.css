@@ -14,8 +14,6 @@
   display: block;
 }
 
-
-
 #processing-log-table tr td div.progress{
     width:50px;
 }
@@ -38,6 +36,20 @@
     display: inline-block;
     vertical-align: top;
 }
+
+#processing-log-tab, #processing-results-plot{
+    display: inline-block!important;
+    vertical-align: top;
+}
+
+#processing-log-tab{
+    width: 15%;
+}
+
+#processing-results-plot{
+    width: 83%;
+}
+
 
 @-webkit-keyframes slide {
     0%   { width:   0%; }

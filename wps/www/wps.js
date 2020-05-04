@@ -1081,7 +1081,7 @@ var Petra = function() {
 
     function refreshPlotsWidth(){
         const plotDivs = document.querySelectorAll('#processing-results-plot > div .js-plotly-plot');
-        const divWidth = parseInt((document.querySelector('#processing-results').clientWidth - 10) / (plotDivs.length));
+        const divWidth = parseInt((document.querySelector('#processing-results').clientWidth - 140) / (plotDivs.length));
 
         for (const plotDiv of plotDivs) {
             Plotly.relayout(plotDiv.id, {
