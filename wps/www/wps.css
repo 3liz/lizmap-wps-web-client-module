@@ -32,24 +32,31 @@
     animation: slide-hidden 5000ms infinite linear;
 }
 
-#processing-results-plot > div{
-    display: inline-block;
-    vertical-align: top;
+#processing-results-plot{
+    display: inline-flex;
 }
 
-#processing-log-tab, #processing-results-plot{
+#processing-results-plot > div{
+    flex-grow: 1;
+}
+
+#processing-log-tab{
     display: inline-block!important;
     vertical-align: top;
 }
 
 #processing-log-tab{
-    width: 15%;
+    width: 365px;
 }
 
-#processing-results-plot{
-    width: 83%;
+#processing-results > div.menu-content > #processing-results-all{
+    width: calc(100% - 390px);
+    display:inline-flex;
 }
 
+#processing-results-all > div{
+    flex-grow: 1;
+}
 
 @-webkit-keyframes slide {
     0%   { width:   0%; }

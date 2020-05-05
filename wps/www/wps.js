@@ -1081,7 +1081,7 @@ var Petra = function() {
 
     function refreshPlotsWidth(){
         const plotDivs = document.querySelectorAll('#processing-results-plot > div .js-plotly-plot');
-        const divWidth = parseInt((document.querySelector('#processing-results').clientWidth - 140) / (plotDivs.length));
+        const divWidth = parseInt((document.querySelector('#processing-results-plot').clientWidth - 50 ) / (plotDivs.length));
 
         for (const plotDiv of plotDivs) {
             Plotly.relayout(plotDiv.id, {
@@ -1104,13 +1104,13 @@ var Petra = function() {
 
         // Action buttons
         tr += '<td>';
-        tr += '<button class="btn btn-mini" value="details-' + uuid + '" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
         if (status == 'Succeeded') {
             tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
         }
         else if (status == 'Failed') {
             tr += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
         }
+        tr += '<button class="btn btn-mini" value="details-' + uuid + '" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
         tr += '</td>';
 
         tr += '<td>'+(new Date(startTime)).toLocaleString()+'</td>';
