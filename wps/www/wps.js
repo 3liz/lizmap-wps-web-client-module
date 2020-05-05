@@ -776,8 +776,6 @@ var Petra = function() {
 
         var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"]');
 
-        $('#processing-results-literal').show();
-        $('#processing-results-layer').show();
         btn.addClass('checked');
         $('#processing-results-title').html(processExecuted.title);
         if ( $('#processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
