@@ -6,10 +6,10 @@
             <table id="processing-log-table" class="table table-condensed table-striped tree">
                 <tbody>
                     <tr>
+                        <th>Actions</th>
                         <th>Start</th>
                         <th>End</th>
                         <th>Status</th>
-                        <th>Actions</th>
                     </tr>
                 </tbody>
             </table>

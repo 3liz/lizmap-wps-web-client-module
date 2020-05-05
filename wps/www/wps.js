@@ -1101,6 +1101,18 @@ var Petra = function() {
         var endTime = executedProcess.endTime;
         var tr = '<tr id="log-'+uuid+'">';
         //tr += '<td>'+uuid+'</td>';
+
+        // Action buttons
+        tr += '<td>';
+        tr += '<button class="btn btn-mini" value="details-' + uuid + '" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
+        if (status == 'Succeeded') {
+            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+        }
+        else if (status == 'Failed') {
+            tr += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
+        }
+        tr += '</td>';
+
         tr += '<td>'+(new Date(startTime)).toLocaleString()+'</td>';
         if ( endTime != '' )
             tr += '<td>'+(new Date(endTime)).toLocaleString()+'</td>';
@@ -1116,14 +1128,7 @@ var Petra = function() {
             tr += '<td><span class="badge badge-important"><i class="icon-white icon-remove"></i></span></td>';
         else
             tr += '<td>'+status+'</td>';
-        //tr += '<td></td>';
-        tr += '<td>';
-        tr += '<button class="btn btn-mini" value="details-'+uuid+'" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
-        if ( status == 'Succeeded' )
-            tr += '<button class="btn btn-mini checkbox" value="results-'+uuid+'" title="Toggle process results"></button>';
-        else if ( status == 'Failed' )
-            tr += '<button class="btn btn-mini" value="failed-'+uuid+'" title="Toggle process information"><i class="icon-info-sign"></i></button>';
-        tr += '</td>';
+
         tr += '</tr>';
 
         var logTr = $('#log-'+uuid);
