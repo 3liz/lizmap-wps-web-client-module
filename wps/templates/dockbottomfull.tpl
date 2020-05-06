@@ -2,6 +2,9 @@
     <h3 id="processing-results-title"></h3>
 
     <div id="processing-log-tab" class="tab-pane">
+        <div>
+            <ul id="processing-log-list"></ul>
+        </div>
         <div id="processing-log">
             <table id="processing-log-table" class="table table-condensed table-striped tree">
                 <tbody>
@@ -35,7 +38,7 @@
         </div>
     </div>
     <div id="processing-results-all">
-        <div id="processing-results-literal">
+        <div id="processing-results-literal" style="display:none;">
             <h4>Literals output</h4>
             <table id="processing-results-literal-table" class="table table-condensed table-striped">
                 <tbody>
@@ -45,7 +48,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="processing-results-layer">
+        <div id="processing-results-layer" style="display:none;">
             <h4>Layers output</h4>
             <table id="processing-results-layer-table" class="table table-condensed table-striped">
                 <tbody>
@@ -56,7 +59,6 @@
             </table>
         </div>
         <div id="processing-results-plot">
-            <h4>Plots output</h4>
         </div>
     </div>
 </div>

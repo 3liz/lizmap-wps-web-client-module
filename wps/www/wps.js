@@ -20,9 +20,10 @@ var Petra = function() {
                     response.responseText
                 );
                 var dropdown = document.getElementById("processing-processes");
+                var processingLogList = document.getElementById("processing-log-list");
                 var offerings = capabilities.processOfferings, option;
 
-                // populate the dropdown
+                // populate dropdown and list
                 for (var p in offerings) {
                     // Remove alg if not set in wps_wps_project_config
                     if(
@@ -31,10 +32,26 @@ var Petra = function() {
                     ){
                         continue;
                     }
+                    // Dropdown
                     option = document.createElement("option");
                     option.innerHTML = offerings[p].title;
                     option.value = p;
                     dropdown.appendChild(option);
+
+                    // List
+                    const li = document.createElement("li");
+                    li.innerHTML = offerings[p].title;
+                    li.dataset.value = p;
+                    processingLogList.appendChild(li);
+                }
+
+                // Add toggle behaviour to processing-log-list
+                for (const li of document.querySelectorAll('#processing-log-list li')) {
+                    li.addEventListener('click', e => {
+                        e.target.classList.toggle('expanded');
+
+                        // console.log(e.target.dataset.value);
+                    });
                 }
             }
         });
@@ -56,17 +73,17 @@ var Petra = function() {
         $('#processing-info-outputs tr:not(:first)').remove();
 
         // clean log table
-        $('#processing-log-table tr:not(:first) button').unbind('click');
-        $('#processing-log-table tr:not(:first)').remove();
+        // $('#processing-log-table tr:not(:first) button').unbind('click');
+        // $('#processing-log-table tr:not(:first)').remove();
 
         // clean results table
-        $('#processing-results-literal').hide();
-        $('#processing-results-literal-table tr:not(:first)').remove();
-        $('#processing-results-literal-table tr:first th:not(:first)').remove();
-        $('#processing-results-layer').hide();
-        $('#processing-results-layer-table tr:not(:first)').remove();
-        $('#processing-results-layer-table tr:first th:not(:first)').remove();
-        $('#processing-results-plot').html('').hide();
+        // $('#processing-results-literal').hide();
+        // $('#processing-results-literal-table tr:not(:first)').remove();
+        // $('#processing-results-literal-table tr:first th:not(:first)').remove();
+        // $('#processing-results-layer').hide();
+        // $('#processing-results-layer-table tr:not(:first)').remove();
+        // $('#processing-results-layer-table tr:first th:not(:first)').remove();
+        // $('#processing-results-plot').html('').hide();
 
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {

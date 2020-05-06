@@ -58,6 +58,23 @@
     flex-grow: 1;
 }
 
+#processing-log-list{
+    cursor: pointer;
+    list-style: none
+}
+
+#processing-log-list li:before{
+    content: "\2023";
+    margin-right: 5px;
+    font-size: 1.5em;
+    vertical-align: middle;
+}
+
+#processing-log-list li.expanded:before{
+    display: inline-block;
+    transform: rotate(90deg);
+}
+
 @-webkit-keyframes slide {
     0%   { width:   0%; }
     50%  { width: 100%; }
