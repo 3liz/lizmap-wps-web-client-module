@@ -51,6 +51,26 @@ var Petra = function() {
                         e.target.classList.toggle('expanded');
 
                         // console.log(e.target.dataset.value);
+                        if(e.target.classList.contains('expanded')){
+                            $.get(lizUrls['wps_wps_results'], {
+                                repository: lizUrls.params.repository,
+                                project: lizUrls.params.project,
+                                identifier: e.target.dataset.value
+                            }, function (d) {
+                                console.log('Get stored results');
+                                console.log(d);
+                                if (!d)
+                                    return;
+                                for (var uuid in d) {
+                                    var executedProcess = d[uuid];
+                                    if (executedProcess) {
+                                        executedProcesses[uuid] = d[uuid];
+                                        updateLogTable(d[uuid]);
+                                    }
+                                }
+                                scheduleUpdateStatusProcesses()
+                            });
+                        }
                     });
                 }
             }
@@ -103,24 +123,6 @@ var Petra = function() {
                         response.responseText
                     ).processDescriptions[selection];
                     buildForm();
-                    $.get(lizUrls['wps_wps_results'],{
-                            repository: lizUrls.params.repository,
-                            project: lizUrls.params.project,
-                            identifier: selection
-                        }, function( d ) {
-                            console.log('Get stored results');
-                            console.log(d);
-                            if ( !d )
-                                return;
-                            for ( var uuid in d ) {
-                                var executedProcess = d[uuid];
-                                if ( executedProcess ) {
-                                    executedProcesses[uuid] = d[uuid];
-                                    updateLogTable( d[uuid] );
-                                }
-                            }
-                            scheduleUpdateStatusProcesses()
-                        });
                 }
             });
         } else {
