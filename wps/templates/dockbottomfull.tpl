@@ -3,7 +3,7 @@
 
     <div id="processing-log-tab" class="tab-pane">
         <div>
-            <ul id="processing-log-list"></ul>
+            <ul id="processing-log-list" class="tree"></ul>
         </div>
         <div id="processing-log">
             <table id="processing-log-table" class="table table-condensed table-striped tree">

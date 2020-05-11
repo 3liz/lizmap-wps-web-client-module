@@ -59,12 +59,15 @@
 }
 
 #processing-log-list{
-    cursor: pointer;
     list-style: none;
     margin-left: 0;
 }
 
-#processing-log-list li:before{
+#processing-log-list li .title{
+    cursor: pointer;
+}
+
+#processing-log-list > li:before{
     content: "\2023";
     margin-right: 5px;
     font-size: 1.5em;
@@ -74,6 +77,14 @@
 #processing-log-list li.expanded:before{
     display: inline-block;
     transform: rotate(90deg);
+}
+
+#processing-log-list li ul.processing-log-list-results{
+    display: none;
+}
+
+#processing-log-list li.expanded ul.processing-log-list-results{
+    display: block;
 }
 
 @-webkit-keyframes slide {

@@ -40,22 +40,28 @@ var Petra = function() {
 
                     // List
                     const li = document.createElement("li");
-                    li.innerHTML = offerings[p].title;
+                    li.innerHTML = '<span class="title">' + offerings[p].title + '</span>';
                     li.dataset.value = p;
+                    const resultsUL = document.createElement("ul");
+                    resultsUL.classList = "processing-log-list-results";
+                    li.appendChild(resultsUL);
                     processingLogList.appendChild(li);
                 }
 
                 // Add toggle behaviour to processing-log-list
-                for (const li of document.querySelectorAll('#processing-log-list li')) {
+                for (const li of document.querySelectorAll('#processing-log-list > li .title')) {
                     li.addEventListener('click', e => {
-                        e.target.classList.toggle('expanded');
+                        const liClicked = e.target.parentElement;
+                        liClicked.classList.toggle('expanded');
 
-                        // console.log(e.target.dataset.value);
-                        if(e.target.classList.contains('expanded')){
+                        if (liClicked.classList.contains('expanded')){
+                            // Clear results first
+                            liClicked.querySelector('.processing-log-list-results').innerHTML = '';
+
                             $.get(lizUrls['wps_wps_results'], {
                                 repository: lizUrls.params.repository,
                                 project: lizUrls.params.project,
-                                identifier: e.target.dataset.value
+                                identifier: liClicked.dataset.value
                             }, function (d) {
                                 console.log('Get stored results');
                                 console.log(d);
@@ -66,6 +72,7 @@ var Petra = function() {
                                     if (executedProcess) {
                                         executedProcesses[uuid] = d[uuid];
                                         updateLogTable(d[uuid]);
+                                        updateLogList(d[uuid]);
                                     }
                                 }
                                 scheduleUpdateStatusProcesses()
@@ -123,6 +130,26 @@ var Petra = function() {
                         response.responseText
                     ).processDescriptions[selection];
                     buildForm();
+
+                    $.get(lizUrls['wps_wps_results'], {
+                        repository: lizUrls.params.repository,
+                        project: lizUrls.params.project,
+                        identifier: selection
+                    }, function (d) {
+                        console.log('Get stored results');
+                        console.log(d);
+                        if (!d)
+                            return;
+                        for (var uuid in d) {
+                            var executedProcess = d[uuid];
+                            if (executedProcess) {
+                                executedProcesses[uuid] = d[uuid];
+                                updateLogTable(d[uuid]);
+                                updateLogList(d[uuid]);
+                            }
+                        }
+                        scheduleUpdateStatusProcesses()
+                    });
                 }
             });
         } else {
@@ -1100,6 +1127,31 @@ var Petra = function() {
                 width: divWidth
             });
         }
+    }
+
+    function updateLogList( executedProcess ) {
+        if (!executedProcess)
+            return;
+        if (!executedProcess.uuid)
+            return;
+        var uuid = executedProcess.uuid;
+        var startTime = executedProcess.startTime;
+        var status = executedProcess.status;
+        var endTime = executedProcess.endTime;
+
+        let toggleButton = '';
+
+        if (status == 'Succeeded') {
+            toggleButton += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+        }
+        else if (status == 'Failed') {
+            toggleButton += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
+        }
+
+        // Add result in its category
+        const resultLi = '<li class="' + uuid + '">' + toggleButton + '</li>';
+
+        $('#processing-log-list > li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(resultLi);
     }
 
     function updateLogTable( executedProcess ) {
