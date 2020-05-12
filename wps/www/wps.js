@@ -1134,10 +1134,10 @@ var Petra = function() {
             return;
         if (!executedProcess.uuid)
             return;
-        var uuid = executedProcess.uuid;
-        var startTime = executedProcess.startTime;
-        var status = executedProcess.status;
-        var endTime = executedProcess.endTime;
+        const uuid = executedProcess.uuid;
+        const shortUUID = uuid.substring(0, 13);
+        const startTime = executedProcess.startTime;
+        const status = executedProcess.status;
 
         let toggleButton = '';
 
@@ -1148,12 +1148,17 @@ var Petra = function() {
             toggleButton += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
         }
 
-        const shortUUID = uuid.substring(0, 13);
-
         // Add result in its category
-        const resultLi = '<li class="' + uuid + '">' + toggleButton + '<span class="short-uuid" title="' + (new Date(startTime)).toLocaleString() + '">' + shortUUID + '</span></li>';
-
+        const resultLi = '<li class="result-' + uuid + '">' + toggleButton + '<span class="short-uuid" title="' + (new Date(startTime)).toLocaleString() + '">' + shortUUID + '</span></li>';
         $('#processing-log-list > li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(resultLi);
+
+        // Handle click on button toggling plots view
+        for (const button of document.querySelectorAll('.processing-log-list-results li.result-' + uuid +' button')) {
+            button.addEventListener('click', e => {
+                const buttonClicked = e.target;
+                buttonClicked.classList.toggle('checked');
+            });
+        }
     }
 
     function updateLogTable( executedProcess ) {
