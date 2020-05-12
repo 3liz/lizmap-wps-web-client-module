@@ -1148,8 +1148,10 @@ var Petra = function() {
             toggleButton += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
         }
 
+        const shortUUID = uuid.substring(0, 13);
+
         // Add result in its category
-        const resultLi = '<li class="' + uuid + '">' + toggleButton + '</li>';
+        const resultLi = '<li class="' + uuid + '">' + toggleButton + '<span class="short-uuid" title="' + (new Date(startTime)).toLocaleString() + '">' + shortUUID + '</span></li>';
 
         $('#processing-log-list > li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(resultLi);
     }

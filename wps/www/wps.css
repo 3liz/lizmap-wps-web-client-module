@@ -87,6 +87,14 @@
     display: block;
 }
 
+.short-uuid {
+    margin-left: 5px;
+}
+
+.processing-log-list-results{
+    list-style: none;
+}
+
 @-webkit-keyframes slide {
     0%   { width:   0%; }
     50%  { width: 100%; }
