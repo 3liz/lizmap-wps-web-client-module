@@ -70,16 +70,16 @@ class wpsListener extends jEventListener{
         $event->add($dock);
     }
 
-    function onmapRightDockable ($event) {
+    function onmapBottomDockable ($event) {
         if ( !$this->isAvailable($event) )
             return;
 
         // Use template dataviz-dock
         $assign = array();
-        $content = array( 'wps~dockright', $assign );
+        $content = array('wps~bottomdock', $assign );
         $dock = new lizmapMapDockItem(
             'processing-results',
-            'WPS Résultats',
+            'WPS results',
             $content,
             15,
             null, // fait via getMapAdditions

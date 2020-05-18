@@ -2,6 +2,6 @@
    <listener name="wps">
        <event name="getMapAdditions" />
        <event name="mapDockable" />
-       <event name="mapRightDockable" />
+       <event name="mapBottomDockable" />
    </listener>
 </events>
