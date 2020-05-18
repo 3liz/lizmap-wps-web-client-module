@@ -20,9 +20,10 @@ var Petra = function() {
                     response.responseText
                 );
                 var dropdown = document.getElementById("processing-processes");
+                var processingLogList = document.getElementById("processing-log-list");
                 var offerings = capabilities.processOfferings, option;
 
-                // populate the dropdown
+                // Populate the dropdown and results list
                 for (var p in offerings) {
                     // Remove alg if not set in wps_wps_project_config
                     if(
@@ -31,10 +32,29 @@ var Petra = function() {
                     ){
                         continue;
                     }
+
+                    // Dropdown
                     option = document.createElement("option");
                     option.innerHTML = offerings[p].title;
                     option.value = p;
                     dropdown.appendChild(option);
+
+                    // List
+                    const li = document.createElement("li");
+                    li.innerHTML = '<span class="title">' + offerings[p].title + '</span>';
+                    li.dataset.value = p;
+                    const resultsTable = document.createElement("table");
+                    resultsTable.classList = "processing-log-list-results";
+                    li.appendChild(resultsTable);
+                    processingLogList.appendChild(li);
+                }
+
+                // Add toggle behaviour to processing-log-list
+                for (const li of document.querySelectorAll('#processing-log-list > li .title')) {
+                    li.addEventListener('click', e => {
+                        const liClicked = e.target.parentElement;
+                        liClicked.classList.toggle('expanded');
+                    });
                 }
             }
         });

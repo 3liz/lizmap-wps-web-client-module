@@ -14,8 +14,6 @@
   display: block;
 }
 
-
-
 #processing-log-table tr td div.progress{
     width:50px;
 }
@@ -32,6 +30,32 @@
     -moz-animation: slide-hidden 5000ms infinite linear;
     -o-animation: slide-hidden 5000ms infinite linear;
     animation: slide-hidden 5000ms infinite linear;
+}
+
+#processing-log-list{
+    cursor: pointer;
+    list-style: none;
+    margin-left: 0;
+}
+
+#processing-log-list li:before{
+    content: "\2023";
+    margin-right: 5px;
+    font-size: 1.5em;
+    vertical-align: middle;
+}
+
+#processing-log-list li.expanded:before{
+    display: inline-block;
+    transform: rotate(90deg);
+}
+
+#processing-log-list li .processing-log-list-results{
+    display: none;
+}
+
+#processing-log-list li.expanded .processing-log-list-results{
+    display: block;
 }
 
 @-webkit-keyframes slide {
