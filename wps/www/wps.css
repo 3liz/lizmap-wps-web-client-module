@@ -33,9 +33,12 @@
 }
 
 #processing-log-list{
-    cursor: pointer;
     list-style: none;
     margin-left: 0;
+}
+
+#processing-log-list .title{
+    cursor: pointer;
 }
 
 #processing-log-list li:before{

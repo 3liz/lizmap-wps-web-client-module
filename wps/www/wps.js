@@ -44,7 +44,7 @@ var Petra = function() {
                     li.innerHTML = '<span class="title">' + offerings[p].title + '</span>';
                     li.dataset.value = p;
                     const resultsTable = document.createElement("table");
-                    resultsTable.classList = "processing-log-list-results";
+                    resultsTable.classList = "processing-log-list-results table table-condensed table-striped";
                     li.appendChild(resultsTable);
                     processingLogList.appendChild(li);
                 }
@@ -54,6 +54,31 @@ var Petra = function() {
                     li.addEventListener('click', e => {
                         const liClicked = e.target.parentElement;
                         liClicked.classList.toggle('expanded');
+
+                        // Load and display results
+                        if (liClicked.classList.contains('expanded')) {
+                            const selection = liClicked.dataset.value;
+                            if (selection != '') {
+                                $.get(lizUrls['wps_wps_results'], {
+                                    repository: lizUrls.params.repository,
+                                    project: lizUrls.params.project,
+                                    identifier: selection
+                                }, function (d) {
+                                    console.log('Get stored results');
+                                    console.log(d);
+                                    if (!d)
+                                        return;
+                                    for (var uuid in d) {
+                                        var executedProcess = d[uuid];
+                                        if (executedProcess) {
+                                            executedProcesses[uuid] = d[uuid];
+                                            updateLogTable(d[uuid]);
+                                        }
+                                    }
+                                    scheduleUpdateStatusProcesses()
+                                });
+                            }
+                        }
                     });
                 }
             }
@@ -64,33 +89,27 @@ var Petra = function() {
     // process
     function describeProcess() {
 
+        // Empty title, abstract and info tables in 'Help' tab
         $("#processing-title").html('');
         $("#processing-abstract").html('');
-
-        // clean form
-        document.getElementById("processing-input").innerHTML = '';
-        document.getElementById("processing-output").innerHTML = '';
-
-        // clean info tables
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
 
-        // clean log table
-        $('#processing-log-table tr:not(:first) button').unbind('click');
-        $('#processing-log-table tr:not(:first)').remove();
+        // Clean 'Run' tab form
+        document.getElementById("processing-input").innerHTML = '';
+        document.getElementById("processing-output").innerHTML = '';
 
-        // clean results table
-        $('#processing-results-literal').hide();
-        $('#processing-results-literal-table tr:not(:first)').remove();
-        $('#processing-results-literal-table tr:first th:not(:first)').remove();
-        $('#processing-results-layer').hide();
-        $('#processing-results-layer-table tr:not(:first)').remove();
-        $('#processing-results-layer-table tr:first th:not(:first)').remove();
-        $('#processing-results-plot').html('').hide();
+        // clean results table (TODO: refactoring)
+        // $('#processing-results-literal').hide();
+        // $('#processing-results-literal-table tr:not(:first)').remove();
+        // $('#processing-results-literal-table tr:first th:not(:first)').remove();
+        // $('#processing-results-layer').hide();
+        // $('#processing-results-layer-table tr:not(:first)').remove();
+        // $('#processing-results-layer-table tr:first th:not(:first)').remove();
+        // $('#processing-results-plot').html('').hide();
 
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {
-            //$('#processing-form-container').show();
             OpenLayers.Request.GET({
                 url: lizUrls['wps_wps'],
                 params: {
@@ -106,28 +125,8 @@ var Petra = function() {
                         response.responseText
                     ).processDescriptions[selection];
                     buildForm();
-                    $.get(lizUrls['wps_wps_results'],{
-                            repository: lizUrls.params.repository,
-                            project: lizUrls.params.project,
-                            identifier: selection
-                        }, function( d ) {
-                            console.log('Get stored results');
-                            console.log(d);
-                            if ( !d )
-                                return;
-                            for ( var uuid in d ) {
-                                var executedProcess = d[uuid];
-                                if ( executedProcess ) {
-                                    executedProcesses[uuid] = d[uuid];
-                                    updateLogTable( d[uuid] );
-                                }
-                            }
-                            scheduleUpdateStatusProcesses()
-                        });
                 }
             });
-        } else {
-            // Error : no selection in the process list combobox
         }
     }
 
@@ -141,7 +140,6 @@ var Petra = function() {
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
 
-        //console.log(process);
         var inputs = process.dataInputs, supported = true,
             outputs = process.processOutputs,
             sld = "text/xml; subtype=sld/1.0.0",
@@ -1134,8 +1132,9 @@ var Petra = function() {
         tr += '</tr>';
 
         var logTr = $('#log-'+uuid);
-        if ( logTr.length == 0 )
-            $('#processing-log-table tr:first').after(tr);
+        if ( logTr.length == 0 ){
+            $('li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
+        }
         else {
             logTr.find('button').unbind('click');
             logTr.replaceWith(tr);
