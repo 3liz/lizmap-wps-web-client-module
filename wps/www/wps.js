@@ -1325,7 +1325,6 @@ var Petra = function() {
         var uuid = pToSave.uuid;
         executedProcesses[uuid] = pToSave;
 
-        $("a[href='#processing-log-tab']").click();
         updateLogTable( pToSave );
         storeStatusProcess( uuid );
         updateStatusProcess( uuid );
