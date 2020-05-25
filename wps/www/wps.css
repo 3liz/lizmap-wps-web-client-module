@@ -7,13 +7,6 @@
   font-size: 12px;
 }
 
-#processing-results > div.menu-content > div {
-  margin: 5px 0px;
-  padding: 0px 5px;
-  background-color: rgb(240, 240, 240);
-  display: block;
-}
-
 #processing-log-table tr td div.progress{
     width:50px;
 }
@@ -59,6 +52,28 @@
 
 #processing-log-list li.expanded .processing-log-list-results{
     display: block;
+}
+
+#processing-results-all{
+    display: inline-flex;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: rgb(240, 240, 240);
+    margin: 5px 0px;
+    padding: 0px 5px;
+}
+
+#processing-results-all > div{
+    padding: 2px;
+}
+
+#processing-results-all > div + div{
+    flex: 1 1 0px;
+    border-left: solid 1px lightgray;
+}
+
+#bottom-dock{
+    width:auto;
 }
 
 @-webkit-keyframes slide {
