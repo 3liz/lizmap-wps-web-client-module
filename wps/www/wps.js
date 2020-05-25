@@ -663,9 +663,17 @@ var Petra = function() {
             headers:{
                 'Content-Length': data.length
             },
-            success: function(response) {showOutput(response, requestTime)},
+            success: function(response) {
+                showOutput(response, requestTime);
+                // Display results tab if inactive
+                $('li.processing-results:not(.active) #button-processing-results').click();
+                // Display results for executed algorithm if not expanded
+                $('#processing-log-list li[data-value="' + $("#processing-processes").val() + '"]:not(.expanded)').addClass('expanded');
+                
+            },
             failure: function() {}
         });
+
         return false;
     }
 
