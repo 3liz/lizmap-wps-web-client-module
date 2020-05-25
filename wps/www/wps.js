@@ -1108,17 +1108,30 @@ var Petra = function() {
             return;
         if ( !executedProcess.uuid )
             return;
-        var uuid = executedProcess.uuid;
-        var startTime = executedProcess.startTime;
-        var status = executedProcess.status;
-        var endTime = executedProcess.endTime;
-        var tr = '<tr id="log-'+uuid+'">';
-        //tr += '<td>'+uuid+'</td>';
-        tr += '<td>'+(new Date(startTime)).toLocaleString()+'</td>';
-        if ( endTime != '' )
-            tr += '<td>'+(new Date(endTime)).toLocaleString()+'</td>';
-        else
-            tr += '<td></td>';
+        const uuid = executedProcess.uuid;
+        const startTime = executedProcess.startTime;
+        const status = executedProcess.status;
+        const endTime = executedProcess.endTime;
+
+        const shortUUID = uuid.substring(0, 13);
+
+        let tr = '<tr id="log-'+uuid+'">';
+
+        // Display actions buttons
+        tr += '<td>';
+        if (status == 'Succeeded'){
+            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+        }
+        else if (status == 'Failed'){
+            tr += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
+        }
+        tr += '<button class="btn btn-mini" value="details-' + uuid + '" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
+        tr += '</td>';
+
+        // Display short UUID
+        tr += '<td title="' + (new Date(startTime)).toLocaleString() + '">'+shortUUID+'</td>';
+
+        // Display status
         if ( status == 'Accepted' || status == 'Started' )
             tr += '<td><div class="progress"><div class="bar bar-hidden"></div><div class="bar"></div></div></td>';
         else if ( status == 'Paused' )
@@ -1129,14 +1142,7 @@ var Petra = function() {
             tr += '<td><span class="badge badge-important"><i class="icon-white icon-remove"></i></span></td>';
         else
             tr += '<td>'+status+'</td>';
-        //tr += '<td></td>';
-        tr += '<td>';
-        tr += '<button class="btn btn-mini" value="details-'+uuid+'" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
-        if ( status == 'Succeeded' )
-            tr += '<button class="btn btn-mini checkbox" value="results-'+uuid+'" title="Toggle process results"></button>';
-        else if ( status == 'Failed' )
-            tr += '<button class="btn btn-mini" value="failed-'+uuid+'" title="Toggle process information"><i class="icon-info-sign"></i></button>';
-        tr += '</td>';
+
         tr += '</tr>';
 
         var logTr = $('#log-'+uuid);
