@@ -1097,10 +1097,6 @@ var Petra = function() {
         // open dock
         if ( !$('#button-processing-results').parent().hasClass('active') )
             $('#button-processing-results').click();
-
-        if ( $('#processing-results-literal-table tr:first th').length == 1
-            && $('#button-processing-results').parent().hasClass('active') )
-            $('#button-processing-results').click();
     }
 
     function updateLogTable( executedProcess ) {
