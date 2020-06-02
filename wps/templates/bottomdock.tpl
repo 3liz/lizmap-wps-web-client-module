@@ -25,7 +25,7 @@
                 </div>
             </div>
         </div>
-        <div id="processing-results-literal">
+        <div id="processing-results-literal" style="display: none;">
             <h4>Literals output</h4>
             <table id="processing-results-literal-table" class="table table-condensed table-striped">
             <tbody><tr>
@@ -33,7 +33,7 @@
             </tr></tbody>
             </table>
         </div>
-        <div id="processing-results-layer">
+        <div id="processing-results-layer" style="display: none;">
             <h4>Layers output</h4>
             <table id="processing-results-layer-table" class="table table-condensed table-striped">
             <tbody><tr>
@@ -42,7 +42,6 @@
             </table>
         </div>
         <div id="processing-results-plot">
-            <h4>Plots output</h4>
         </div>
     </div>
 </div>
