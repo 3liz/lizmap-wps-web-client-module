@@ -1459,6 +1459,12 @@ var Petra = function() {
             OpenLayers.Format.WPSExecute.prototype.readers.wps.ProcessPaused = function(node,obj) {
                 obj.processPaused = true;
             };
+
+            // Refresh plots width when #processing-results size change
+            const processingResultsObserver = new ResizeObserver(() => {
+                refreshPlotsWidth();
+            });
+            processingResultsObserver.observe(document.querySelector('#processing-results'));
         },
 
         'layerSelectionChanged': function(e) {
