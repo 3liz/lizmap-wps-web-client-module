@@ -802,8 +802,8 @@ var Petra = function() {
 
         var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"]');
 
-        $('#processing-results-literal').show();
-        $('#processing-results-layer').show();
+        // $('#processing-results-literal').show();
+        // $('#processing-results-layer').show();
         btn.addClass('checked');
         $('#processing-results-title').html(processExecuted.title);
         if ( $('#processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
@@ -1097,6 +1097,23 @@ var Petra = function() {
         // open dock
         if ( !$('#button-processing-results').parent().hasClass('active') )
             $('#button-processing-results').click();
+
+        refreshPlotsWidth();
+    }
+
+    // Refresh plots width based on their parent width which have CSS flex:1 so they all share space equally
+    function refreshPlotsWidth() {
+        const plotDivs = document.querySelectorAll('#processing-results-plot > div .js-plotly-plot');
+
+        if(plotDivs.length){
+            const divWidth = parseInt(document.querySelector('#processing-results-plot > div').clientWidth);
+
+            for (const plotDiv of plotDivs) {
+                Plotly.relayout(plotDiv.id, {
+                    width: divWidth
+                });
+            }
+        }
     }
 
     function updateLogTable( executedProcess ) {

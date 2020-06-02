@@ -55,7 +55,7 @@
 }
 
 #processing-results-all{
-    display: inline-flex;
+    display: flex;
     box-sizing: border-box;
     width: 100%;
     background-color: rgb(240, 240, 240);
@@ -70,6 +70,16 @@
 #processing-results-all > div + div{
     flex: 1 1 0px;
     border-left: solid 1px lightgray;
+}
+
+#processing-results-plot{
+    display: flex;
+    overflow: auto;
+}
+
+#processing-results-plot > div{
+    flex: 1;
+    overflow: auto;
 }
 
 #bottom-dock{
