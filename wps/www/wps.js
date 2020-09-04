@@ -843,7 +843,7 @@ var Petra = function() {
                 var url = output.reference.href;
                 var mapParam = getQueryParam(url, 'map');
                 //console.log(mapParam);
-                var layerParam = getQueryParam(url, 'layer');
+                var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
 
                 var layerName = uuid+'-'+output.identifier;
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
