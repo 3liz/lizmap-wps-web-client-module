@@ -10,7 +10,7 @@
  * @license Mozilla Public License : http://www.mozilla.org/MPL/
  */
 class wpsOGCRequest extends lizmapOGCRequest {
-{
+
     protected $params;
 
     protected $xml_post = null;
