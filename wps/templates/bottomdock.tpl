@@ -3,7 +3,7 @@
     <div id="processing-results-all">
         <div>
             <ul id="processing-log-list" class="tree"></ul>
-            
+
             <div id="processing-log-details" style="display:none;">
                 <span id="processing-log-details-uuid" style="display:none;"></span>
                 <span id="processing-log-details-creation"></span>
@@ -25,6 +25,8 @@
                 </div>
             </div>
         </div>
+        <div id="processing-results-list" style="display: none;">
+        </div>
         <div id="processing-results-literal" style="display: none;">
             <h4>Literals output</h4>
             <table id="processing-results-literal-table" class="table table-condensed table-striped">
@@ -41,7 +43,7 @@
             </tr></tbody>
             </table>
         </div>
-        <div id="processing-results-plot">
+        <div id="processing-results-plot" style="display: none;">
         </div>
     </div>
 </div>

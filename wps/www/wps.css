@@ -72,12 +72,14 @@
     border-left: solid 1px lightgray;
 }
 
-#processing-results-plot{
+#processing-results-plot,
+#processing-results-list .processing-results-plot{
     display: flex;
     overflow: auto;
 }
 
-#processing-results-plot > div{
+#processing-results-plot > div,
+#processing-results-list .processing-results-plot > div{
     flex: 1;
     overflow: auto;
 }

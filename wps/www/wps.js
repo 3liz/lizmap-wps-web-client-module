@@ -21,6 +21,7 @@ var Petra = function() {
                 );
                 var dropdown = document.getElementById("processing-processes");
                 var processingLogList = document.getElementById("processing-log-list");
+                var processingResultsList = document.getElementById("processing-results-list");
                 var offerings = capabilities.processOfferings, option;
 
                 // Populate the dropdown and results list
@@ -47,6 +48,37 @@ var Petra = function() {
                     resultsTable.classList = "processing-log-list-results table table-condensed table-striped";
                     li.appendChild(resultsTable);
                     processingLogList.appendChild(li);
+
+                    // Div results
+                    // The algorithm div
+                    const div = document.createElement("div");
+                    div.innerHTML = '<h4 class="title">' + offerings[p].title + '</h4>';
+                    div.dataset.value = p;
+                    div.style = 'display:none;';
+                    processingResultsList.appendChild(div);
+                    // The details div
+                    const divDetails = document.createElement("div");
+                    divDetails.classList = "processing-results-detail";
+                    divDetails.style = 'display:none;';
+                    div.appendChild(divDetails);
+                    // The literals div
+                    const divLiterals = document.createElement("div");
+                    divLiterals.classList = "processing-results-literal";
+                    divLiterals.style = 'display:none;';
+                    divLiterals.innerHTML = '<h4>Literals output</h4><table class="processing-results-literal-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
+                    div.appendChild(divLiterals);
+                    // The layers div
+                    const divLayers = document.createElement("div");
+                    divLayers.classList = "processing-results-layer";
+                    divLayers.innerHTML = '<h4>Layers output</h4><table class="processing-results-layer-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
+                    divLayers.style = 'display:none;';
+                    div.appendChild(divLayers);
+                    // The plots div
+                    const divPlots = document.createElement("div");
+                    divPlots.classList = "processing-results-plot";
+                    //divPlots.innerHTML = '<h4>Plots output</h4>';
+                    divPlots.style = 'display:none;';
+                    div.appendChild(divPlots);
                 }
 
                 // Add toggle behaviour to processing-log-list
@@ -669,7 +701,7 @@ var Petra = function() {
                 $('li.processing-results:not(.active) #button-processing-results').click();
                 // Display results for executed algorithm if not expanded
                 $('#processing-log-list li[data-value="' + $("#processing-processes").val() + '"]:not(.expanded)').addClass('expanded');
-                
+
             },
             failure: function() {}
         });
@@ -800,19 +832,25 @@ var Petra = function() {
     function toggleProcessResults( uuid ) {
         var processExecuted = executedProcesses[uuid];
 
+        // Get the process button
         var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"]');
 
-        // $('#processing-results-literal').show();
-        // $('#processing-results-layer').show();
-        btn.addClass('checked');
-        $('#processing-results-title').html(processExecuted.title);
-        if ( $('#processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
-        //    btn.removeClass('checked');
+        // Show results
+        $('#processing-results-list').show();
 
+        // Get algorithm results div
+        var divResults = $('#processing-results-list div[data-value="'+processExecuted.identifier+'"]');
+        // And show it
+        divResults.show();
+
+        btn.addClass('checked');
+        if ( divResults.find('table.processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
+            // No process results are displayed
 
             // literal Data
             var hasLiteral = false;
-            if ($('#processing-results-literal-table tr').length == 1) {
+            // Add literal output description
+            if (divResults.find('table.processing-results-literal-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                     var output = processExecuted.processOutputs[i];
                     if ( !output.literalData )
@@ -820,28 +858,31 @@ var Petra = function() {
                     var tr = '<tr class="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
-                    $('#processing-results-literal-table tr:last').after(tr);
+                    divResults.find('table.processing-results-literal-table tr:last').after(tr);
                 }
             }
-            $('#processing-results-literal-table tr:first th:last')
+            // Add process literal results
+            // Fisrt the header
+            divResults.find('table.processing-results-literal-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.literalData )
                     continue;
                 var td = '<td class="'+uuid+'">'+output.literalData.value+'</td>';
-                $('#processing-results-literal-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-literal-table tr.'+output.identifier+' td:last').after(td);
                 hasLiteral = true;
             }
             // Hide or show content depending on results
-            $('#processing-results-literal').toggle(hasLiteral);
+            divResults.find('div.processing-results-literal').toggle(hasLiteral);
 
 
             // LAYERS
             // reference Data with mimeType application/x-ogc-wms
             var hasLayer = false;
-            //console.log('has layer BEGIN');
-            if ($('#processing-results-layer-table tr').length == 1) {
+            // Add layer output description
+            if (divResults.find('table.processing-results-layer-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                     var output = processExecuted.processOutputs[i];
                     if ( !output.reference )
@@ -853,11 +894,14 @@ var Petra = function() {
                     var tr = '<tr class="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
-                    $('#processing-results-layer-table tr:last').after(tr);
+                    divResults.find('table.processing-results-layer-table tr:last').after(tr);
                 }
             }
-            $('#processing-results-layer-table tr:first th:last')
+            // Add process layer results
+            // Fisrt the header
+            divResults.find('table.processing-results-layer-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.reference )
@@ -867,15 +911,17 @@ var Petra = function() {
                 if ( output.reference.mimeType != 'application/x-ogc-wms' )
                     continue;
                 var url = output.reference.href;
+                // Extract map parameter
                 var mapParam = getQueryParam(url, 'map');
-                //console.log(mapParam);
+                // Extract layer parameter
                 var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
-
+                // Create a layer name for the map
                 var layerName = uuid+'-'+output.identifier;
+                // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                   ,OpenLayers.Util.getParameterString({map:mapParam})
                 );
-                //console.log(serviceUrl );
+                // Defined WMS layer parameters
                 var layerWmsParams = {
                     version:'1.3.0'
                     ,layers: layerParam
@@ -886,7 +932,7 @@ var Petra = function() {
                     ,exceptions:'application/vnd.ogc.se_inimage'
                     ,dpi:96
                 };
-
+                // Create OpenLayers WMS layer
                 var wmsLayer = new OpenLayers.Layer.WMS(layerName
                     ,serviceUrl
                     ,layerWmsParams
@@ -900,6 +946,7 @@ var Petra = function() {
                     ,ratio:1
                 });
                 map.addLayer(wmsLayer);
+                // Get the vector layer index to push WMS layer just before
                 var zIndex = -1;
                 var vlayers = lizMap.map.getLayersByClass('OpenLayers.Layer.Vector');
                 for ( var j=0, jj= vlayers.length; j<jj; j++ ) {
@@ -913,8 +960,8 @@ var Petra = function() {
                         zIndex = vZIndex;
                 }
                 lizMap.map.setLayerIndex(wmsLayer, zIndex);
-                //console.log(layerName);
 
+                // Insert layer info in table layer results
                 var td = '<td class="'+uuid+'">';
                 //td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
                 td += '<span>'+layerParam+'</span>'
@@ -922,10 +969,11 @@ var Petra = function() {
                 td += '<i class="icon-download-alt"></i>';
                 td += '</button>';
                 td += '</td>';
-                $('#processing-results-layer-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-layer-table tr.'+output.identifier+' td:last').after(td);
 
                 hasLayer = true;
 
+                // Add a line in the map layer tree
                 var trResults = $('#switcher table.tree #group-wps-results');
                 if ( trResults.length == 0 ) {
                     $('<tr id="group-wps-results" class="liz-group expanded parent initialized"><td><a href="#" title="Réduire" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox partial checked" name="group" value="wps-results" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">Résultats</span></td><td></td><td></td><td></td></tr>')
@@ -954,6 +1002,7 @@ var Petra = function() {
                     });
                 }
 
+                // Build WMS GetLegendGraphic to add image in layer tree
                 var legendParams = {SERVICE: "WMS",
                               VERSION: "1.3.0",
                               REQUEST: "GetLegendGraphic",
@@ -1022,7 +1071,7 @@ var Petra = function() {
                 }
                 return false;
             });*/
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
+            divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
                 var btn = $(this);
                 var btnVal = btn.val();
                 var processUuid = btn.parent().attr('class');
@@ -1033,16 +1082,17 @@ var Petra = function() {
                 return false;
             });
             // Hide or show content depending on results
-            $('#processing-results-layer').toggle(hasLayer);
+            divResults.find('div.processing-results-layer').toggle(hasLayer);
 
 
             // PLOTS
             // Display plots
             var hasPlot = false;
-            var div = '<div class="'+uuid+'">';
+            var div = '<div class="processing-results-plot-display" data-value="'+uuid+'">';
             div+= '<h5>'+(new Date(processExecuted.startTime)).toLocaleString()+'</h5>';
             div+= '</div>';
-            $('#processing-results-plot').append(div);
+            divResults.find('div.processing-results-plot').append(div);
+            // for each plot output create a plotly display
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.reference )
@@ -1055,19 +1105,26 @@ var Petra = function() {
                 var oDiv = '<p><strong>'+output.title+'</strong></p>';
                 oDiv += '<div id="'+uuid+'-'+output.identifier+'" style="height:400px;">';
                 oDiv += '</div>';
-                $('#processing-results-plot div[class="'+uuid+'"]').append(oDiv);
+                divResults.find('div.processing-results-plot div[data-value="'+uuid+'"]').append(oDiv);
                 loadConfigAndDisplayPlot( uuid+'-'+output.identifier, url );
                 hasPlot = true;
 
             }
             // Hide or show content depending on results
-            $('#processing-results-plot').toggle(hasPlot);
-
-
+            divResults.find('div.processing-results-plot').toggle(hasPlot);
 
         } else {
-            $('#processing-results-plot > div[class="'+uuid+'"]').remove();
+            // Remove displayed results
+            // Remove plot div
+            divResults.find('div.processing-results-plot > div[data-value="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasPlot = (divResults.find('div.processing-results-plot > div').length != 0);
+            if (!hasPlot) {
+                divResults.find('div.processing-results-plot').hide();
+            }
 
+            // Remove layer outputs
+            // From the layer tree
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').unbind('click');
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' a.expander').unbind('click');
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').each(function(i, b){
@@ -1080,17 +1137,34 @@ var Petra = function() {
             if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
                 $('#switcher table.tree #group-wps-results').remove();
 
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
+            // From table layer results
+            //divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
             /*$('#processing-results-layer-table tr td[class="'+uuid+'"] button').each(function(i, b){
                 var layerName = $(b).val();
                 var layers = lizMap.map.getLayersByName( layerName );
                 if ( layers.length > 0 )
                     lizMap.map.removeLayer( layers[0] );
             });*/
-            $('#processing-results-layer-table tr td[class="'+uuid+'"]').remove();
-            $('#processing-results-layer-table tr th[class="'+uuid+'"]').remove();
-            $('#processing-results-literal-table tr td[class="'+uuid+'"]').remove();
-            $('#processing-results-literal-table tr th[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-layer-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasLayer = (divResults.find('table.processing-results-layer-table tr th').length != 1);
+            if (!hasLayer) {
+                divResults.find('div.processing-results-layer').hide();
+            }
+
+            // Remove literal outputs
+            divResults.find('table.processing-results-literal-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-literal-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasLiteral = (divResults.find('table.processing-results-literal-table tr th').length != 1);
+            if (!hasLiteral) {
+                divResults.find('div.processing-results-literal').hide();
+            }
+            // Hide or show algorithm results depending on results
+            if (!hasPlot && !hasLayer && !hasLiteral) {
+                divResults.hide();
+            }
             btn.removeClass('checked');
         }
 
@@ -1103,15 +1177,22 @@ var Petra = function() {
 
     // Refresh plots width based on their parent width which have CSS flex:1 so they all share space equally
     function refreshPlotsWidth() {
-        const plotDivs = document.querySelectorAll('#processing-results-plot > div .js-plotly-plot');
-
-        if(plotDivs.length){
-            const divWidth = parseInt(document.querySelector('#processing-results-plot > div').clientWidth);
-
-            for (const plotDiv of plotDivs) {
-                Plotly.relayout(plotDiv.id, {
-                    width: divWidth
-                });
+        // Get plot divs
+        const divPlots = document.querySelectorAll('#processing-results-list div.processing-results-plot');
+        if (divPlots.length) {
+            for (const divPlot of divPlots) {
+                // for each plot div get plotly divs to update width
+                const divPlotlys = divPlot.querySelectorAll('div.processing-results-plot-display .js-plotly-plot');
+                if (divPlotlys.length) {
+                    // Get first container div width
+                    const divWidth = parseInt(divPlot.querySelector('div.processing-results-plot-display').clientWidth);
+                    for (const divPlotly of divPlotlys) {
+                        // Apply width to all plotly divs of this plot div
+                        Plotly.relayout(divPlotly.id, {
+                            width: divWidth
+                        });
+                    }
+                }
             }
         }
     }
