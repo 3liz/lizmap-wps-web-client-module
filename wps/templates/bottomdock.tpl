@@ -4,20 +4,6 @@
         <div>
             <ul id="processing-log-list" class="tree"></ul>
 
-            <div id="processing-log-details" style="display:none;">
-                <span id="processing-log-details-uuid" style="display:none;"></span>
-                <span id="processing-log-details-creation"></span>
-                <table id="processing-log-details-table" class="table table-condensed table-striped">
-                    <tbody>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Value</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
             <div id="processing-log-failed" style="display:none;">
                 <span id="processing-log-failed-uuid" style="display:none;"></span>
                 <span id="processing-log-failed-creation"></span>

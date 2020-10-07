@@ -60,6 +60,7 @@ var Petra = function() {
                     const divDetails = document.createElement("div");
                     divDetails.classList = "processing-results-detail";
                     divDetails.style = 'display:none;';
+                    divDetails.innerHTML = '<h4>Inputs</h4><table class="processing-results-detail-table table table-condensed table-striped"><tbody><tr><th>Name</th><th>Type</th></tr></tbody></table>';
                     div.appendChild(divDetails);
                     // The literals div
                     const divLiterals = document.createElement("div");
@@ -773,62 +774,6 @@ var Petra = function() {
         $('#processing-log-failed').show();
     }
 
-    function toggleProcessDetails( uuid ) {
-        var processExecuted = executedProcesses[uuid];
-
-        var btn = $('#log-'+uuid).find('button[value="details-'+uuid+'"]');
-
-        var logDetailsUuid = $('#processing-log-details-uuid');
-        var oldUuid = logDetailsUuid.text();
-        if ( uuid == oldUuid ) {
-            $('#processing-log-details').hide();
-            $('#processing-log-details-table tr:not(:first)').remove();
-            $('#processing-log-details-creation').html('');
-            logDetailsUuid.html('');
-            btn.removeClass('active');
-            return;
-        }
-
-        $('#log-'+oldUuid).find('button[value="details-'+oldUuid+'"]').removeClass('active');
-        btn.addClass('active');
-        logDetailsUuid.html(uuid);
-
-        $('#processing-log-details-creation').html((new Date(processExecuted.startTime)).toLocaleString());
-        $('#processing-log-details-table tr:not(:first)').remove();
-        for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
-            var input = processExecuted.dataInputs[i];
-            //console.log(input);
-            // details table
-            var tr = '<tr>';
-            tr += '<td>'+input.title+'</td>';
-            if (input.boundingBoxData)
-                tr += '<td>Bounding box</td>';
-            else if (input.literalData) {
-                var dataType = input.literalData.dataType;
-                if ( 'processMetadata' in input ) {
-                    var qgisType = input.processMetadata.type;
-                    if ( qgisType == 'number' )
-                        tr += '<td>'+qgisType+' ('+dataType+')</td>';
-                    else
-                        tr += '<td>'+qgisType+'</td>';
-                } else
-                    tr += '<td>'+dataType+'</td>';
-            }
-            else
-                tr += '<td></td>';
-            if ( input.data )
-                if (input.data.literalData)
-                    tr += '<td>'+input.data.literalData.value+'</td>';
-                else
-                    tr += '<td>Not set</td>';
-            else
-                tr += '<td>Not set</td>';
-            tr += '</tr>';
-            $('#processing-log-details-table tr:last').after(tr);
-        }
-        $('#processing-log-details').show();
-    }
-
     function toggleProcessResults( uuid ) {
         var processExecuted = executedProcesses[uuid];
 
@@ -846,6 +791,54 @@ var Petra = function() {
         btn.addClass('checked');
         if ( divResults.find('table.processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
             // No process results are displayed
+
+            var hasDetail = false;
+            // Add intput description
+            if (divResults.find('table.processing-results-detail-table tr').length == 1) {
+                for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+                    var input = processExecuted.dataInputs[i];
+                    console.log(input);
+                    // details table
+                    var tr = '<tr class="'+input.identifier+'">';
+                    tr += '<td>'+input.title+'</td>';
+                    if (input.boundingBoxData)
+                        tr += '<td>Bounding box</td>';
+                    else if (input.literalData) {
+                        var dataType = input.literalData.dataType;
+                        if ( 'processMetadata' in input ) {
+                            var qgisType = input.processMetadata.type;
+                            if ( qgisType == 'number' )
+                                tr += '<td>'+qgisType+' ('+dataType+')</td>';
+                            else
+                                tr += '<td>'+qgisType+'</td>';
+                        } else
+                            tr += '<td>'+dataType+'</td>';
+                    }
+                    else
+                        tr += '<td></td>';
+                    tr += '</tr>';
+                    divResults.find('table.processing-results-detail-table tr:last').after(tr);
+                }
+            }
+            // Add process inputs
+            // Fisrt the header
+            divResults.find('table.processing-results-detail-table tr:first th:last')
+                .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
+            for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+                var input = processExecuted.dataInputs[i];
+                var td = '<td class="'+uuid+'">';
+                if ( input.data && input.data.literalData) {
+                    td += input.data.literalData.value;
+                } else {
+                    td += 'Not set';
+                }
+                td += '</td>';
+                divResults.find('table.processing-results-detail-table tr.'+input.identifier+' td:last').after(td);
+                hasDetail = true;
+            }
+            // Hide or show content depending on results
+            divResults.find('div.processing-results-detail').toggle(hasDetail);
 
             // literal Data
             var hasLiteral = false;
@@ -1161,6 +1154,16 @@ var Petra = function() {
             if (!hasLiteral) {
                 divResults.find('div.processing-results-literal').hide();
             }
+
+            // Remove inputs
+            divResults.find('table.processing-results-detail-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-detail-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasDetail = (divResults.find('table.processing-results-detail-table tr th').length != 2);
+            if (!hasDetail) {
+                divResults.find('div.processing-results-detail').hide();
+            }
+
             // Hide or show algorithm results depending on results
             if (!hasPlot && !hasLayer && !hasLiteral) {
                 divResults.hide();
@@ -1219,7 +1222,6 @@ var Petra = function() {
         else if (status == 'Failed'){
             tr += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
         }
-        tr += '<button class="btn btn-mini" value="details-' + uuid + '" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
         tr += '</td>';
 
         // Display short UUID
@@ -1255,10 +1257,7 @@ var Petra = function() {
             //console.log(val);
             var btnUuid = '';
             var btnAction = '';
-            if ( val.startsWith( 'details-' ) ) {
-                btnUuid = val.replace('details-', '');
-                btnAction = 'details';
-            } else if ( val.startsWith('results-' ) ) {
+            if ( val.startsWith('results-' ) ) {
                 btnUuid = val.replace('results-', '');
                 btnAction = 'results';
             } else if ( val.startsWith('failed-' ) ) {
@@ -1269,9 +1268,7 @@ var Petra = function() {
             if ( btnUuid in executedProcesses ) {
                 var processExecuted = executedProcesses[btnUuid];
                 //console.log( processExecuted );
-                if ( btnAction == 'details' ) {
-                    toggleProcessDetails( btnUuid );
-                } else if ( btnAction == 'results' ) {
+                if ( btnAction == 'results' ) {
                     toggleProcessResults( btnUuid );
                 } else if ( btnAction == 'failed' ) {
                     toggleProcessFailedMessages( btnUuid );
