@@ -76,6 +76,16 @@
     border-left: solid 1px lightgray;
 }
 
+#processing-results-list > div{
+    padding: 0 5px;
+}
+
+#processing-results-list h4.title {
+  background-color: #f9f9f9;
+  padding: 5px 0;
+  font-size: 20px;
+}
+
 #processing-results-plot,
 #processing-results-list .processing-results-plot-table{
     display: flex;

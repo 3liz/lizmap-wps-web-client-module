@@ -81,6 +81,7 @@ var Petra = function() {
                     divPlots.innerHTML = '<h4>Plots output</h4><div class="processing-results-plot-table"></div>';
                     divPlots.style = 'display:none;';
                     div.appendChild(divPlots);
+                    div.appendChild(document.createElement("hr"));
                 }
 
                 // Add toggle behaviour to processing-log-list
