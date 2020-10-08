@@ -1294,6 +1294,7 @@ var Petra = function() {
         tr += '</tr>';
 
         var logTr = $('#log-'+uuid);
+        var isChecked = false;
         if ( logTr.length == 0 ){
             logTrList = $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results tr');
             if (!logTrList.length) {
@@ -1310,10 +1311,14 @@ var Petra = function() {
         }
         else {
             logTr.find('button').unbind('click');
+            var isChecked = logTr.find('button.checkbox').hasClass('checked');
             logTr.replaceWith(tr);
         }
 
         logTr = $('#log-'+uuid);
+        if (isChecked) {
+            logTr.find('button.checkbox').addClass('checked');
+        }
         logTr.find('button').click(function(){
             var self = $(this);
             var val = self.val();
