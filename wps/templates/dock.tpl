@@ -11,9 +11,9 @@
     <div class="tab-content">
 
         <div id="processing-form-container" class="tab-pane active">
+            <div id="processing-form-errors"></div>
             <b>Please fill in the form and click the RUN button</b>
             <div id="processing-input" class="form-horizontal"></div>
-            <div id="processing-output"></div>
         </div>
 
         <div id="processing-info" class="tab-pane">

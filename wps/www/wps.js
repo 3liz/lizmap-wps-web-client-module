@@ -114,7 +114,7 @@ var Petra = function() {
 
         // Clean 'Run' tab form
         document.getElementById("processing-input").innerHTML = '';
-        document.getElementById("processing-output").innerHTML = '';
+        document.getElementById("processing-form-errors").innerHTML = '';
 
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {
@@ -173,7 +173,7 @@ var Petra = function() {
         if('abstract' in process && process.abstract != '')
             $("#processing-abstract").html(process.abstract);
         document.getElementById("processing-input").innerHTML = "<h3>Input:</h3>";
-        document.getElementById("processing-output").innerHTML = "";
+        document.getElementById("processing-form-errors").innerHTML = "";
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
 
@@ -634,7 +634,7 @@ var Petra = function() {
 
     // execute the process
     function execute() {
-        document.getElementById("processing-output").innerHTML = '';
+        document.getElementById("processing-form-errors").innerHTML = '';
         //var output = process.processOutputs[0];
         var inputs = process.dataInputs,
             input;
@@ -1446,7 +1446,7 @@ var Petra = function() {
     }
 
     function manageExceptionReport( exceptionReport, requestTime ) {
-        var result = document.getElementById("processing-output");
+        var result = document.getElementById("processing-form-errors");
         var div = '<div class="alert alert-error">';
         div+= '<ul>';
         for ( var i=0, ii=exceptionReport.exceptions.length; i<ii; i++ ) {
@@ -1462,8 +1462,6 @@ var Petra = function() {
 
     // add the process's output to the page
     function showOutput(response, requestTime) {
-        //var result = document.getElementById("processing-output");
-        //result.innerHTML = "<h3>Output:</h3>";
         var features;
         var contentType = response.getResponseHeader("Content-Type");
         if (contentType == "application/wkt") {
