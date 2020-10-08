@@ -812,7 +812,7 @@ var Petra = function() {
         var processExecuted = executedProcesses[uuid];
 
         // Get the process button
-        var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"]');
+        var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"].checkbox');
 
         // Show results
         $('#processing-results-list').show();
