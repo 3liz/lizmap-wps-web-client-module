@@ -4,6 +4,7 @@ var Petra = function() {
     var map = null;
     var capabilities = null;
     var process = null;
+    var processes = {};
     var executedProcesses = {};
     var intervalStatusProcesses = null;
 
@@ -92,24 +93,7 @@ var Petra = function() {
                         if (liClicked.classList.contains('expanded')) {
                             const selection = liClicked.dataset.value;
                             if (selection != '') {
-                                $.get(lizUrls['wps_wps_results'], {
-                                    repository: lizUrls.params.repository,
-                                    project: lizUrls.params.project,
-                                    identifier: selection
-                                }, function (d) {
-                                    console.log('Get stored results');
-                                    console.log(d);
-                                    if (!d)
-                                        return;
-                                    for (var uuid in d) {
-                                        var executedProcess = d[uuid];
-                                        if (executedProcess) {
-                                            executedProcesses[uuid] = d[uuid];
-                                            updateLogTable(d[uuid]);
-                                        }
-                                    }
-                                    scheduleUpdateStatusProcesses()
-                                });
+                                getStoredResults(selection);
                             }
                         }
                     });
@@ -148,10 +132,39 @@ var Petra = function() {
                     process = new OpenLayers.Format.WPSDescribeProcess().read(
                         response.responseText
                     ).processDescriptions[selection];
+                    processes[selection] = OpenLayers.Util.extend({}, process);
                     buildForm();
+                    getStoredResults(selection);
                 }
             });
         }
+    }
+
+    // using OpenLayers.Format.WPSDescribeProcess to get information about a
+    // process
+    function getStoredResults(identifier) {
+        if (!identifier || identifier == '') {
+            return false;
+        }
+        $.get(lizUrls['wps_wps_results'], {
+            repository: lizUrls.params.repository,
+            project: lizUrls.params.project,
+            identifier: identifier
+        }, function (d) {
+            console.log('Get stored results');
+            console.log(d);
+            if (!d)
+                return;
+            for (var uuid in d) {
+                var executedProcess = d[uuid];
+                if (executedProcess) {
+                    executedProcesses[uuid] = d[uuid];
+                    updateLogTable(d[uuid]);
+                }
+            }
+            scheduleUpdateStatusProcesses()
+        });
+        return true;
     }
 
     // dynamically create a form from the process description
@@ -163,6 +176,9 @@ var Petra = function() {
         document.getElementById("processing-output").innerHTML = "";
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
+
+        var container = document.getElementById("processing-form-container");
+        container.setAttribute('data-value', process.identifier);
 
         var inputs = process.dataInputs, supported = true,
             outputs = process.processOutputs,
@@ -689,10 +705,8 @@ var Petra = function() {
             },
             success: function(response) {
                 showOutput(response, requestTime);
-                // Display results tab if inactive
-                $('li.processing-results:not(.active) #button-processing-results').click();
                 // Display results for executed algorithm if not expanded
-                $('#processing-log-list li[data-value="' + $("#processing-processes").val() + '"]:not(.expanded)').addClass('expanded');
+                // $('#processing-log-list li[data-value="' + $("#processing-processes").val() + '"]:not(.expanded)').addClass('expanded');
 
             },
             failure: function() {}
@@ -734,6 +748,7 @@ var Petra = function() {
 
     function toggleProcessFailedMessages( uuid ) {
         var processExecuted = executedProcesses[uuid];
+        console.log(processExecuted);
 
         var btn = $('#log-'+uuid).find('button[value="failed-'+uuid+'"]');
 
@@ -1203,11 +1218,6 @@ var Petra = function() {
 
         const shortUUID = uuid.substring(0, 13);
 
-        const logLi = document.querySelector('#processing-log-list li[data-value="' + executedProcess.identifier + '"]');
-        if (!logLi.classList.contains('expanded')) {
-            logLi.querySelector('.title').dispatchEvent(new Event('click'));
-        }
-
         let tr = '<tr id="log-'+uuid+'">';
 
         // Display actions buttons
@@ -1422,6 +1432,9 @@ var Petra = function() {
     }
 
     function manageExecuteResponse( executeResponse, requestTime ) {
+        // Display results tab if inactive
+        $('li.processing-results:not(.active) #button-processing-results').click();
+
         var pToSave = parseExecuteResponse( executeResponse, requestTime );
         var uuid = pToSave.uuid;
         executedProcesses[uuid] = pToSave;
@@ -1433,7 +1446,6 @@ var Petra = function() {
     }
 
     function manageExceptionReport( exceptionReport, requestTime ) {
-        console.log(exceptionReport);
         var result = document.getElementById("processing-output");
         var div = '<div class="alert alert-error">';
         div+= '<ul>';
@@ -1464,6 +1476,7 @@ var Petra = function() {
             //result.innerHTML += "The result should also be visible on the map.";
         } else if (contentType && contentType.startsWith('text/xml')){
             var parseResponse = new OpenLayers.Format.WPSExecute().read(response.responseText);
+            console.log(parseResponse);
             if ( parseResponse.executeResponse )
                 manageExecuteResponse( parseResponse.executeResponse, requestTime );
             if ( parseResponse.exceptionReport )
