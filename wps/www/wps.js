@@ -635,11 +635,13 @@ var Petra = function() {
     // execute the process
     function execute() {
         document.getElementById("processing-form-errors").innerHTML = '';
+        // Clone process
+        var theProcess = OpenLayers.Util.extend({}, process);
         //var output = process.processOutputs[0];
-        var inputs = process.dataInputs,
+        var inputs = theProcess.dataInputs,
             input;
         if ( !inputs )
-            inputs = process.dataInputs = [];
+            inputs = theProcess.dataInputs = [];
         // remove occurrences that the user has not filled out
         for (var i=inputs.length-1; i>=0; --i) {
             input = inputs[i];
@@ -677,8 +679,8 @@ var Petra = function() {
          * */
         //console.log(process.processOutputs);
         var outputs = [];
-        for (var i=process.processOutputs.length-1; i>=0; --i) {
-            var processOutput = process.processOutputs[i];
+        for (var i=theProcess.processOutputs.length-1; i>=0; --i) {
+            var processOutput = theProcess.processOutputs[i];
             var output = {
                 identifier: processOutput.identifier
             }
@@ -687,14 +689,14 @@ var Petra = function() {
             }
             outputs.push( output );
         }
-        process.responseForm = {
+        theProcess.responseForm = {
             responseDocument: {
                 storeExecuteResponse: true,
                 status: true,
                 outputs: outputs
             }
         };
-        var data = new OpenLayers.Format.WPSExecute().write(process);
+        var data = new OpenLayers.Format.WPSExecute().write(theProcess);
         var requestTime = (new Date()).toISOString();
         OpenLayers.Request.POST({
             url: lizUrls['wps_wps'],
@@ -704,9 +706,7 @@ var Petra = function() {
                 'Content-Length': data.length
             },
             success: function(response) {
-                showOutput(response, requestTime);
-                // Display results for executed algorithm if not expanded
-                // $('#processing-log-list li[data-value="' + $("#processing-processes").val() + '"]:not(.expanded)').addClass('expanded');
+                showOutput(theProcess, response, requestTime);
 
             },
             failure: function() {}
@@ -1218,7 +1218,7 @@ var Petra = function() {
 
         const shortUUID = uuid.substring(0, 13);
 
-        let tr = '<tr id="log-'+uuid+'">';
+        let tr = '<tr id="log-'+uuid+'" data-value="'+startTime+'">';
 
         // Display actions buttons
         tr += '<td>';
@@ -1231,7 +1231,7 @@ var Petra = function() {
         tr += '</td>';
 
         // Display short UUID
-        tr += '<td title="' + (new Date(startTime)).toLocaleString() + '">'+shortUUID+'</td>';
+        tr += '<td title="' + shortUUID + '">'+(new Date(startTime)).toLocaleString()+'</td>';
 
         // Display status
         if ( status == 'Accepted' || status == 'Started' )
@@ -1249,7 +1249,18 @@ var Petra = function() {
 
         var logTr = $('#log-'+uuid);
         if ( logTr.length == 0 ){
-            $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
+            logTrList = $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results tr');
+            if (!logTrList.length) {
+                $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
+            } else {
+                logTrList.each(function(idx, elt){
+                    elt = $(elt);
+                    if (startTime > elt.attr('data-value')) {
+                        elt.before(tr);
+                        return false;
+                    }
+                });
+            }
         }
         else {
             logTr.find('button').unbind('click');
@@ -1461,7 +1472,7 @@ var Petra = function() {
     }
 
     // add the process's output to the page
-    function showOutput(response, requestTime) {
+    function showOutput(theProcess, response, requestTime) {
         var features;
         var contentType = response.getResponseHeader("Content-Type");
         if (contentType == "application/wkt") {
@@ -1474,7 +1485,10 @@ var Petra = function() {
             //result.innerHTML += "The result should also be visible on the map.";
         } else if (contentType && contentType.startsWith('text/xml')){
             var parseResponse = new OpenLayers.Format.WPSExecute().read(response.responseText);
-            console.log(parseResponse);
+
+            // Display results for executed algorithm if not expanded
+            $('#processing-log-list li[data-value="' + theProcess.identifier + '"]:not(.expanded)').addClass('expanded');
+
             if ( parseResponse.executeResponse )
                 manageExecuteResponse( parseResponse.executeResponse, requestTime );
             if ( parseResponse.exceptionReport )
