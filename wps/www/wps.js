@@ -215,7 +215,7 @@ var Petra = function() {
                 supported = false;
             }
             if (input.minOccurs > 0) {
-                document.getElementById("processing-input-"+input.identifier+"-label").appendChild(document.createTextNode("* "));
+                document.getElementById("processing-input-"+input.identifier.replaceAll(':', '_')+"-label").appendChild(document.createTextNode("* "));
             }
             // inputs table
             var tr = '<tr>';
@@ -313,9 +313,9 @@ var Petra = function() {
         control.setAttribute('class', 'control-group');
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
-        label.setAttribute('for', 'processing-input-'+name);
+        label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
         label.innerHTML = input.title;
-        label.id = 'processing-input-'+name+'-label';
+        label.id = 'processing-input-'+name.replaceAll(':', '_')+'-label';
         control.appendChild(label);
         var fieldDiv = document.createElement("div");
         fieldDiv.setAttribute('class', 'controls');
@@ -373,7 +373,7 @@ var Petra = function() {
 
         // anyValue means textfield, otherwise we create a dropdown
         var field = document.createElement((dataType == 'boolean' || (dataType == 'string' && !anyValue) || qgisType == 'field' || qgisType == 'vector' || qgisType == 'raster' || qgisType == 'source') ? "select" : "input");
-        field.id = 'processing-input-'+name;
+        field.id = 'processing-input-'+name.replaceAll(':', '_');
         field.title = input.title;
         fieldDiv.appendChild(field);
 
@@ -414,7 +414,7 @@ var Petra = function() {
             option.innerHTML = '---';
             field.appendChild(option);
             fieldClass += ' ';
-            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName;
+            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_');
             fieldClass += ' ';
             fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
             field.setAttribute('class', fieldClass);
@@ -451,7 +451,7 @@ var Petra = function() {
                 };
             };
             if ( qgisType == 'source' ) {
-                $(field).after('<label class="checkbox inline disabled"><input id="processing-input-'+name+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
+                $(field).after('<label class="checkbox inline disabled"><input id="processing-input-'+name.replaceAll(':', '_')+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
                 $(field).parent().find('input[type="checkbox"].selection').change(function(){
                     var cbx = $(this);
                     if ( cbx.is(':checked') ) {
@@ -541,7 +541,7 @@ var Petra = function() {
     }
 
     function updateQgisFieldInput(input, field, fn) {
-        var qgisFieldInputs = $('#processing-input select.fieldParentLayerParameterName-'+input.identifier);
+        var qgisFieldInputs = $('#processing-input select.fieldParentLayerParameterName-'+input.identifier.replaceAll(':', '_'));
         if ( qgisFieldInputs.length == 0 )
             return;
         var aName = $(field).val();
@@ -782,7 +782,7 @@ var Petra = function() {
 
         for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
             var input = processExecuted.dataInputs[i];
-            var tr = '<tr class="wps-input '+input.identifier+'">';
+            var tr = '<tr class="wps-input" data-value="'+input.identifier+'">';
             tr += '<td>'+input.title+'</td>';
             tr += '<td>';
             if ( input.data && input.data.literalData) {
@@ -832,7 +832,7 @@ var Petra = function() {
                     var input = processExecuted.dataInputs[i];
                     //console.log(input);
                     // details table
-                    var tr = '<tr class="'+input.identifier+'">';
+                    var tr = '<tr data-value="'+input.identifier+'">';
                     tr += '<td>'+input.title+'</td>';
                     if (input.boundingBoxData)
                         tr += '<td>Bounding box</td>';
@@ -867,7 +867,7 @@ var Petra = function() {
                     td += 'Not set';
                 }
                 td += '</td>';
-                divResults.find('table.processing-results-detail-table tr.'+input.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-detail-table tr[data-value="'+input.identifier+'"] td:last').after(td);
                 hasDetail = true;
             }
             // Hide or show content depending on results
@@ -881,7 +881,7 @@ var Petra = function() {
                     var output = processExecuted.processOutputs[i];
                     if ( !output.literalData )
                         continue;
-                    var tr = '<tr class="'+output.identifier+'">';
+                    var tr = '<tr data-value="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
                     divResults.find('table.processing-results-literal-table tr:last').after(tr);
@@ -897,7 +897,7 @@ var Petra = function() {
                 if ( !output.literalData )
                     continue;
                 var td = '<td class="'+uuid+'">'+output.literalData.value+'</td>';
-                divResults.find('table.processing-results-literal-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-literal-table tr[data-value="'+output.identifier+'"] td:last').after(td);
                 hasLiteral = true;
             }
             // Hide or show content depending on results
@@ -917,7 +917,7 @@ var Petra = function() {
                         continue;
                     if ( output.reference.mimeType != 'application/x-ogc-wms' )
                         continue;
-                    var tr = '<tr class="'+output.identifier+'">';
+                    var tr = '<tr data-value="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
                     divResults.find('table.processing-results-layer-table tr:last').after(tr);
@@ -942,7 +942,8 @@ var Petra = function() {
                 // Extract layer parameter
                 var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
                 // Create a layer name for the map
-                var layerName = uuid+'-'+output.identifier;
+                var layerName = uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_');
+                console.log(layerName);
                 // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                   ,OpenLayers.Util.getParameterString({map:mapParam})
@@ -995,7 +996,7 @@ var Petra = function() {
                 td += '<i class="icon-download-alt"></i>';
                 td += '</button>';
                 td += '</td>';
-                divResults.find('table.processing-results-layer-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-layer-table tr[data-value="'+output.identifier+'"] td:last').after(td);
 
                 hasLayer = true;
 
@@ -1129,10 +1130,10 @@ var Petra = function() {
                     continue;
                 var url = output.reference.href;
                 var oDiv = '<p><strong>'+output.title+'</strong></p>';
-                oDiv += '<div id="'+uuid+'-'+output.identifier+'" style="height:400px;">';
+                oDiv += '<div id="'+uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_')+'" style="height:400px;">';
                 oDiv += '</div>';
                 divResults.find('div.processing-results-plot div[data-value="'+uuid+'"]').append(oDiv);
-                loadConfigAndDisplayPlot( uuid+'-'+output.identifier, url );
+                loadConfigAndDisplayPlot( uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_'), url );
                 hasPlot = true;
 
             }
@@ -1250,10 +1251,10 @@ var Petra = function() {
         // Display actions buttons
         tr += '<td>';
         if (status == 'Succeeded'){
-            tr += '<button class="btn btn-mini checkbox" style="margin-top: 16px;" value="results-' + uuid + '" title="Toggle process results"></button>';
+            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
         }
         else if (status == 'Failed'){
-            tr += '<button class="btn btn-mini checkbox" style="margin-top: 16px;" value="failed-' + uuid + '" title="Toggle process information"></button>';
+            tr += '<button class="btn btn-mini checkbox" value="failed-' + uuid + '" title="Toggle process information"></button>';
         }
         tr += '</td>';
 
@@ -1269,10 +1270,10 @@ var Petra = function() {
         // Display start time
         tr += '<td title="' + shortUUID + '">';
         if (status == 'Succeeded'){
-            tr += '<button class="btn btn-mini btn-link" style="font-size: 12px;" value="results-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+            tr += '<button class="btn btn-mini btn-link" value="results-' + uuid + '" title="' + titleInfo.join(', ') + '">';
         }
         else if (status == 'Failed'){
-            tr += '<button class="btn btn-mini btn-link" style="font-size: 12px;" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+            tr += '<button class="btn btn-mini btn-link" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
         }
         tr += (new Date(startTime)).toLocaleString();
         tr += '</button></td>';
@@ -1319,10 +1320,10 @@ var Petra = function() {
             var btnUuid = '';
             var btnAction = '';
             if ( val.startsWith('results-' ) ) {
-                btnUuid = val.replace('results-', '');
+                btnUuid = val.replaceAll('results-', '');
                 btnAction = 'results';
             } else if ( val.startsWith('failed-' ) ) {
-                btnUuid = val.replace('failed-', '');
+                btnUuid = val.replaceAll('failed-', '');
                 btnAction = 'failed';
             }
             //console.log(btnUuid);

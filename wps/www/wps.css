@@ -54,6 +54,10 @@
     display: block;
 }
 
+#processing-log-list li .processing-log-list-results button.btn-link {
+  font-size: 12px;
+}
+
 #processing-results-all{
     display: flex;
     box-sizing: border-box;
