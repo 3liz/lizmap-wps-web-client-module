@@ -5,7 +5,7 @@ export LIZMAP_USER_ID:=$(shell id -u)
 export LIZMAP_USER_GID:=$(shell id -g)
 
 export LIZMAP_VERSION_TAG:=3.3
-export QGIS_VERSION_TAG:=3.4
+export QGIS_VERSION_TAG:=3.10
 
 export LIZMAP_PORT:=127.0.0.1:9090
 export OWS_PORT:=127.0.0.1:9091
