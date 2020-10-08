@@ -151,8 +151,8 @@ var Petra = function() {
             project: lizUrls.params.project,
             identifier: identifier
         }, function (d) {
-            console.log('Get stored results');
-            console.log(d);
+            //console.log('Get stored results');
+            //console.log(d);
             if (!d)
                 return;
             for (var uuid in d) {
@@ -748,26 +748,53 @@ var Petra = function() {
 
     function toggleProcessFailedMessages( uuid ) {
         var processExecuted = executedProcesses[uuid];
-        console.log(processExecuted);
 
-        var btn = $('#log-'+uuid).find('button[value="failed-'+uuid+'"]');
+        var btn = $('#log-'+uuid).find('button[value="failed-'+uuid+'"].checkbox');
 
         var logFailedUuid = $('#processing-log-failed-uuid');
         var oldUuid = logFailedUuid.text();
+
+        // clear
+        $('#processing-log-failed-messages').html('');
+        $('#processing-log-failed .processing-log-failed-detail-table tr.wps-input').remove();
+        $('#processing-log-failed-creation').html('');
+        $('#processing-log-failed-identifier').html('');
+        $('#processing-log-failed-title').html('');
+
+        // close
         if ( uuid == oldUuid ) {
             $('#processing-log-failed').hide();
-            $('#processing-log-failed-messages').html('');
-            $('#processing-log-failed-creation').html('');
             logFailedUuid.html('');
-            btn.removeClass('active');
+            btn.removeClass('checked');
             return;
         }
 
-        $('#log-'+oldUuid).find('button[value="failed-'+oldUuid+'"]').removeClass('active');
-        btn.addClass('active');
+        // unique checked
+        $('#log-'+oldUuid).find('button[value="failed-'+oldUuid+'"]').removeClass('checked');
+        btn.addClass('checked');
+
+        // Update information
+        $('#processing-log-failed-title').html(processExecuted.title);
+        $('#processing-log-failed-identifier').html(processExecuted.identifier);
         logFailedUuid.html(uuid);
 
         $('#processing-log-failed-creation').html((new Date(processExecuted.startTime)).toLocaleString());
+
+        for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+            var input = processExecuted.dataInputs[i];
+            var tr = '<tr class="wps-input '+input.identifier+'">';
+            tr += '<td>'+input.title+'</td>';
+            tr += '<td>';
+            if ( input.data && input.data.literalData) {
+                tr += input.data.literalData.value;
+            } else {
+                tr += 'Not set';
+            }
+            tr += '</td>';
+            tr += '</tr>';
+            $('#processing-log-failed .processing-log-failed-detail-table').append(tr);
+        }
+
         $('#processing-log-failed-messages').html('');
         var div = '<div class="alert alert-error">';
         div+= '<ul>';
@@ -803,7 +830,7 @@ var Petra = function() {
             if (divResults.find('table.processing-results-detail-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
                     var input = processExecuted.dataInputs[i];
-                    console.log(input);
+                    //console.log(input);
                     // details table
                     var tr = '<tr class="'+input.identifier+'">';
                     tr += '<td>'+input.title+'</td>';
@@ -1223,15 +1250,32 @@ var Petra = function() {
         // Display actions buttons
         tr += '<td>';
         if (status == 'Succeeded'){
-            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+            tr += '<button class="btn btn-mini checkbox" style="margin-top: 16px;" value="results-' + uuid + '" title="Toggle process results"></button>';
         }
         else if (status == 'Failed'){
-            tr += '<button class="btn btn-mini" value="failed-' + uuid + '" title="Toggle process information"><i class="icon-info-sign"></i></button>';
+            tr += '<button class="btn btn-mini checkbox" style="margin-top: 16px;" value="failed-' + uuid + '" title="Toggle process information"></button>';
         }
         tr += '</td>';
 
-        // Display short UUID
-        tr += '<td title="' + shortUUID + '">'+(new Date(startTime)).toLocaleString()+'</td>';
+        // Title info
+        let titleInfo = [];
+        for (var i=0,ii=executedProcess.dataInputs.length; i<ii; ++i) {
+            var input = executedProcess.dataInputs[i];
+            if ( input.data && input.data.literalData) {
+                titleInfo.push(input.data.literalData.value);
+            }
+        }
+
+        // Display start time
+        tr += '<td title="' + shortUUID + '">';
+        if (status == 'Succeeded'){
+            tr += '<button class="btn btn-mini btn-link" style="font-size: 12px;" value="results-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+        }
+        else if (status == 'Failed'){
+            tr += '<button class="btn btn-mini btn-link" style="font-size: 12px;" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+        }
+        tr += (new Date(startTime)).toLocaleString();
+        tr += '</button></td>';
 
         // Display status
         if ( status == 'Accepted' || status == 'Started' )
@@ -1345,8 +1389,8 @@ var Petra = function() {
                 executedProcesses[uuid] = pToSave;
                 updateLogTable( pToSave );
                 storeStatusProcess( uuid );
-                console.log('Process object updated');
-                console.log(pToSave);
+                //console.log('Process object updated');
+                //console.log(pToSave);
             },
             failure: function() {
             }
@@ -1390,7 +1434,7 @@ var Petra = function() {
     }
 
     function parseExecuteResponse( executeResponse, requestTime ) {
-        console.log(executeResponse);
+        //console.log(executeResponse);
         var uuid = getQueryParam(executeResponse.statusLocation, 'uuid');
         var statusCreationTime = executeResponse.status.creationTime;
 
@@ -1406,12 +1450,9 @@ var Petra = function() {
 
         var exceptions = [];
         if ( status == 'Failed' ) {
-            console.log('Failed');
             if ( executeResponse.status.exceptionReport && executeResponse.status.exceptionReport.exceptions ) {
-                console.log('ExceptionReport');
                 var exceptionList = executeResponse.status.exceptionReport.exceptions;
                 for ( var i = 0, len=exceptionList.length; i < len; i++ ) {
-                    console.log(exceptionList[i].texts);
                     exceptions = exceptions.concat( exceptionList[i].texts );
                 }
             }
