@@ -76,14 +76,29 @@
     border-left: solid 1px lightgray;
 }
 
-#processing-results-list > div{
+#processing-log-failed {
+  border: 1px solid #F00;
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+#processing-results-list > div {
     padding: 0 5px;
 }
 
-#processing-results-list h4.title {
+#processing-results-list h4.title,
+#processing-log-failed h4.title {
   background-color: #f9f9f9;
   padding: 5px 0;
   font-size: 20px;
+}
+
+#processing-log-failed-info {
+  display: flex; overflow: auto;
+}
+
+#processing-log-failed-info > div {
+  margin:0 5px; width: 50%;
 }
 
 #processing-results-plot,

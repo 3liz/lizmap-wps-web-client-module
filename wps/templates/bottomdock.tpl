@@ -14,8 +14,8 @@
             <div id="processing-log-failed" style="display:none;">
                 <h4 id="processing-log-failed-title" class="title"></h4>
                 <p>Contact the administrator with these informations to fix the error.</p>
-                <div style="display: flex; overflow: auto;">
-                    <div style="margin:0 5px; width: 50%;">
+                <div id="processing-log-failed-info" style="">
+                    <div style="">
                         <h4>Informations</h4>
                         <table class="processing-log-failed-info-table table table-condensed table-striped">
                             <tbody>
@@ -38,7 +38,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div style="margin:0 5px; width: 50%;">
+                    <div style="">
                         <h4>Inputs</h4>
                         <table class="processing-log-failed-detail-table table table-condensed table-striped">
                             <tbody>
