@@ -73,13 +73,13 @@
 }
 
 #processing-results-plot,
-#processing-results-list .processing-results-plot{
+#processing-results-list .processing-results-plot-table{
     display: flex;
     overflow: auto;
 }
 
 #processing-results-plot > div,
-#processing-results-list .processing-results-plot > div{
+#processing-results-list .processing-results-plot-table > div{
     flex: 1;
     overflow: auto;
 }

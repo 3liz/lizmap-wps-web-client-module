@@ -77,7 +77,7 @@ var Petra = function() {
                     // The plots div
                     const divPlots = document.createElement("div");
                     divPlots.classList = "processing-results-plot";
-                    //divPlots.innerHTML = '<h4>Plots output</h4>';
+                    divPlots.innerHTML = '<h4>Plots output</h4><div class="processing-results-plot-table"></div>';
                     divPlots.style = 'display:none;';
                     div.appendChild(divPlots);
                 }
@@ -131,15 +131,6 @@ var Petra = function() {
         // Clean 'Run' tab form
         document.getElementById("processing-input").innerHTML = '';
         document.getElementById("processing-output").innerHTML = '';
-
-        // clean results table (TODO: refactoring)
-        // $('#processing-results-literal').hide();
-        // $('#processing-results-literal-table tr:not(:first)').remove();
-        // $('#processing-results-literal-table tr:first th:not(:first)').remove();
-        // $('#processing-results-layer').hide();
-        // $('#processing-results-layer-table tr:not(:first)').remove();
-        // $('#processing-results-layer-table tr:first th:not(:first)').remove();
-        // $('#processing-results-plot').html('').hide();
 
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {
@@ -1084,7 +1075,7 @@ var Petra = function() {
             var div = '<div class="processing-results-plot-display" data-value="'+uuid+'">';
             div+= '<h5>'+(new Date(processExecuted.startTime)).toLocaleString()+'</h5>';
             div+= '</div>';
-            divResults.find('div.processing-results-plot').append(div);
+            divResults.find('div.processing-results-plot-table').append(div);
             // for each plot output create a plotly display
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
@@ -1109,9 +1100,9 @@ var Petra = function() {
         } else {
             // Remove displayed results
             // Remove plot div
-            divResults.find('div.processing-results-plot > div[data-value="'+uuid+'"]').remove();
+            divResults.find('div.processing-results-plot-table > div[data-value="'+uuid+'"]').remove();
             // Hide or show content depending on results
-            var hasPlot = (divResults.find('div.processing-results-plot > div').length != 0);
+            var hasPlot = (divResults.find('div.processing-results-plot-table > div').length != 0);
             if (!hasPlot) {
                 divResults.find('div.processing-results-plot').hide();
             }
@@ -1212,6 +1203,11 @@ var Petra = function() {
 
         const shortUUID = uuid.substring(0, 13);
 
+        const logLi = document.querySelector('#processing-log-list li[data-value="' + executedProcess.identifier + '"]');
+        if (!logLi.classList.contains('expanded')) {
+            logLi.querySelector('.title').dispatchEvent(new Event('click'));
+        }
+
         let tr = '<tr id="log-'+uuid+'">';
 
         // Display actions buttons
@@ -1243,7 +1239,7 @@ var Petra = function() {
 
         var logTr = $('#log-'+uuid);
         if ( logTr.length == 0 ){
-            $('li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
+            $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
         }
         else {
             logTr.find('button').unbind('click');
