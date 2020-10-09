@@ -827,49 +827,51 @@ var Petra = function() {
             // No process results are displayed
 
             var hasDetail = false;
-            // Add intput description
-            if (divResults.find('table.processing-results-detail-table tr').length == 1) {
+            // Add input description
+            if (processExecuted.dataInputs) {
+                if (divResults.find('table.processing-results-detail-table tr').length == 1) {
+                    for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+                        var input = processExecuted.dataInputs[i];
+                        //console.log(input);
+                        // details table
+                        var tr = '<tr data-value="'+input.identifier+'">';
+                        tr += '<td>'+input.title+'</td>';
+                        if (input.boundingBoxData)
+                            tr += '<td>Bounding box</td>';
+                        else if (input.literalData) {
+                            var dataType = input.literalData.dataType;
+                            if ( 'processMetadata' in input ) {
+                                var qgisType = input.processMetadata.type;
+                                if ( qgisType == 'number' )
+                                    tr += '<td>'+qgisType+' ('+dataType+')</td>';
+                                else
+                                    tr += '<td>'+qgisType+'</td>';
+                            } else
+                                tr += '<td>'+dataType+'</td>';
+                        }
+                        else
+                            tr += '<td></td>';
+                        tr += '</tr>';
+                        divResults.find('table.processing-results-detail-table tr:last').after(tr);
+                    }
+                }
+                // Add process inputs
+                // Fisrt the header
+                divResults.find('table.processing-results-detail-table tr:first th:last')
+                    .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+                // Then the data
                 for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
                     var input = processExecuted.dataInputs[i];
-                    //console.log(input);
-                    // details table
-                    var tr = '<tr data-value="'+input.identifier+'">';
-                    tr += '<td>'+input.title+'</td>';
-                    if (input.boundingBoxData)
-                        tr += '<td>Bounding box</td>';
-                    else if (input.literalData) {
-                        var dataType = input.literalData.dataType;
-                        if ( 'processMetadata' in input ) {
-                            var qgisType = input.processMetadata.type;
-                            if ( qgisType == 'number' )
-                                tr += '<td>'+qgisType+' ('+dataType+')</td>';
-                            else
-                                tr += '<td>'+qgisType+'</td>';
-                        } else
-                            tr += '<td>'+dataType+'</td>';
+                    var td = '<td class="'+uuid+'">';
+                    if ( input.data && input.data.literalData) {
+                        td += input.data.literalData.value;
+                    } else {
+                        td += 'Not set';
                     }
-                    else
-                        tr += '<td></td>';
-                    tr += '</tr>';
-                    divResults.find('table.processing-results-detail-table tr:last').after(tr);
+                    td += '</td>';
+                    divResults.find('table.processing-results-detail-table tr[data-value="'+input.identifier+'"] td:last').after(td);
+                    hasDetail = true;
                 }
-            }
-            // Add process inputs
-            // Fisrt the header
-            divResults.find('table.processing-results-detail-table tr:first th:last')
-                .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
-            // Then the data
-            for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
-                var input = processExecuted.dataInputs[i];
-                var td = '<td class="'+uuid+'">';
-                if ( input.data && input.data.literalData) {
-                    td += input.data.literalData.value;
-                } else {
-                    td += 'Not set';
-                }
-                td += '</td>';
-                divResults.find('table.processing-results-detail-table tr[data-value="'+input.identifier+'"] td:last').after(td);
-                hasDetail = true;
             }
             // Hide or show content depending on results
             divResults.find('div.processing-results-detail').toggle(hasDetail);
@@ -1261,10 +1263,12 @@ var Petra = function() {
 
         // Title info
         let titleInfo = [];
-        for (var i=0,ii=executedProcess.dataInputs.length; i<ii; ++i) {
-            var input = executedProcess.dataInputs[i];
-            if ( input.data && input.data.literalData) {
-                titleInfo.push(input.data.literalData.value);
+        if (executedProcess.dataInputs) {
+            for (var i=0,ii=executedProcess.dataInputs.length; i<ii; ++i) {
+                var input = executedProcess.dataInputs[i];
+                if ( input.data && input.data.literalData) {
+                    titleInfo.push(input.data.literalData.value);
+                }
             }
         }
 
