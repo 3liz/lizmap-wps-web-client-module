@@ -12,7 +12,7 @@
 
         <div id="processing-form-container" class="tab-pane active">
             <div id="processing-form-errors"></div>
-            <b>Please fill in the form and click the RUN button</b>
+            <b>Please fill in the form and click the Execute button</b>
             <div id="processing-input" class="form-horizontal"></div>
         </div>
 
