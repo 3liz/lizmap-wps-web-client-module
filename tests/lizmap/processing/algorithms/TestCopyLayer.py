@@ -26,7 +26,7 @@ class TestCopyLayer(QgsProcessingAlgorithm):
         return 'Test Copy Layer'
 
     def createInstance(self, config={}):
-        """ Virtual override 
+        """ Virtual override
 
             see https://qgis.org/api/classQgsProcessingAlgorithm.html
         """
@@ -34,7 +34,7 @@ class TestCopyLayer(QgsProcessingAlgorithm):
 
     def initAlgorithm( self, config=None ):
         """ Virtual override
-    
+
            see https://qgis.org/api/classQgsProcessingAlgorithm.html
         """
         self.addParameter(QgsProcessingParameterVectorLayer(self.INPUT, 'Vector Layer'))
@@ -49,10 +49,10 @@ class TestCopyLayer(QgsProcessingAlgorithm):
         outfile = self.parameterAsOutputLayer(parameters, self.OUTPUT, context)
 
         # Save a copy of our layer
-        err = QgsVectorFileWriter.writeAsVectorFormat(layer, outfile, "utf-8", driverName="ESRI Shapefile") 
+        err = QgsVectorFileWriter.writeAsVectorFormat(layer, outfile, "utf-8")
 
         if err[0] != QgsVectorFileWriter.NoError:
             feedback.reportError("Error writing vector layer %s: %s" % (outfile, err))
 
         return {self.OUTPUT: outfile }
-        
+
