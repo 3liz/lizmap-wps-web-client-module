@@ -8,6 +8,9 @@ from qgis.core import (QgsApplication,
 
 from .TestSimpleValue import TestSimpleValue
 from .TestCopyLayer import TestCopyLayer
+from .TestContextVectorLayer import TestContextVectorLayer
+from .TestContextRasterLayer import TestContextRasterLayer
+from .TestQgisBuffer import TestQgisBuffer
 from .TestFileDestination import TestFileDestination
 from .TestPlot import TestPlot
 
@@ -19,16 +22,19 @@ class TestAlgorithmProvider(QgsProcessingProvider):
     def getAlgs(self):
         try:
             algs = [
-                 TestSimpleValue(),
-                 TestCopyLayer(),
-                 TestFileDestination(),
-                 TestPlot()
-            ]
+                    TestSimpleValue(),
+                    TestCopyLayer(),
+                    TestFileDestination(),
+                    TestContextVectorLayer(),
+                    TestContextRasterLayer(),
+                    TestQgisBuffer(),
+                    TestPlot()
+                ]
         except:
             traceback.print_exc()
             algs = []
         return algs
-    
+
     def id(self):
         return 'pyqgiswps_test'
 
@@ -44,7 +50,7 @@ class DummyAlgorithmProvider(QgsProcessingProvider):
 
     def __init__(self):
         super().__init__()
-    
+
     def id(self):
         return 'pyqgiswps_dummy_test'
 

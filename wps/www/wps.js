@@ -4,6 +4,7 @@ var Petra = function() {
     var map = null;
     var capabilities = null;
     var process = null;
+    var processes = {};
     var executedProcesses = {};
     var intervalStatusProcesses = null;
 
@@ -20,9 +21,11 @@ var Petra = function() {
                     response.responseText
                 );
                 var dropdown = document.getElementById("processing-processes");
+                var processingLogList = document.getElementById("processing-log-list");
+                var processingResultsList = document.getElementById("processing-results-list");
                 var offerings = capabilities.processOfferings, option;
 
-                // populate the dropdown
+                // Populate the dropdown and results list
                 for (var p in offerings) {
                     // Remove alg if not set in wps_wps_project_config
                     if(
@@ -31,10 +34,70 @@ var Petra = function() {
                     ){
                         continue;
                     }
+
+                    // Dropdown
                     option = document.createElement("option");
                     option.innerHTML = offerings[p].title;
                     option.value = p;
                     dropdown.appendChild(option);
+
+                    // List
+                    const li = document.createElement("li");
+                    li.innerHTML = '<span class="title">' + offerings[p].title + '</span>';
+                    li.dataset.value = p;
+                    const resultsTable = document.createElement("table");
+                    resultsTable.classList = "processing-log-list-results table table-condensed table-striped";
+                    li.appendChild(resultsTable);
+                    processingLogList.appendChild(li);
+
+                    // Div results
+                    // The algorithm div
+                    const div = document.createElement("div");
+                    div.innerHTML = '<h4 class="title">' + offerings[p].title + '</h4>';
+                    div.dataset.value = p;
+                    div.style = 'display:none;';
+                    processingResultsList.appendChild(div);
+                    // The details div
+                    const divDetails = document.createElement("div");
+                    divDetails.classList = "processing-results-detail";
+                    divDetails.style = 'display:none;';
+                    divDetails.innerHTML = '<h4>Inputs</h4><table class="processing-results-detail-table table table-condensed table-striped"><tbody><tr><th>Name</th><th>Type</th></tr></tbody></table>';
+                    div.appendChild(divDetails);
+                    // The literals div
+                    const divLiterals = document.createElement("div");
+                    divLiterals.classList = "processing-results-literal";
+                    divLiterals.style = 'display:none;';
+                    divLiterals.innerHTML = '<h4>Literals output</h4><table class="processing-results-literal-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
+                    div.appendChild(divLiterals);
+                    // The layers div
+                    const divLayers = document.createElement("div");
+                    divLayers.classList = "processing-results-layer";
+                    divLayers.innerHTML = '<h4>Layers output</h4><table class="processing-results-layer-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
+                    divLayers.style = 'display:none;';
+                    div.appendChild(divLayers);
+                    // The plots div
+                    const divPlots = document.createElement("div");
+                    divPlots.classList = "processing-results-plot";
+                    divPlots.innerHTML = '<h4>Plots output</h4><div class="processing-results-plot-table"></div>';
+                    divPlots.style = 'display:none;';
+                    div.appendChild(divPlots);
+                    div.appendChild(document.createElement("hr"));
+                }
+
+                // Add toggle behaviour to processing-log-list
+                for (const li of document.querySelectorAll('#processing-log-list > li .title')) {
+                    li.addEventListener('click', e => {
+                        const liClicked = e.target.parentElement;
+                        liClicked.classList.toggle('expanded');
+
+                        // Load and display results
+                        if (liClicked.classList.contains('expanded')) {
+                            const selection = liClicked.dataset.value;
+                            if (selection != '') {
+                                getStoredResults(selection);
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -44,33 +107,18 @@ var Petra = function() {
     // process
     function describeProcess() {
 
+        // Empty title, abstract and info tables in 'Help' tab
         $("#processing-title").html('');
         $("#processing-abstract").html('');
-
-        // clean form
-        document.getElementById("processing-input").innerHTML = '';
-        document.getElementById("processing-output").innerHTML = '';
-
-        // clean info tables
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
 
-        // clean log table
-        $('#processing-log-table tr:not(:first) button').unbind('click');
-        $('#processing-log-table tr:not(:first)').remove();
-
-        // clean results table
-        $('#processing-results-literal').hide();
-        $('#processing-results-literal-table tr:not(:first)').remove();
-        $('#processing-results-literal-table tr:first th:not(:first)').remove();
-        $('#processing-results-layer').hide();
-        $('#processing-results-layer-table tr:not(:first)').remove();
-        $('#processing-results-layer-table tr:first th:not(:first)').remove();
-        $('#processing-results-plot').html('').hide();
+        // Clean 'Run' tab form
+        document.getElementById("processing-input").innerHTML = '';
+        document.getElementById("processing-form-errors").innerHTML = '';
 
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {
-            //$('#processing-form-container').show();
             OpenLayers.Request.GET({
                 url: lizUrls['wps_wps'],
                 params: {
@@ -85,30 +133,39 @@ var Petra = function() {
                     process = new OpenLayers.Format.WPSDescribeProcess().read(
                         response.responseText
                     ).processDescriptions[selection];
+                    processes[selection] = OpenLayers.Util.extend({}, process);
                     buildForm();
-                    $.get(lizUrls['wps_wps_results'],{
-                            repository: lizUrls.params.repository,
-                            project: lizUrls.params.project,
-                            identifier: selection
-                        }, function( d ) {
-                            console.log('Get stored results');
-                            console.log(d);
-                            if ( !d )
-                                return;
-                            for ( var uuid in d ) {
-                                var executedProcess = d[uuid];
-                                if ( executedProcess ) {
-                                    executedProcesses[uuid] = d[uuid];
-                                    updateLogTable( d[uuid] );
-                                }
-                            }
-                            scheduleUpdateStatusProcesses()
-                        });
+                    getStoredResults(selection);
                 }
             });
-        } else {
-            // Error : no selection in the process list combobox
         }
+    }
+
+    // using OpenLayers.Format.WPSDescribeProcess to get information about a
+    // process
+    function getStoredResults(identifier) {
+        if (!identifier || identifier == '') {
+            return false;
+        }
+        $.get(lizUrls['wps_wps_results'], {
+            repository: lizUrls.params.repository,
+            project: lizUrls.params.project,
+            identifier: identifier
+        }, function (d) {
+            //console.log('Get stored results');
+            //console.log(d);
+            if (!d)
+                return;
+            for (var uuid in d) {
+                var executedProcess = d[uuid];
+                if (executedProcess) {
+                    executedProcesses[uuid] = d[uuid];
+                    updateLogTable(d[uuid]);
+                }
+            }
+            scheduleUpdateStatusProcesses()
+        });
+        return true;
     }
 
     // dynamically create a form from the process description
@@ -117,11 +174,13 @@ var Petra = function() {
         if('abstract' in process && process.abstract != '')
             $("#processing-abstract").html(process.abstract);
         document.getElementById("processing-input").innerHTML = "<h3>Input:</h3>";
-        document.getElementById("processing-output").innerHTML = "";
+        document.getElementById("processing-form-errors").innerHTML = "";
         $('#processing-info-inputs tr:not(:first)').remove();
         $('#processing-info-outputs tr:not(:first)').remove();
 
-        //console.log(process);
+        var container = document.getElementById("processing-form-container");
+        container.setAttribute('data-value', process.identifier);
+
         var inputs = process.dataInputs, supported = true,
             outputs = process.processOutputs,
             sld = "text/xml; subtype=sld/1.0.0",
@@ -157,7 +216,7 @@ var Petra = function() {
                 supported = false;
             }
             if (input.minOccurs > 0) {
-                document.getElementById("processing-input-"+input.identifier+"-label").appendChild(document.createTextNode("* "));
+                document.getElementById("processing-input-"+input.identifier.replaceAll(':', '_')+"-label").appendChild(document.createTextNode("* "));
             }
             // inputs table
             var tr = '<tr>';
@@ -255,9 +314,9 @@ var Petra = function() {
         control.setAttribute('class', 'control-group');
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
-        label.setAttribute('for', 'processing-input-'+name);
+        label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
         label.innerHTML = input.title;
-        label.id = 'processing-input-'+name+'-label';
+        label.id = 'processing-input-'+name.replaceAll(':', '_')+'-label';
         control.appendChild(label);
         var fieldDiv = document.createElement("div");
         fieldDiv.setAttribute('class', 'controls');
@@ -315,7 +374,7 @@ var Petra = function() {
 
         // anyValue means textfield, otherwise we create a dropdown
         var field = document.createElement((dataType == 'boolean' || (dataType == 'string' && !anyValue) || qgisType == 'field' || qgisType == 'vector' || qgisType == 'raster' || qgisType == 'source') ? "select" : "input");
-        field.id = 'processing-input-'+name;
+        field.id = 'processing-input-'+name.replaceAll(':', '_');
         field.title = input.title;
         fieldDiv.appendChild(field);
 
@@ -327,48 +386,8 @@ var Petra = function() {
             container.insertBefore(field, previousSibling.nextSibling) :
             container.appendChild(control);
 
-        if ( dataType == 'boolean' ||  (dataType == 'string' && !anyValue) ) {
-            var option;
-            option = document.createElement("option");
-            option.innerHTML = '---';
-            field.appendChild(option);
-            for (var v in input.literalData.allowedValues) {
-                option = document.createElement("option");
-                option.value = v;
-                option.innerHTML = v;
-                field.appendChild(option);
-            }
-            field.onchange = function() {
-                createCopy(input, field, addLiteralInput);
-                input.data = this.selectedIndex ? {
-                    literalData: {
-                        value: this.options[this.selectedIndex].value
-                    }
-                } : undefined;
-            };
-            if ( defaultValue ) {
-                $(field).val(defaultValue);
-                field.onchange();
-            }
-        } else if ( qgisType == 'field' ) {
-            var option;
-            option = document.createElement("option");
-            option.innerHTML = '---';
-            field.appendChild(option);
-            fieldClass += ' ';
-            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName;
-            fieldClass += ' ';
-            fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
-            field.setAttribute('class', fieldClass);
-            field.onchange = function() {
-                createCopy(input, field, addLiteralInput);
-                input.data = this.selectedIndex ? {
-                    literalData: {
-                        value: this.options[this.selectedIndex].value
-                    }
-                } : undefined;
-            };
-        } else if ( qgisType == 'vector' || qgisType == 'source' ) {
+        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
+        if ( qgisType == 'vector' || qgisType == 'source' ) {
             var option;
             option = document.createElement("option");
             option.innerHTML = '---';
@@ -393,7 +412,7 @@ var Petra = function() {
                 };
             };
             if ( qgisType == 'source' ) {
-                $(field).after('<label class="checkbox inline disabled"><input id="processing-input-'+name+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
+                $(field).after('<br><label class="checkbox inline disabled"><input id="processing-input-'+name.replaceAll(':', '_').replaceAll(' ', '_')+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
                 $(field).parent().find('input[type="checkbox"].selection').change(function(){
                     var cbx = $(this);
                     if ( cbx.is(':checked') ) {
@@ -401,9 +420,9 @@ var Petra = function() {
                         var aName = input.data.literalData.value;
                         var lConfig = lizMap.config.layers[aName];
                         if ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' ) ')
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' )')
                         } else if ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' ) ')
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' )')
                         }
                         input.data.literalData.value = aName;
                     } else {
@@ -414,6 +433,24 @@ var Petra = function() {
                     }
                 });
             }
+        } else if ( qgisType == 'field' ) {
+            var option;
+            option = document.createElement("option");
+            option.innerHTML = '---';
+            field.appendChild(option);
+            fieldClass += ' ';
+            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_');
+            fieldClass += ' ';
+            fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
+            field.setAttribute('class', fieldClass);
+            field.onchange = function() {
+                createCopy(input, field, addLiteralInput);
+                input.data = this.selectedIndex ? {
+                    literalData: {
+                        value: this.options[this.selectedIndex].value
+                    }
+                } : undefined;
+            };
         } else if ( qgisType == 'raster' ) {
             var option;
             option = document.createElement("option");
@@ -435,6 +472,29 @@ var Petra = function() {
                     }
                 } : undefined;
             };
+        } else if ( dataType == 'boolean' ||  (dataType == 'string' && !anyValue) ) {
+            var option;
+            option = document.createElement("option");
+            option.innerHTML = '---';
+            field.appendChild(option);
+            for (var v in input.literalData.allowedValues) {
+                option = document.createElement("option");
+                option.value = v;
+                option.innerHTML = v;
+                field.appendChild(option);
+            }
+            field.onchange = function() {
+                createCopy(input, field, addLiteralInput);
+                input.data = this.selectedIndex ? {
+                    literalData: {
+                        value: this.options[this.selectedIndex].value
+                    }
+                } : undefined;
+            };
+            if ( defaultValue ) {
+                $(field).val(defaultValue);
+                field.onchange();
+            }
         } else {
             if ( defaultValue ) {
                 field.value = defaultValue;
@@ -483,7 +543,7 @@ var Petra = function() {
     }
 
     function updateQgisFieldInput(input, field, fn) {
-        var qgisFieldInputs = $('#processing-input select.fieldParentLayerParameterName-'+input.identifier);
+        var qgisFieldInputs = $('#processing-input select.fieldParentLayerParameterName-'+input.identifier.replaceAll(':', '_'));
         if ( qgisFieldInputs.length == 0 )
             return;
         var aName = $(field).val();
@@ -576,12 +636,14 @@ var Petra = function() {
 
     // execute the process
     function execute() {
-        document.getElementById("processing-output").innerHTML = '';
+        document.getElementById("processing-form-errors").innerHTML = '';
+        // Clone process
+        var theProcess = OpenLayers.Util.extend({}, process);
         //var output = process.processOutputs[0];
-        var inputs = process.dataInputs,
+        var inputs = theProcess.dataInputs,
             input;
         if ( !inputs )
-            inputs = process.dataInputs = [];
+            inputs = theProcess.dataInputs = [];
         // remove occurrences that the user has not filled out
         for (var i=inputs.length-1; i>=0; --i) {
             input = inputs[i];
@@ -619,8 +681,8 @@ var Petra = function() {
          * */
         //console.log(process.processOutputs);
         var outputs = [];
-        for (var i=process.processOutputs.length-1; i>=0; --i) {
-            var processOutput = process.processOutputs[i];
+        for (var i=theProcess.processOutputs.length-1; i>=0; --i) {
+            var processOutput = theProcess.processOutputs[i];
             var output = {
                 identifier: processOutput.identifier
             }
@@ -629,14 +691,14 @@ var Petra = function() {
             }
             outputs.push( output );
         }
-        process.responseForm = {
+        theProcess.responseForm = {
             responseDocument: {
                 storeExecuteResponse: true,
                 status: true,
                 outputs: outputs
             }
         };
-        var data = new OpenLayers.Format.WPSExecute().write(process);
+        var data = new OpenLayers.Format.WPSExecute().write(theProcess);
         var requestTime = (new Date()).toISOString();
         OpenLayers.Request.POST({
             url: lizUrls['wps_wps'],
@@ -645,9 +707,13 @@ var Petra = function() {
             headers:{
                 'Content-Length': data.length
             },
-            success: function(response) {showOutput(response, requestTime)},
+            success: function(response) {
+                showOutput(theProcess, response, requestTime);
+
+            },
             failure: function() {}
         });
+
         return false;
     }
 
@@ -685,24 +751,52 @@ var Petra = function() {
     function toggleProcessFailedMessages( uuid ) {
         var processExecuted = executedProcesses[uuid];
 
-        var btn = $('#log-'+uuid).find('button[value="failed-'+uuid+'"]');
+        var btn = $('#log-'+uuid).find('button[value="failed-'+uuid+'"].checkbox');
 
         var logFailedUuid = $('#processing-log-failed-uuid');
         var oldUuid = logFailedUuid.text();
+
+        // clear
+        $('#processing-log-failed-messages').html('');
+        $('#processing-log-failed .processing-log-failed-detail-table tr.wps-input').remove();
+        $('#processing-log-failed-creation').html('');
+        $('#processing-log-failed-identifier').html('');
+        $('#processing-log-failed-title').html('');
+
+        // close
         if ( uuid == oldUuid ) {
             $('#processing-log-failed').hide();
-            $('#processing-log-failed-messages').html('');
-            $('#processing-log-failed-creation').html('');
             logFailedUuid.html('');
-            btn.removeClass('active');
+            btn.removeClass('checked');
             return;
         }
 
-        $('#log-'+oldUuid).find('button[value="failed-'+oldUuid+'"]').removeClass('active');
-        btn.addClass('active');
+        // unique checked
+        $('#log-'+oldUuid).find('button[value="failed-'+oldUuid+'"]').removeClass('checked');
+        btn.addClass('checked');
+
+        // Update information
+        $('#processing-log-failed-title').html(processExecuted.title);
+        $('#processing-log-failed-identifier').html(processExecuted.identifier);
         logFailedUuid.html(uuid);
 
         $('#processing-log-failed-creation').html((new Date(processExecuted.startTime)).toLocaleString());
+
+        for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+            var input = processExecuted.dataInputs[i];
+            var tr = '<tr class="wps-input" data-value="'+input.identifier+'">';
+            tr += '<td>'+input.title+'</td>';
+            tr += '<td>';
+            if ( input.data && input.data.literalData) {
+                tr += input.data.literalData.value;
+            } else {
+                tr += 'Not set';
+            }
+            tr += '</td>';
+            tr += '</tr>';
+            $('#processing-log-failed .processing-log-failed-detail-table').append(tr);
+        }
+
         $('#processing-log-failed-messages').html('');
         var div = '<div class="alert alert-error">';
         div+= '<ul>';
@@ -715,107 +809,110 @@ var Petra = function() {
         $('#processing-log-failed').show();
     }
 
-    function toggleProcessDetails( uuid ) {
-        var processExecuted = executedProcesses[uuid];
-
-        var btn = $('#log-'+uuid).find('button[value="details-'+uuid+'"]');
-
-        var logDetailsUuid = $('#processing-log-details-uuid');
-        var oldUuid = logDetailsUuid.text();
-        if ( uuid == oldUuid ) {
-            $('#processing-log-details').hide();
-            $('#processing-log-details-table tr:not(:first)').remove();
-            $('#processing-log-details-creation').html('');
-            logDetailsUuid.html('');
-            btn.removeClass('active');
-            return;
-        }
-
-        $('#log-'+oldUuid).find('button[value="details-'+oldUuid+'"]').removeClass('active');
-        btn.addClass('active');
-        logDetailsUuid.html(uuid);
-
-        $('#processing-log-details-creation').html((new Date(processExecuted.startTime)).toLocaleString());
-        $('#processing-log-details-table tr:not(:first)').remove();
-        for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
-            var input = processExecuted.dataInputs[i];
-            //console.log(input);
-            // details table
-            var tr = '<tr>';
-            tr += '<td>'+input.title+'</td>';
-            if (input.boundingBoxData)
-                tr += '<td>Bounding box</td>';
-            else if (input.literalData) {
-                var dataType = input.literalData.dataType;
-                if ( 'processMetadata' in input ) {
-                    var qgisType = input.processMetadata.type;
-                    if ( qgisType == 'number' )
-                        tr += '<td>'+qgisType+' ('+dataType+')</td>';
-                    else
-                        tr += '<td>'+qgisType+'</td>';
-                } else
-                    tr += '<td>'+dataType+'</td>';
-            }
-            else
-                tr += '<td></td>';
-            if ( input.data )
-                if (input.data.literalData)
-                    tr += '<td>'+input.data.literalData.value+'</td>';
-                else
-                    tr += '<td>Not set</td>';
-            else
-                tr += '<td>Not set</td>';
-            tr += '</tr>';
-            $('#processing-log-details-table tr:last').after(tr);
-        }
-        $('#processing-log-details').show();
-    }
-
     function toggleProcessResults( uuid ) {
         var processExecuted = executedProcesses[uuid];
 
-        var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"]');
+        // Get the process button
+        var btn = $('#log-'+uuid).find('button[value="results-'+uuid+'"].checkbox');
 
-        $('#processing-results-literal').show();
-        $('#processing-results-layer').show();
+        // Show results
+        $('#processing-results-list').show();
+
+        // Get algorithm results div
+        var divResults = $('#processing-results-list div[data-value="'+processExecuted.identifier+'"]');
+        // And show it
+        divResults.show();
+
         btn.addClass('checked');
-        $('#processing-results-title').html(processExecuted.title);
-        if ( $('#processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
-        //    btn.removeClass('checked');
+        if ( divResults.find('table.processing-results-literal-table tr:first th[class="'+uuid+'"]').length == 0 ) {
+            // No process results are displayed
 
+            var hasDetail = false;
+            // Add input description
+            if (processExecuted.dataInputs) {
+                if (divResults.find('table.processing-results-detail-table tr').length == 1) {
+                    for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+                        var input = processExecuted.dataInputs[i];
+                        //console.log(input);
+                        // details table
+                        var tr = '<tr data-value="'+input.identifier+'">';
+                        tr += '<td>'+input.title+'</td>';
+                        if (input.boundingBoxData)
+                            tr += '<td>Bounding box</td>';
+                        else if (input.literalData) {
+                            var dataType = input.literalData.dataType;
+                            if ( 'processMetadata' in input ) {
+                                var qgisType = input.processMetadata.type;
+                                if ( qgisType == 'number' )
+                                    tr += '<td>'+qgisType+' ('+dataType+')</td>';
+                                else
+                                    tr += '<td>'+qgisType+'</td>';
+                            } else
+                                tr += '<td>'+dataType+'</td>';
+                        }
+                        else
+                            tr += '<td></td>';
+                        tr += '</tr>';
+                        divResults.find('table.processing-results-detail-table tr:last').after(tr);
+                    }
+                }
+                // Add process inputs
+                // Fisrt the header
+                divResults.find('table.processing-results-detail-table tr:first th:last')
+                    .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+                // Then the data
+                for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
+                    var input = processExecuted.dataInputs[i];
+                    var td = '<td class="'+uuid+'">';
+                    if ( input.data && input.data.literalData) {
+                        td += input.data.literalData.value;
+                    } else {
+                        td += 'Not set';
+                    }
+                    td += '</td>';
+                    divResults.find('table.processing-results-detail-table tr[data-value="'+input.identifier+'"] td:last').after(td);
+                    hasDetail = true;
+                }
+            }
+            // Hide or show content depending on results
+            divResults.find('div.processing-results-detail').toggle(hasDetail);
 
             // literal Data
             var hasLiteral = false;
-            if ($('#processing-results-literal-table tr').length == 1) {
+            // Add literal output description
+            if (divResults.find('table.processing-results-literal-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                     var output = processExecuted.processOutputs[i];
                     if ( !output.literalData )
                         continue;
-                    var tr = '<tr class="'+output.identifier+'">';
+                    var tr = '<tr data-value="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
-                    $('#processing-results-literal-table tr:last').after(tr);
+                    divResults.find('table.processing-results-literal-table tr:last').after(tr);
                 }
             }
-            $('#processing-results-literal-table tr:first th:last')
+            // Add process literal results
+            // Fisrt the header
+            divResults.find('table.processing-results-literal-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.literalData )
                     continue;
                 var td = '<td class="'+uuid+'">'+output.literalData.value+'</td>';
-                $('#processing-results-literal-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-literal-table tr[data-value="'+output.identifier+'"] td:last').after(td);
                 hasLiteral = true;
             }
             // Hide or show content depending on results
-            $('#processing-results-literal').toggle(hasLiteral);
+            divResults.find('div.processing-results-literal').toggle(hasLiteral);
 
 
             // LAYERS
             // reference Data with mimeType application/x-ogc-wms
             var hasLayer = false;
-            //console.log('has layer BEGIN');
-            if ($('#processing-results-layer-table tr').length == 1) {
+            // Add layer output description
+            if (divResults.find('table.processing-results-layer-table tr').length == 1) {
                 for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                     var output = processExecuted.processOutputs[i];
                     if ( !output.reference )
@@ -824,14 +921,17 @@ var Petra = function() {
                         continue;
                     if ( output.reference.mimeType != 'application/x-ogc-wms' )
                         continue;
-                    var tr = '<tr class="'+output.identifier+'">';
+                    var tr = '<tr data-value="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
-                    $('#processing-results-layer-table tr:last').after(tr);
+                    divResults.find('table.processing-results-layer-table tr:last').after(tr);
                 }
             }
-            $('#processing-results-layer-table tr:first th:last')
+            // Add process layer results
+            // Fisrt the header
+            divResults.find('table.processing-results-layer-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.reference )
@@ -841,15 +941,18 @@ var Petra = function() {
                 if ( output.reference.mimeType != 'application/x-ogc-wms' )
                     continue;
                 var url = output.reference.href;
+                // Extract map parameter
                 var mapParam = getQueryParam(url, 'map');
-                //console.log(mapParam);
+                // Extract layer parameter
                 var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
-
-                var layerName = uuid+'-'+output.identifier;
+                // Create a layer name for the map
+                var layerName = uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_');
+                console.log(layerName);
+                // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                   ,OpenLayers.Util.getParameterString({map:mapParam})
                 );
-                //console.log(serviceUrl );
+                // Defined WMS layer parameters
                 var layerWmsParams = {
                     version:'1.3.0'
                     ,layers: layerParam
@@ -860,7 +963,7 @@ var Petra = function() {
                     ,exceptions:'application/vnd.ogc.se_inimage'
                     ,dpi:96
                 };
-
+                // Create OpenLayers WMS layer
                 var wmsLayer = new OpenLayers.Layer.WMS(layerName
                     ,serviceUrl
                     ,layerWmsParams
@@ -874,6 +977,7 @@ var Petra = function() {
                     ,ratio:1
                 });
                 map.addLayer(wmsLayer);
+                // Get the vector layer index to push WMS layer just before
                 var zIndex = -1;
                 var vlayers = lizMap.map.getLayersByClass('OpenLayers.Layer.Vector');
                 for ( var j=0, jj= vlayers.length; j<jj; j++ ) {
@@ -887,8 +991,8 @@ var Petra = function() {
                         zIndex = vZIndex;
                 }
                 lizMap.map.setLayerIndex(wmsLayer, zIndex);
-                //console.log(layerName);
 
+                // Insert layer info in table layer results
                 var td = '<td class="'+uuid+'">';
                 //td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
                 td += '<span>'+layerParam+'</span>'
@@ -896,10 +1000,11 @@ var Petra = function() {
                 td += '<i class="icon-download-alt"></i>';
                 td += '</button>';
                 td += '</td>';
-                $('#processing-results-layer-table tr.'+output.identifier+' td:last').after(td);
+                divResults.find('table.processing-results-layer-table tr[data-value="'+output.identifier+'"] td:last').after(td);
 
                 hasLayer = true;
 
+                // Add a line in the map layer tree
                 var trResults = $('#switcher table.tree #group-wps-results');
                 if ( trResults.length == 0 ) {
                     $('<tr id="group-wps-results" class="liz-group expanded parent initialized"><td><a href="#" title="Réduire" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox partial checked" name="group" value="wps-results" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">Résultats</span></td><td></td><td></td><td></td></tr>')
@@ -928,6 +1033,7 @@ var Petra = function() {
                     });
                 }
 
+                // Build WMS GetLegendGraphic to add image in layer tree
                 var legendParams = {SERVICE: "WMS",
                               VERSION: "1.3.0",
                               REQUEST: "GetLegendGraphic",
@@ -996,7 +1102,7 @@ var Petra = function() {
                 }
                 return false;
             });*/
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
+            divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
                 var btn = $(this);
                 var btnVal = btn.val();
                 var processUuid = btn.parent().attr('class');
@@ -1007,16 +1113,17 @@ var Petra = function() {
                 return false;
             });
             // Hide or show content depending on results
-            $('#processing-results-layer').toggle(hasLayer);
+            divResults.find('div.processing-results-layer').toggle(hasLayer);
 
 
             // PLOTS
             // Display plots
             var hasPlot = false;
-            var div = '<div class="'+uuid+'">';
+            var div = '<div class="processing-results-plot-display" data-value="'+uuid+'">';
             div+= '<h5>'+(new Date(processExecuted.startTime)).toLocaleString()+'</h5>';
             div+= '</div>';
-            $('#processing-results-plot').append(div);
+            divResults.find('div.processing-results-plot-table').append(div);
+            // for each plot output create a plotly display
             for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
                 var output = processExecuted.processOutputs[i];
                 if ( !output.reference )
@@ -1027,21 +1134,28 @@ var Petra = function() {
                     continue;
                 var url = output.reference.href;
                 var oDiv = '<p><strong>'+output.title+'</strong></p>';
-                oDiv += '<div id="'+uuid+'-'+output.identifier+'" style="height:400px;">';
+                oDiv += '<div id="'+uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_')+'" style="height:400px;">';
                 oDiv += '</div>';
-                $('#processing-results-plot div[class="'+uuid+'"]').append(oDiv);
-                loadConfigAndDisplayPlot( uuid+'-'+output.identifier, url );
+                divResults.find('div.processing-results-plot div[data-value="'+uuid+'"]').append(oDiv);
+                loadConfigAndDisplayPlot( uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_'), url );
                 hasPlot = true;
 
             }
             // Hide or show content depending on results
-            $('#processing-results-plot').toggle(hasPlot);
-
-
+            divResults.find('div.processing-results-plot').toggle(hasPlot);
 
         } else {
-            $('#processing-results-plot > div[class="'+uuid+'"]').remove();
+            // Remove displayed results
+            // Remove plot div
+            divResults.find('div.processing-results-plot-table > div[data-value="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasPlot = (divResults.find('div.processing-results-plot-table > div').length != 0);
+            if (!hasPlot) {
+                divResults.find('div.processing-results-plot').hide();
+            }
 
+            // Remove layer outputs
+            // From the layer tree
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').unbind('click');
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' a.expander').unbind('click');
             $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').each(function(i, b){
@@ -1054,17 +1168,44 @@ var Petra = function() {
             if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
                 $('#switcher table.tree #group-wps-results').remove();
 
-            $('#processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
+            // From table layer results
+            //divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
             /*$('#processing-results-layer-table tr td[class="'+uuid+'"] button').each(function(i, b){
                 var layerName = $(b).val();
                 var layers = lizMap.map.getLayersByName( layerName );
                 if ( layers.length > 0 )
                     lizMap.map.removeLayer( layers[0] );
             });*/
-            $('#processing-results-layer-table tr td[class="'+uuid+'"]').remove();
-            $('#processing-results-layer-table tr th[class="'+uuid+'"]').remove();
-            $('#processing-results-literal-table tr td[class="'+uuid+'"]').remove();
-            $('#processing-results-literal-table tr th[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-layer-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasLayer = (divResults.find('table.processing-results-layer-table tr th').length != 1);
+            if (!hasLayer) {
+                divResults.find('div.processing-results-layer').hide();
+            }
+
+            // Remove literal outputs
+            divResults.find('table.processing-results-literal-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-literal-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasLiteral = (divResults.find('table.processing-results-literal-table tr th').length != 1);
+            if (!hasLiteral) {
+                divResults.find('div.processing-results-literal').hide();
+            }
+
+            // Remove inputs
+            divResults.find('table.processing-results-detail-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-detail-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasDetail = (divResults.find('table.processing-results-detail-table tr th').length != 2);
+            if (!hasDetail) {
+                divResults.find('div.processing-results-detail').hide();
+            }
+
+            // Hide or show algorithm results depending on results
+            if (!hasPlot && !hasLayer && !hasLiteral) {
+                divResults.hide();
+            }
             btn.removeClass('checked');
         }
 
@@ -1072,9 +1213,29 @@ var Petra = function() {
         if ( !$('#button-processing-results').parent().hasClass('active') )
             $('#button-processing-results').click();
 
-        if ( $('#processing-results-literal-table tr:first th').length == 1
-            && $('#button-processing-results').parent().hasClass('active') )
-            $('#button-processing-results').click();
+        refreshPlotsWidth();
+    }
+
+    // Refresh plots width based on their parent width which have CSS flex:1 so they all share space equally
+    function refreshPlotsWidth() {
+        // Get plot divs
+        const divPlots = document.querySelectorAll('#processing-results-list div.processing-results-plot');
+        if (divPlots.length) {
+            for (const divPlot of divPlots) {
+                // for each plot div get plotly divs to update width
+                const divPlotlys = divPlot.querySelectorAll('div.processing-results-plot-display .js-plotly-plot');
+                if (divPlotlys.length) {
+                    // Get first container div width
+                    const divWidth = parseInt(divPlot.querySelector('div.processing-results-plot-display').clientWidth);
+                    for (const divPlotly of divPlotlys) {
+                        // Apply width to all plotly divs of this plot div
+                        Plotly.relayout(divPlotly.id, {
+                            width: divWidth
+                        });
+                    }
+                }
+            }
+        }
     }
 
     function updateLogTable( executedProcess ) {
@@ -1082,69 +1243,105 @@ var Petra = function() {
             return;
         if ( !executedProcess.uuid )
             return;
-        var uuid = executedProcess.uuid;
-        var startTime = executedProcess.startTime;
-        var status = executedProcess.status;
-        var endTime = executedProcess.endTime;
-        var tr = '<tr id="log-'+uuid+'">';
-        //tr += '<td>'+uuid+'</td>';
-        tr += '<td>'+(new Date(startTime)).toLocaleString()+'</td>';
-        if ( endTime != '' )
-            tr += '<td>'+(new Date(endTime)).toLocaleString()+'</td>';
-        else
-            tr += '<td></td>';
+        const uuid = executedProcess.uuid;
+        const startTime = executedProcess.startTime;
+        const status = executedProcess.status;
+        const endTime = executedProcess.endTime;
+
+        const shortUUID = uuid.substring(0, 13);
+
+        let tr = '<tr id="log-'+uuid+'" data-value="'+startTime+'">';
+
+        // Display actions buttons
+        tr += '<td>';
+        if (status == 'Succeeded'){
+            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+        }
+        else if (status == 'Failed'){
+            tr += '<button class="btn btn-mini checkbox" value="failed-' + uuid + '" title="Toggle process information"></button>';
+        }
+        tr += '</td>';
+
+        // Title info
+        let titleInfo = [];
+        if (executedProcess.dataInputs) {
+            for (var i=0,ii=executedProcess.dataInputs.length; i<ii; ++i) {
+                var input = executedProcess.dataInputs[i];
+                if ( input.data && input.data.literalData) {
+                    titleInfo.push(input.data.literalData.value);
+                }
+            }
+        }
+
+        // Display start time
+        tr += '<td title="' + shortUUID + '">';
+        if (status == 'Succeeded'){
+            tr += '<button class="btn btn-mini btn-link" value="results-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+        }
+        else if (status == 'Failed'){
+            tr += '<button class="btn btn-mini btn-link" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+        }
+        tr += (new Date(startTime)).toLocaleString();
+        tr += '</button></td>';
+
+        // Display status
         if ( status == 'Accepted' || status == 'Started' )
-            tr += '<td><div class="progress"><div class="bar bar-hidden"></div><div class="bar"></div></div></td>';
+            tr += '<td><span class="badge badge-info"><i class="icon-white icon-refresh"></i></span></td>';
         else if ( status == 'Paused' )
-            tr += '<td><i class="icon-pause"></i></td>';
+            tr += '<td><span class="badge badge-warning"><i class="icon-white icon-pause"></i></span></td>';
         else if ( status == 'Succeeded' )
-            tr += '<td><span class="badge badge-success"><i class="icon-white icon-ok"></i></td>';
+            tr += '<td><span class="badge badge-success"><i class="icon-white icon-ok"></i></span></td>';
         else if ( status == 'Failed' )
             tr += '<td><span class="badge badge-important"><i class="icon-white icon-remove"></i></span></td>';
         else
             tr += '<td>'+status+'</td>';
-        //tr += '<td></td>';
-        tr += '<td>';
-        tr += '<button class="btn btn-mini" value="details-'+uuid+'" title="Toggle process details"><i class="icon-resize-vertical"></i></button>';
-        if ( status == 'Succeeded' )
-            tr += '<button class="btn btn-mini checkbox" value="results-'+uuid+'" title="Toggle process results"></button>';
-        else if ( status == 'Failed' )
-            tr += '<button class="btn btn-mini" value="failed-'+uuid+'" title="Toggle process information"><i class="icon-info-sign"></i></button>';
-        tr += '</td>';
+
         tr += '</tr>';
 
         var logTr = $('#log-'+uuid);
-        if ( logTr.length == 0 )
-            $('#processing-log-table tr:first').after(tr);
+        var isChecked = false;
+        if ( logTr.length == 0 ){
+            logTrList = $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results tr');
+            if (!logTrList.length) {
+                $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
+            } else {
+                logTrList.each(function(idx, elt){
+                    elt = $(elt);
+                    if (startTime > elt.attr('data-value')) {
+                        elt.before(tr);
+                        return false;
+                    }
+                });
+            }
+        }
         else {
             logTr.find('button').unbind('click');
+            var isChecked = logTr.find('button.checkbox').hasClass('checked');
             logTr.replaceWith(tr);
         }
 
         logTr = $('#log-'+uuid);
+        if (isChecked) {
+            logTr.find('button.checkbox').addClass('checked');
+        }
         logTr.find('button').click(function(){
             var self = $(this);
             var val = self.val();
             //console.log(val);
             var btnUuid = '';
             var btnAction = '';
-            if ( val.startsWith( 'details-' ) ) {
-                btnUuid = val.replace('details-', '');
-                btnAction = 'details';
-            } else if ( val.startsWith('results-' ) ) {
-                btnUuid = val.replace('results-', '');
+            if ( val.startsWith('results-' ) ) {
+                btnUuid = val.replaceAll('results-', '');
                 btnAction = 'results';
             } else if ( val.startsWith('failed-' ) ) {
-                btnUuid = val.replace('failed-', '');
+                btnUuid = val.replaceAll('failed-', '');
                 btnAction = 'failed';
             }
             //console.log(btnUuid);
             if ( btnUuid in executedProcesses ) {
                 var processExecuted = executedProcesses[btnUuid];
                 //console.log( processExecuted );
-                if ( btnAction == 'details' ) {
-                    toggleProcessDetails( btnUuid );
-                } else if ( btnAction == 'results' ) {
+                if ( btnAction == 'results' ) {
                     toggleProcessResults( btnUuid );
                 } else if ( btnAction == 'failed' ) {
                     toggleProcessFailedMessages( btnUuid );
@@ -1204,8 +1401,8 @@ var Petra = function() {
                 executedProcesses[uuid] = pToSave;
                 updateLogTable( pToSave );
                 storeStatusProcess( uuid );
-                console.log('Process object updated');
-                console.log(pToSave);
+                //console.log('Process object updated');
+                //console.log(pToSave);
             },
             failure: function() {
             }
@@ -1249,7 +1446,7 @@ var Petra = function() {
     }
 
     function parseExecuteResponse( executeResponse, requestTime ) {
-        console.log(executeResponse);
+        //console.log(executeResponse);
         var uuid = getQueryParam(executeResponse.statusLocation, 'uuid');
         var statusCreationTime = executeResponse.status.creationTime;
 
@@ -1265,12 +1462,9 @@ var Petra = function() {
 
         var exceptions = [];
         if ( status == 'Failed' ) {
-            console.log('Failed');
             if ( executeResponse.status.exceptionReport && executeResponse.status.exceptionReport.exceptions ) {
-                console.log('ExceptionReport');
                 var exceptionList = executeResponse.status.exceptionReport.exceptions;
                 for ( var i = 0, len=exceptionList.length; i < len; i++ ) {
-                    console.log(exceptionList[i].texts);
                     exceptions = exceptions.concat( exceptionList[i].texts );
                 }
             }
@@ -1302,11 +1496,13 @@ var Petra = function() {
     }
 
     function manageExecuteResponse( executeResponse, requestTime ) {
+        // Display results tab if inactive
+        $('li.processing-results:not(.active) #button-processing-results').click();
+
         var pToSave = parseExecuteResponse( executeResponse, requestTime );
         var uuid = pToSave.uuid;
         executedProcesses[uuid] = pToSave;
 
-        $("a[href='#processing-log-tab']").click();
         updateLogTable( pToSave );
         storeStatusProcess( uuid );
         updateStatusProcess( uuid );
@@ -1314,8 +1510,7 @@ var Petra = function() {
     }
 
     function manageExceptionReport( exceptionReport, requestTime ) {
-        console.log(exceptionReport);
-        var result = document.getElementById("processing-output");
+        var result = document.getElementById("processing-form-errors");
         var div = '<div class="alert alert-error">';
         div+= '<ul>';
         for ( var i=0, ii=exceptionReport.exceptions.length; i<ii; i++ ) {
@@ -1330,9 +1525,7 @@ var Petra = function() {
     }
 
     // add the process's output to the page
-    function showOutput(response, requestTime) {
-        //var result = document.getElementById("processing-output");
-        //result.innerHTML = "<h3>Output:</h3>";
+    function showOutput(theProcess, response, requestTime) {
         var features;
         var contentType = response.getResponseHeader("Content-Type");
         if (contentType == "application/wkt") {
@@ -1345,6 +1538,10 @@ var Petra = function() {
             //result.innerHTML += "The result should also be visible on the map.";
         } else if (contentType && contentType.startsWith('text/xml')){
             var parseResponse = new OpenLayers.Format.WPSExecute().read(response.responseText);
+
+            // Display results for executed algorithm if not expanded
+            $('#processing-log-list li[data-value="' + theProcess.identifier + '"]:not(.expanded)').addClass('expanded');
+
             if ( parseResponse.executeResponse )
                 manageExecuteResponse( parseResponse.executeResponse, requestTime );
             if ( parseResponse.exceptionReport )
@@ -1414,6 +1611,12 @@ var Petra = function() {
             OpenLayers.Format.WPSExecute.prototype.readers.wps.ProcessPaused = function(node,obj) {
                 obj.processPaused = true;
             };
+
+            // Refresh plots width when #processing-results size change
+            const processingResultsObserver = new ResizeObserver(() => {
+                refreshPlotsWidth();
+            });
+            processingResultsObserver.observe(document.querySelector('#processing-results'));
         },
 
         'layerSelectionChanged': function(e) {

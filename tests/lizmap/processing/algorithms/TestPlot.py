@@ -7,7 +7,8 @@ from qgis.core import (
     QgsProcessingParameterNumber,
     QgsProcessingParameterFileDestination,
     QgsProcessingOutputFile,
-    QgsProcessingAlgorithm
+    QgsProcessingAlgorithm,
+    QgsProcessingException
 )
 from qgis.PyQt.QtCore import QCoreApplication
 
@@ -52,7 +53,8 @@ class TestPlot(QgsProcessingAlgorithm):
                 self.POWER,
                 'Power',
                 type=QgsProcessingParameterNumber.Integer,
-                defaultValue=2
+                defaultValue=2,
+                minValue=2
             )
         )
 
@@ -75,6 +77,8 @@ class TestPlot(QgsProcessingAlgorithm):
         """
 
         p = self.parameterAsInt(parameters, self.POWER, context)
+        if p > 4:
+            raise QgsProcessingException('Failed')
 
         outputJsonFile = self.parameterAsFileOutput(parameters, self.OUTPUT_JSON_FILE, context)
 

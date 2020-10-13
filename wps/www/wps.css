@@ -7,15 +7,6 @@
   font-size: 12px;
 }
 
-#processing-results > div.menu-content > div {
-  margin: 5px 0px;
-  padding: 0px 5px;
-  background-color: rgb(240, 240, 240);
-  display: block;
-}
-
-
-
 #processing-log-table tr td div.progress{
     width:50px;
 }
@@ -32,6 +23,98 @@
     -moz-animation: slide-hidden 5000ms infinite linear;
     -o-animation: slide-hidden 5000ms infinite linear;
     animation: slide-hidden 5000ms infinite linear;
+}
+
+#processing-log-list{
+    list-style: none;
+    margin-left: 0;
+}
+
+#processing-log-list .title{
+    cursor: pointer;
+}
+
+#processing-log-list li:before{
+    content: "\2023";
+    margin-right: 5px;
+    font-size: 1.5em;
+    vertical-align: middle;
+}
+
+#processing-log-list li.expanded:before{
+    display: inline-block;
+    transform: rotate(90deg);
+}
+
+#processing-log-list li .processing-log-list-results{
+    display: none;
+}
+
+#processing-log-list li.expanded .processing-log-list-results{
+    display: block;
+}
+
+#processing-log-list li .processing-log-list-results button.btn-link {
+  font-size: 12px;
+}
+
+#processing-results-all{
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: rgb(240, 240, 240);
+    margin: 5px 0px;
+    padding: 0px 5px;
+}
+
+#processing-results-all > div{
+    padding: 2px;
+}
+
+#processing-results-all > div + div{
+    flex: 1 1 0px;
+    border-left: solid 1px lightgray;
+}
+
+#processing-log-failed {
+  border: 1px solid #F00;
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+#processing-results-list > div {
+    padding: 0 5px;
+}
+
+#processing-results-list h4.title,
+#processing-log-failed h4.title {
+  background-color: #f9f9f9;
+  padding: 5px 0;
+  font-size: 20px;
+}
+
+#processing-log-failed-info {
+  display: flex; overflow: auto;
+}
+
+#processing-log-failed-info > div {
+  margin:0 5px; width: 50%;
+}
+
+#processing-results-plot,
+#processing-results-list .processing-results-plot-table{
+    display: flex;
+    overflow: auto;
+}
+
+#processing-results-plot > div,
+#processing-results-list .processing-results-plot-table > div{
+    flex: 1;
+    overflow: auto;
+}
+
+#bottom-dock{
+    width:auto;
 }
 
 @-webkit-keyframes slide {
