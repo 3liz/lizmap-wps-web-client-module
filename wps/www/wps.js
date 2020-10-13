@@ -386,48 +386,8 @@ var Petra = function() {
             container.insertBefore(field, previousSibling.nextSibling) :
             container.appendChild(control);
 
-        if ( dataType == 'boolean' ||  (dataType == 'string' && !anyValue) ) {
-            var option;
-            option = document.createElement("option");
-            option.innerHTML = '---';
-            field.appendChild(option);
-            for (var v in input.literalData.allowedValues) {
-                option = document.createElement("option");
-                option.value = v;
-                option.innerHTML = v;
-                field.appendChild(option);
-            }
-            field.onchange = function() {
-                createCopy(input, field, addLiteralInput);
-                input.data = this.selectedIndex ? {
-                    literalData: {
-                        value: this.options[this.selectedIndex].value
-                    }
-                } : undefined;
-            };
-            if ( defaultValue ) {
-                $(field).val(defaultValue);
-                field.onchange();
-            }
-        } else if ( qgisType == 'field' ) {
-            var option;
-            option = document.createElement("option");
-            option.innerHTML = '---';
-            field.appendChild(option);
-            fieldClass += ' ';
-            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_');
-            fieldClass += ' ';
-            fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
-            field.setAttribute('class', fieldClass);
-            field.onchange = function() {
-                createCopy(input, field, addLiteralInput);
-                input.data = this.selectedIndex ? {
-                    literalData: {
-                        value: this.options[this.selectedIndex].value
-                    }
-                } : undefined;
-            };
-        } else if ( qgisType == 'vector' || qgisType == 'source' ) {
+        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
+        if ( qgisType == 'vector' || qgisType == 'source' ) {
             var option;
             option = document.createElement("option");
             option.innerHTML = '---';
@@ -452,7 +412,7 @@ var Petra = function() {
                 };
             };
             if ( qgisType == 'source' ) {
-                $(field).after('<label class="checkbox inline disabled"><input id="processing-input-'+name.replaceAll(':', '_')+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
+                $(field).after('<br><label class="checkbox inline disabled"><input id="processing-input-'+name.replaceAll(':', '_').replaceAll(' ', '_')+'-selection" type="checkbox" class="selection" disabled="disabled">Sélection</label>');
                 $(field).parent().find('input[type="checkbox"].selection').change(function(){
                     var cbx = $(this);
                     if ( cbx.is(':checked') ) {
@@ -460,9 +420,9 @@ var Petra = function() {
                         var aName = input.data.literalData.value;
                         var lConfig = lizMap.config.layers[aName];
                         if ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' ) ')
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' )')
                         } else if ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' ) ')
+                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' )')
                         }
                         input.data.literalData.value = aName;
                     } else {
@@ -473,6 +433,24 @@ var Petra = function() {
                     }
                 });
             }
+        } else if ( qgisType == 'field' ) {
+            var option;
+            option = document.createElement("option");
+            option.innerHTML = '---';
+            field.appendChild(option);
+            fieldClass += ' ';
+            fieldClass += 'fieldParentLayerParameterName-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_');
+            fieldClass += ' ';
+            fieldClass += 'fieldDataType-'+input.processMetadata.dataType;
+            field.setAttribute('class', fieldClass);
+            field.onchange = function() {
+                createCopy(input, field, addLiteralInput);
+                input.data = this.selectedIndex ? {
+                    literalData: {
+                        value: this.options[this.selectedIndex].value
+                    }
+                } : undefined;
+            };
         } else if ( qgisType == 'raster' ) {
             var option;
             option = document.createElement("option");
@@ -494,6 +472,29 @@ var Petra = function() {
                     }
                 } : undefined;
             };
+        } else if ( dataType == 'boolean' ||  (dataType == 'string' && !anyValue) ) {
+            var option;
+            option = document.createElement("option");
+            option.innerHTML = '---';
+            field.appendChild(option);
+            for (var v in input.literalData.allowedValues) {
+                option = document.createElement("option");
+                option.value = v;
+                option.innerHTML = v;
+                field.appendChild(option);
+            }
+            field.onchange = function() {
+                createCopy(input, field, addLiteralInput);
+                input.data = this.selectedIndex ? {
+                    literalData: {
+                        value: this.options[this.selectedIndex].value
+                    }
+                } : undefined;
+            };
+            if ( defaultValue ) {
+                $(field).val(defaultValue);
+                field.onchange();
+            }
         } else {
             if ( defaultValue ) {
                 field.value = defaultValue;
