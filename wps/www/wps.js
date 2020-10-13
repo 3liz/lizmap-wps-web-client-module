@@ -1286,11 +1286,11 @@ var Petra = function() {
 
         // Display status
         if ( status == 'Accepted' || status == 'Started' )
-            tr += '<td><div class="progress"><div class="bar bar-hidden"></div><div class="bar"></div></div></td>';
+            tr += '<td><span class="badge badge-info"><i class="icon-white icon-refresh"></i></span></td>';
         else if ( status == 'Paused' )
-            tr += '<td><i class="icon-pause"></i></td>';
+            tr += '<td><span class="badge badge-warning"><i class="icon-white icon-pause"></i></span></td>';
         else if ( status == 'Succeeded' )
-            tr += '<td><span class="badge badge-success"><i class="icon-white icon-ok"></i></td>';
+            tr += '<td><span class="badge badge-success"><i class="icon-white icon-ok"></i></span></td>';
         else if ( status == 'Failed' )
             tr += '<td><span class="badge badge-important"><i class="icon-white icon-remove"></i></span></td>';
         else
