@@ -4,7 +4,9 @@ Lizmap WPS Web Client is a Lizmap module to add a WPS panel into [Lizmap Web Cli
 
 This is an example showing the QGIS Processing Buffer algorithm, exposed as a WPS algorithm within Lizmap Web Client:
 
-![demo](screenshot.png "3Liz")
+![Screenshot](screenshot.png)
+
+![Demo gif](demo.gif)
 
 It's also providing another panel showing you the results which have been executed on the Lizmap instance.
 
