@@ -1,5 +1,6 @@
 {
     "name": "lizmap/lizmap-wps-web-client",
+    "version": "0.1.0",
     "type": "jelix-module",
     "description": "Jelix modules to add WPS Web Client.",
     "keywords": ["module", "jelix", "lizmap", "wps"],

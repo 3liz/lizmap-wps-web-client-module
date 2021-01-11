@@ -11,4 +11,5 @@ factory.manifest
 tests/lizmap/www
 tests/lizmap/var
 tests/lizmap/wps-data
+tests/.env
 
