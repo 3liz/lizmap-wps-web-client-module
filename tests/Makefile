@@ -22,9 +22,6 @@ BASEDIR:=$(shell realpath ..)
 
 WPS_MODULE_SRC:=$(shell realpath ..)
 
-LIZMAP_VERSION_TAG:=3.3.12
-QGIS_VERSION_TAG:=3.10
-
 main:
 	@cat <<- EOF
 		Commandes:
