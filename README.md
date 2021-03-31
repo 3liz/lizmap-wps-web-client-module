@@ -12,9 +12,54 @@ It's also providing another panel showing you the results which have been execut
 
 ## Installation
 
-This module can be installed with PHP Composer and the file below needs to be update.
+Since version 0.1.1, it is recommended to install the module
+with [Composer](https://getcomposer.org), the package manager for PHP.
+If you can't use it or if you are using Lizmap 3.3 or lower, use the manual way to
+install the module (jump to the corresponding section below)
 
-Add a section `wps` in your `localconfig.ini.php` and add the variables:
+### Automatic install with Composer and lizmap 3.4 or higher
+
+* into `lizmap/my-packages`, create the file `composer.json` (if it doesn't exists)
+  by copying the file `composer.json.dist`, and install the module with Composer:
+
+```bash
+cp -n lizmap/my-packages/composer.json.dist lizmap/my-packages/composer.json
+composer require --working-dir=lizmap/my-packages "lizmap/lizmap-wps-web-client"
+```
+
+* Then execute Lizmap install scripts into `lizmap/install/` :
+
+```bash
+php lizmap/install/installer.php
+./lizmap/install/clean_vartmp.sh
+./lizmap/install/set_rights.sh
+```
+
+Go to the "Configuration" section.
+
+### Manual installation into lizmap 3.3 or 3.4 without Composer
+
+* Download the zip archive from the [release page into github](https://github.com/3liz/lizmap-wps-web-client-module/releases).
+* Extract files from the archive and copy the directory `wps` into `lizmap/lizmap-modules/` of Lizmap.
+* Edit the file  `lizmap/var/config/localconfig.ini.php` to add this 
+  into the `[modules]` section
+
+```ini
+wps.access=2
+```
+
+* Then execute Lizmap install scripts into `lizmap/install/` :
+
+```bash
+php lizmap/install/installer.php
+./lizmap/install/clean_vartmp.sh
+./lizmap/install/set_rights.sh
+```
+
+
+## configuration
+
+Add a section `[wps]` in your `localconfig.ini.php` and add the variables:
 
 ```ini
 [wps]

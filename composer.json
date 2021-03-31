@@ -19,7 +19,15 @@
         "jelix" : {
             "modules": [
                 "wps/"
-            ]
+            ],
+            "autoconfig-access-16" : {
+                "lizmap@3liz.com" : {
+                    "wps": {
+                        "__global": 1,
+                        "index" : 2
+                    }
+                }
+            }
         }
     }
 }
