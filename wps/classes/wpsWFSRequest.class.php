@@ -20,8 +20,9 @@ class wpsWFSRequest extends wpsOGCRequest {
         return parent::constructUrl();
     }
 
-    protected function getcapabilities ( ) {
-        $result = parent::getcapabilities();
+    protected function process_getcapabilities()
+    {
+        $result = parent::process_getcapabilities();
 
         $data = $result->data;
         if ( empty( $data ) or floor( $result->code / 100 ) >= 4 ) {
@@ -54,7 +55,7 @@ class wpsWFSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function describefeaturetype()
+    protected function process_describefeaturetype()
     {
         $result = $this->doRequest();
 
@@ -72,7 +73,7 @@ class wpsWFSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getfeature()
+    protected function process_getfeature()
     {
         $result = $this->doRequest();
 
@@ -90,7 +91,7 @@ class wpsWFSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function transaction()
+    protected function process_transaction()
     {
         $result = $this->doRequest();
 

@@ -42,8 +42,40 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         }
     }
 
-    public function process ( ) {
-        return $this->{$this->param('request')}();
+    /**
+     * Do the process
+     *
+     * @internal we override the process() method of lizmapOGCRequest to be sure
+     * we have the secure version of the method, in case where the lizmap version
+     * is <= 3.4.3, <= 3.3.15
+     *
+     * deprecated: remove this overrided method when we will mark the module compatible
+     * only with Lizmap 3.5.
+     *
+     *
+     * @return array
+     */
+    public function process ()
+    {
+        $req = $this->param('request');
+        if ($req) {
+            $reqMeth = 'process_'.$req;
+            if (method_exists($this, $reqMeth)) {
+                return $this->{$reqMeth}();
+            }
+            // old unsecure way, to be compatible with methods of lizmap <= 3.4.3, <= 3.3.15
+            else if (method_exists($this, $req)) {
+                return $this->{$req}();
+            }
+        }
+
+        if (!$req) {
+            jMessage::add('Please add or check the value of the REQUEST parameter', 'OperationNotSupported');
+        } else {
+            jMessage::add('Request '.$req.' is not supported', 'OperationNotSupported');
+        }
+
+        return $this->serviceException(501);
     }
 
     protected function constructUrl ( ) {
@@ -89,7 +121,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         return $querystring;
     }
 
-    protected function getcapabilities()
+    protected function process_getcapabilities()
     {
         $result = $this->doRequest();
 
@@ -127,7 +159,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         );
     }
 
-    protected function describeprocess()
+    protected function process_describeprocess()
     {
         $result = $this->doRequest();
 
@@ -145,7 +177,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         return $result;
     }
 
-    protected function execute()
+    protected function process_execute()
     {
         $result = $this->doRequest();
 
@@ -198,7 +230,7 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         );
     }
 
-    protected function getresults()
+    protected function process_getresults()
     {
         $result = $this->doRequest();
 

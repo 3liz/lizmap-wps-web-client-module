@@ -20,8 +20,8 @@ class wpsWMSRequest extends wpsOGCRequest {
         return parent::constructUrl();
     }
 
-    protected function getcapabilities ( ) {
-        $result = parent::getcapabilities();
+    protected function process_getcapabilities ( ) {
+        $result = parent::process_getcapabilities();
 
         $data = $result->data;
         if ( empty( $data ) or floor( $result->code / 100 ) >= 4 ) {
@@ -52,7 +52,7 @@ class wpsWMSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function getmap()
+    protected function process_getmap()
     {
         $result = $this->doRequest();
 
@@ -70,11 +70,11 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getlegendgraphic ( ) {
-        return $this->getlegendgraphics();
+    protected function process_getlegendgraphic ( ) {
+        return $this->process_getlegendgraphics();
     }
 
-    protected function getlegendgraphics()
+    protected function process_getlegendgraphics()
     {
         $result = $this->doRequest();
 
@@ -92,7 +92,7 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getfeatureinfo ()
+    protected function process_getfeatureinfo ()
     {
         $result = $this->doRequest();
 
@@ -110,7 +110,7 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getstyles ()
+    protected function process_getstyles ()
     {
         $result = $this->doRequest();
 

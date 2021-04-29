@@ -20,8 +20,9 @@ class wpsWCSRequest extends wpsOGCRequest {
         return parent::constructUrl();
     }
 
-    protected function getcapabilities ( ) {
-        $result = parent::getcapabilities();
+    protected function process_getcapabilities ( )
+    {
+        $result = parent::process_getcapabilities();
 
         $data = $result->data;
         if ( empty( $data ) or floor( $result->code / 100 ) >= 4 ) {
@@ -54,7 +55,7 @@ class wpsWCSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function describecoverage()
+    protected function process_describecoverage()
     {
         $result = $this->doRequest();
 
@@ -72,7 +73,7 @@ class wpsWCSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getcoverage()
+    protected function process_getcoverage()
     {
         $result = $this->doRequest();
 
