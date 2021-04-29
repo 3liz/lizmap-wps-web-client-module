@@ -89,12 +89,9 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         return $querystring;
     }
 
-    protected function getcapabilities ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getcapabilities()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -130,12 +127,9 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         );
     }
 
-    function describeprocess(){
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function describeprocess()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -151,12 +145,9 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         return $result;
     }
 
-    function execute() {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function execute()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -207,12 +198,9 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         );
     }
 
-    function getresults(){
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getresults()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -264,70 +252,35 @@ class lizmapWPSRequest extends lizmapOGCRequest {
     }
 
     /**
-     * get
-     * @return request.
+     * @return array
      */
-    protected function get(){
+    protected function doRequest()
+    {
         $querystring = $this->constructUrl();
 
-        // Get data form server
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_URL, $querystring);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(
-            array(
-                'Connection: close'
-            ),
-            $this->userHttpHeader()
-        ));
-        $data = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        $mime = $info['content_type'];
-        $code = (int) $info['http_code'];
-        curl_close($ch);
+        $headers = $this->userHttpHeader();
+        $headers['Connection'] = 'close';
 
+        if ($this->xml_post !== null) {
+            $headers['Content-Type'] = 'text/xml';
+            $options = array(
+                "method" => "post",
+                "headers" => $headers,
+                "body" => $this->xml_post
+            );
+        }
+        else {
+            $options = array(
+                "method" => "get",
+                "headers" => $headers
+            );
+        }
 
-        return (object) array(
-            'code' => $code,
-            'mime' => $mime,
-            'data' => $data,
-            'cached' => False
+        // launch request
+        list($data, $mime, $code) = lizmapProxy::getRemoteData(
+            $querystring,
+            $options
         );
-
-    }
-
-    /**
-     * post
-     * @return request.
-     */
-    protected function post(){
-        $querystring = $this->constructUrl();
-
-        // Get data form server
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_URL, $querystring);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(
-            array(
-                'Connection: close',
-                'Content-Type: text/xml'
-            ),
-            $this->userHttpHeader()
-        ));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->xml_post);
-        $data = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        $mime = $info['content_type'];
-        $code = (int) $info['http_code'];
-        curl_close($ch);
-
 
         return (object) array(
             'code' => $code,
@@ -348,8 +301,8 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         $userGroups = jAcl2DbUserGroup::getGroups();
 
         return array(
-            'X-Lizmap-User: '. $user->login,
-            'X-Lizmap-User-Groups: '. implode(', ', $userGroups)
+            'X-Lizmap-User' => $user->login,
+            'X-Lizmap-User-Groups' => implode(', ', $userGroups)
         );
     }
 

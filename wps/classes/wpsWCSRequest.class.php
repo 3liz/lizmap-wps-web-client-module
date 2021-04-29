@@ -54,12 +54,9 @@ class wpsWCSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function describecoverage ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function describecoverage()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -75,12 +72,9 @@ class wpsWCSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getcoverage ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getcoverage()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');

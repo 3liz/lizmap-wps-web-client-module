@@ -150,14 +150,7 @@ class serviceCtrl extends jController {
 
         $url = $wps_url .'store/'. $uuid .'/'. $file .'?service=WPS';
 
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $url//,
-          //$this->services->proxyMethod,
-          //$this->services->debugMode
-        );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
 
         $rep->outputFileName = $file;
         $rep->mimeType = $mime;
@@ -186,14 +179,7 @@ class serviceCtrl extends jController {
 
         $url.= '?SERVICE=WPS';
 
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $url//,
-          //$this->services->proxyMethod,
-          //$this->services->debugMode
-        );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
 
         if ( empty( $data ) or floor( $code / 100 ) >= 4 ) {
             $rep->setHttpStatus($code, 'Not Found');

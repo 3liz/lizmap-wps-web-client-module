@@ -32,14 +32,8 @@ class processStatus {
 
     public function saved ( $identifier, $repository, $project ) {
         $url = $this->url.'?SERVICE=WPS';
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $url//,
-          //$this->services->proxyMethod,
-          //$this->services->debugMode
-        );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
+
         if ( empty( $data ) or floor( $code / 100 ) >= 4 )
             $data = array();
 
@@ -73,14 +67,7 @@ class processStatus {
 
     public function get( $identifier, $repository, $project, $uuid ) {
         $url = $this->url.$uuid.'?SERVICE=WPS';
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $url//,
-          //$this->services->proxyMethod,
-          //$this->services->debugMode
-        );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
 
         $saved = $this->saved( $identifier, $repository, $project );
 

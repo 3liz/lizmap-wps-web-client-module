@@ -52,12 +52,9 @@ class wpsWMSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function getmap ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getmap()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -77,12 +74,9 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $this->getlegendgraphics();
     }
 
-    protected function getlegendgraphics ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getlegendgraphics()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -98,12 +92,9 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getfeatureinfo ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getfeatureinfo ()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -119,12 +110,9 @@ class wpsWMSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getstyles ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getstyles ()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
