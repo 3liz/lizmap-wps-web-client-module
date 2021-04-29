@@ -91,9 +91,7 @@ class wpsListener extends jEventListener{
     protected function isAvailable ($event) {
 
         // get wps rootDirectories
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $rootDirectories = $localConfig->getValue('wps_rootDirectories', 'wps');
+        $rootDirectories =  jApp::config()->wps['wps_rootDirectories'];
         if ( !$rootDirectories )
             return false;
 

@@ -149,9 +149,7 @@ class serviceCtrl extends jController {
           return $rep;
         }
 
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = jApp::config()->wps['wps_rootUrl'];
         $wps_url = ltrim($wps_url, '/');
         if ( substr($wps_url, -1) != '/' )
             $wps_url .= '/';
@@ -181,9 +179,7 @@ class serviceCtrl extends jController {
         $content = 'null';
         $rep->content = $content;
 
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = jApp::config()->wps['wps_rootUrl'];
         $wps_url = ltrim($wps_url, '/');
         if ( substr($wps_url, -1) != '/' )
             $wps_url .= '/';

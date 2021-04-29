@@ -30,15 +30,16 @@ class lizmapWPSRequest extends lizmapOGCRequest {
         $this->params = $nParams;
         $this->xml_post = $xml_post;
 
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $this->wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
-        if ( substr($this->wps_url, -1) != '/' )
+        $wpsConfig = jApp::config()->wps;
+        $this->wps_url = $wpsConfig['wps_rootUrl'];
+        if ( substr($this->wps_url, -1) != '/' ) {
             $this->wps_url .= '/';
-        $this->wps_rootDirectories = $localConfig->getValue('wps_rootDirectories', 'wps');
-        $this->ows_url = $localConfig->getValue('ows_url', 'wps');
-        if ( substr($this->ows_url, -1) != '/' )
+        }
+        $this->wps_rootDirectories = $wpsConfig['wps_rootDirectories'];
+        $this->ows_url = $wpsConfig['ows_url'];
+        if ( substr($this->ows_url, -1) != '/' ) {
             $this->ows_url .= '/';
+        }
     }
 
     public function process ( ) {

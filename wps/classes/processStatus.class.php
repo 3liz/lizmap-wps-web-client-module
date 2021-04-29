@@ -22,10 +22,7 @@ class processStatus {
     public function __construct () {
         self::declareRedisProfile();
         $this->db = jKVDb::getConnection( self::$profile );
-
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $wps_url = $localConfig->getValue('wps_rootUrl', 'wps');
+        $wps_url = jApp::config()->wps['wps_rootUrl'];
         $wps_url = ltrim($wps_url, '/');
         if ( substr($wps_url, -1) != '/' )
             $wps_url .= '/';
@@ -129,14 +126,14 @@ class processStatus {
         return true;
     }
 
-    static protected function declareRedisProfile() {
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
+    static protected function declareRedisProfile()
+    {
+        $wpsConfig = jApp::config()->wps;
 
-        $statusRedisHost = $localConfig->getValue('redis_host', 'wps');
-        $statusRedisPort = $localConfig->getValue('redis_port', 'wps');
-        $statusRedisKeyPrefix = $localConfig->getValue('redis_key_prefix', 'wps');
-        $statusRedisDb = $localConfig->getValue('redis_db', 'wps');
+        $statusRedisHost = $wpsConfig['redis_host'];
+        $statusRedisPort = $wpsConfig['redis_port'];
+        $statusRedisKeyPrefix = $wpsConfig['redis_key_prefix'];
+        $statusRedisDb = $wpsConfig['redis_db'];
 
         if (extension_loaded('redis')) {
             $driver = 'redis_ext';

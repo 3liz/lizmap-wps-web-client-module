@@ -37,9 +37,7 @@ class wpsOGCRequest extends lizmapOGCRequest {
         $this->params = $nParams;
         $this->xml_post = $xml_post;
 
-        $localConfig = jApp::configPath('localconfig.ini.php');
-        $localConfig = new jIniFileModifier($localConfig);
-        $this->ows_url = $localConfig->getValue('ows_url', 'wps');
+        $this->ows_url = jApp::config()->wps['ows_url'];
     }
 
     public function process ( ) {
