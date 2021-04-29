@@ -54,12 +54,9 @@ class wpsWFSRequest extends wpsOGCRequest {
         );
     }
 
-    protected function describefeaturetype ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function describefeaturetype()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -75,12 +72,9 @@ class wpsWFSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function getfeature ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function getfeature()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');
@@ -96,12 +90,9 @@ class wpsWFSRequest extends wpsOGCRequest {
         return $result;
     }
 
-    protected function transaction ( ) {
-        $result = null;
-        if ( $this->xml_post !== null )
-            $result = $this->post();
-        else
-            $result = $this->get();
+    protected function transaction()
+    {
+        $result = $this->doRequest();
 
         if ( !$result ) {
             jMessage::add('Server Error !', 'Error');

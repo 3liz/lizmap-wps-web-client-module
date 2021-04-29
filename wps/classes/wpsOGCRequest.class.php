@@ -99,54 +99,32 @@ class wpsOGCRequest extends lizmapOGCRequest {
     }
 
     /**
-     * get
-     * @return request.
+     * @return array
      */
-    protected function get(){
+    protected function doRequest()
+    {
         $querystring = $this->constructUrl();
 
-        // Get remote data
-        $getRemoteData = lizmapProxy::getRemoteData(
-          $querystring,
-          $this->services->proxyMethod,
-          $this->services->debugMode
+        if ($this->xml_post !== null) {
+            $options = array(
+                "method" => "post",
+                "headers" => array(
+                    "Content-Type" => "text/xml"
+                ),
+                "body" =>$this->xml_post
+            );
+        }
+        else {
+            $options = array(
+                "method" => "get",
+            );
+        }
+
+        // launch request
+        list($data, $mime, $code) = lizmapProxy::getRemoteData(
+            $querystring,
+            $options
         );
-        $data = $getRemoteData[0];
-        $mime = $getRemoteData[1];
-        $code = $getRemoteData[2];
-
-        return (object) array(
-            'code' => $code,
-            'mime' => $mime,
-            'data' => $data,
-            'cached' => False
-        );
-    }
-
-    /**
-     * post
-     * @param string $xml_post
-     * @return request.
-     */
-    protected function post(){
-        $querystring = $this->constructUrl();
-
-        // Get data form server
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_URL, $querystring);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false );
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->xml_post);
-        $data = curl_exec($ch);
-        $info = curl_getinfo($ch);
-        $mime = $info['content_type'];
-        $code = (int) $info['http_code'];
-        curl_close($ch);
-
 
         return (object) array(
             'code' => $code,
