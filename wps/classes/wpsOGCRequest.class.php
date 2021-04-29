@@ -40,10 +40,27 @@ class wpsOGCRequest extends lizmapOGCRequest {
         $this->ows_url = jApp::config()->wps['ows_url'];
     }
 
-    public function process ( ) {
+    /**
+     * Do the process
+     *
+     * @internal we override the process() method of lizmapOGCRequest to be sure
+     * we have the secure version of the method, in case where the lizmap version
+     * is <= 3.4.3, <= 3.3.15
+     *
+     * @deprecated remove this overrided method when we will mark the module compatible
+     * only with Lizmap 3.5.
+     *
+     *
+     * @return array
+     */
+    public function process ()
+    {
         $req = $this->param('request');
-        if ($req && method_exists($this, $req)) {
-            return $this->{$req}();
+        if ($req) {
+            $reqMeth = 'process_'.$req;
+            if (method_exists($this, $reqMeth)) {
+                return $this->{$reqMeth}();
+            }
         }
 
         if (!$req) {
@@ -77,7 +94,7 @@ class wpsOGCRequest extends lizmapOGCRequest {
         return $querystring;
     }
 
-    protected function getcapabilities()
+    protected function process_getcapabilities()
     {
         $querystring = $this->constructUrl();
 
