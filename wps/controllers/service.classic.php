@@ -34,14 +34,8 @@ class serviceCtrl extends jController {
         $this->params = $params;
 
         // Get and parsed xml post
-        $requestXml = null;
-        global $HTTP_RAW_POST_DATA;
-        if(isset($HTTP_RAW_POST_DATA)){
-            $requestXml = $HTTP_RAW_POST_DATA;
-        }else{
-            $requestXml = file('php://input');
-            $requestXml = implode("\n",$requestXml);
-        }
+        $requestXml = $this->param('__httpbody');
+
         if ( $requestXml ) {
             $xml = simplexml_load_string( $requestXml );
             if ( $xml !== FALSE ) {

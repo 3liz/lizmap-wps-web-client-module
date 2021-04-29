@@ -70,19 +70,14 @@ class resultsCtrl extends jController {
         }
 
         // Get and decode json post
-        $requestJson = null;
-        global $HTTP_RAW_POST_DATA;
-        if ( isset($HTTP_RAW_POST_DATA) ) {
-            $requestJson = $HTTP_RAW_POST_DATA;
-        } else {
-            $requestJson = file('php://input');
-            $requestJson = implode("\n",$requestJson);
-        }
+        $requestJson = $this->param('__httpbody');
 
         if ( !$requestJson ) {
             return $rep;
         }
-        $data = json_decode( $requestJson, true );
+        // depending on how jelix is configured, we could have directly
+        // decoded json, so let's decode data only if needed
+        $data = (is_string($requestJson)?json_decode( $requestJson, true ):$requestJson);
 
         if ( !array_key_exists( 'uuid', $data ) ) {
             return $rep;
