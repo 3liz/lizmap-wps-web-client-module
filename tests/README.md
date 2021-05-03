@@ -1,6 +1,6 @@
 # Run Lizmap stack with docker-compose
 
-Juste do:
+Just do:
 
 ```
 make run
