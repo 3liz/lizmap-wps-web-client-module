@@ -14,9 +14,9 @@ QGIS_VERSION_TAG:=3.16
 QGIS_MAP_WORKERS:=1
 WPS_NUM_WORKERS:=1
 
-LIZMAP_PORT:=9090
-OWS_PORT:=9091
-WPS_PORT:=9092
+LIZMAP_PORT:=127.0.0.1:9090
+OWS_PORT:=127.0.0.1:9091
+WPS_PORT:=127.0.0.1:9092
 
 BASEDIR:=$(shell realpath ..)
 
@@ -36,11 +36,16 @@ main:
 	EOF
 
 dirs:
-	@mkdir -p $(LIZMAP_DIR)/var/log/nginx \
-		      $(LIZMAP_DIR)/var/nginx-cache \
-		      $*
+	@mkdir -p $(LIZMAP_DIR)/www/var/log \
+			  $(LIZMAP_DIR)/var/log/nginx \
+			  $(LIZMAP_DIR)/var/nginx-cache \
+			  $(LIZMAP_DIR)/var/lizmap-theme-config \
+			  $(LIZMAP_DIR)/var/lizmap-db \
+			  $(LIZMAP_DIR)/var/lizmap-config \
+			  $*
 
 env: dirs
+	@echo "Creating environment file for docker-compose"
 	@cat <<- EOF > .env
 		LIZMAP_DIR=$(LIZMAP_DIR)
 		LIZMAP_USER_ID=$(LIZMAP_USER_ID)
@@ -61,10 +66,12 @@ run: stop env
 stop:
 	docker-compose rm -f || true
 
-clean: stop
+_clean: stop
 	rm -rf $(LIZMAP_DIR)/www/*
 	rm -rf $(LIZMAP_DIR)/var/*
 	rm -rf $(LIZMAP_DIR)/wps-data/*
+
+clean: _clean dirs
 
 # Pull images from github 3liz
 pull:

@@ -4,8 +4,6 @@
 
 *.pyc
 
-factory.manifest
-
 .ignore
 
 tests/lizmap/www
