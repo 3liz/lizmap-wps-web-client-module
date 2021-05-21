@@ -11,6 +11,21 @@ class wpsListener extends jEventListener{
 
         $bp = jApp::config()->urlengine['basePath'];
         $js = array(
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WCSGetCoverage.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/Filter.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/Filter/v1.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/Filter/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/OWSCommon.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/OWSCommon/v1.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/OWSCommon/v1_0_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/OWSCommon/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WFST.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WFST/v1.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WFST/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WPSDescribeProcess.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WPSExecute.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WPSCapabilities.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'OpenLayers/Format/WPSCapabilities/v1_0_0.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule'=>'wps', 'file'=>'wps.js'))
         );
         $jscode = array(
