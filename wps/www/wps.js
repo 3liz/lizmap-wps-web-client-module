@@ -704,9 +704,6 @@ var Petra = function() {
             url: lizUrls['wps_wps'],
             params: lizUrls.params,
             data: data,
-            headers:{
-                'Content-Length': data.length
-            },
             success: function(response) {
                 showOutput(theProcess, response, requestTime);
 
