@@ -3,6 +3,7 @@
 Just do:
 
 ```
+make pull
 make run
 ```
 
