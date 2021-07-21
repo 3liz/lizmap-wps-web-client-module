@@ -1,0 +1,17 @@
+variables:
+    FACTORY_PRODUCT_NAME: wps
+    FACTORY_PACKAGE_TYPE: module
+
+stages:
+- release
+
+tickets:
+  stage: release
+  only:
+    - tags
+  image:
+    name: registry.snap.lizlan:5000/infra/ci-tools:latest
+  script:
+    - create_ticket.py
+  tags:
+    - factory-plain
