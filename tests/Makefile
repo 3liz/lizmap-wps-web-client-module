@@ -60,11 +60,11 @@ env: dirs
 		QGIS_VERSION_TAG=$(QGIS_VERSION_TAG)
 		EOF
 
-run: stop env
-	docker-compose up
+run: env
+	docker-compose up -V --force-recreate
 
 stop:
-	docker-compose rm -f || true
+	docker-compose down -v --remove-orphans
 
 _clean: stop
 	rm -rf $(LIZMAP_DIR)/www/*
