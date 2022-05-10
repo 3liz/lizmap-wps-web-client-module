@@ -43,8 +43,8 @@ class wpsListener extends jEventListener{
         // Add Dataviz if not already available
         if ( !$this->getDatavizStatus($event) ) {
             $bp = jApp::config()->urlengine['basePath'];
-            $js[] = $bp.'js/dataviz/plotly-latest.min.js';
-            $js[] = $bp.'js/dataviz/dataviz.js';
+            $js[] = $bp.'assets/js/dataviz/plotly-latest.min.js';
+            $js[] = $bp.'assets/js/dataviz/dataviz.js';
         }
 
         // Check if there is a processing configuration for this project
