@@ -95,9 +95,9 @@ class lizmapWPSRequest extends lizmapOGCRequest
             }
         }
 
-        if ($this->wps_rootDirectories &&
-             array_key_exists('repository', $params) &&
-             array_key_exists('project', $params)) {
+        if ($this->wps_rootDirectories
+             && array_key_exists('repository', $params)
+             && array_key_exists('project', $params)) {
             $project = $params['project'];
             $repository = $params['repository'];
             $lproj = lizmap::getProject($repository.'~'.$project);
