@@ -11,17 +11,11 @@
     width:50px;
 }
 #processing-log-table tr td div.progress div.bar {
-    -webkit-animation: slide 5000ms infinite linear;
-    -moz-animation: slide 5000ms infinite linear;
-    -o-animation: slide 5000ms infinite linear;
     animation: slide 5000ms infinite linear;
 }
 #processing-log-table tr td div.progress div.bar-hidden {
     background-color: transparent;
     background-image: none;
-    -webkit-animation: slide-hidden 5000ms infinite linear;
-    -moz-animation: slide-hidden 5000ms infinite linear;
-    -o-animation: slide-hidden 5000ms infinite linear;
     animation: slide-hidden 5000ms infinite linear;
 }
 
@@ -115,43 +109,6 @@
 
 #bottom-dock{
     width:auto;
-}
-
-@-webkit-keyframes slide {
-    0%   { width:   0%; }
-    50%  { width: 100%; }
-    100% { width:   0%; }
-}
-
-@-webkit-keyframes slide-hidden {
-    0%   { width:   0%; }
-    50%  { width:   0%; }
-    100% { width: 100%; }
-}
-
-@-moz-keyframes slide {
-    0%   { width:   0%; }
-    50%  { width: 100%; }
-    100% { width:   0%; }
-}
-
-@-moz-keyframes slide-hidden {
-    0%   { width:   0%; }
-    50%  { width:   0%; }
-    100% { width: 100%; }
-}
-
-
-@-o-keyframes slide {
-    0%   { width:   0%; }
-    50%  { width: 100%; }
-    100% { width:   0%; }
-}
-
-@-o-keyframes slide-hidden {
-    0%   { width:   0%; }
-    50%  { width:   0%; }
-    100% { width: 100%; }
 }
 
 @keyframes slide {
