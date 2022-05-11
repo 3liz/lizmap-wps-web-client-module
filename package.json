@@ -1,0 +1,14 @@
+{
+  "name": "wps",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "eslint": "eslint wps/www/wps.js",
+    "eslint-fix": "eslint --fix wps/www/wps.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0"
+  },
+  "author": "3Liz",
+  "license": "ISC"
+}
