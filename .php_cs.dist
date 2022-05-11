@@ -2,7 +2,7 @@
 
 $finder = PhpCsFixer\Finder::create()
           ->in(array(
-                __DIR__.'/lizmap/wps',
+                __DIR__.'/wps',
               ))
         ;
 
