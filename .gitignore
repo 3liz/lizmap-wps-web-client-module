@@ -10,4 +10,4 @@ tests/lizmap/www
 tests/lizmap/var
 tests/lizmap/wps-data
 tests/.env
-
+tests/end2end/node_modules/
