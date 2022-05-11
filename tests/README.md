@@ -18,4 +18,20 @@ Open your browser at `http://localhost:9090`
 
 For more informations, refer to the [docker-compose documentation](https://docs.docker.com/compose/)
 
+## End-to-End tests with Cypress
 
+The `end2end` directory contains some end-to-end tests made for Cypress.
+Go in `end2end` directory and execute `npm install` to install Cypress (only the first time).
+You can then :
+- execute `npm run cy:open` to open Cypress window.
+- select the target browser then click one of the integration tests or 'Run n integration specs' to run all.
+
+or
+
+- execute `npm run cy:test` to automatically open Cypress window and run tests in Electron browser.
+
+You can also use GNU Parallel to parallelize Cypress tests execution on 8 cores for example:
+
+`find cypress/integration/ -name '*.js' | parallel -j8 --group  npx cypress run --spec {}`
+
+Output colors can be kept with `--tty` parameter but it won't work with `--group` which is useful to not mix outputs from different tests.
