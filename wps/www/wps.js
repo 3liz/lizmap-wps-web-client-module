@@ -498,7 +498,7 @@ var Petra = function() {
         } else {
             if ( defaultValue ) {
                 field.value = defaultValue;
-                 defaultValue = {
+                defaultValue = {
                     literalData: {
                         value: defaultValue
                     }
@@ -538,7 +538,7 @@ var Petra = function() {
              ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) ) {
             cbx.removeAttr('disabled');
             cbx.parent().removeClass('disabled');
-         }
+        }
         return;
     }
 
@@ -555,14 +555,14 @@ var Petra = function() {
             $(e).append('<option>---</option>');
         });
         var service = OpenLayers.Util.urlAppend(lizUrls.wms
-                    ,OpenLayers.Util.getParameterString(lizUrls.params)
+            ,OpenLayers.Util.getParameterString(lizUrls.params)
         );
         $.get(service, {
-              'SERVICE':'WFS'
-             ,'VERSION':'1.0.0'
-             ,'REQUEST':'DescribeFeatureType'
-             ,'TYPENAME':aName
-             ,'OUTPUTFORMAT':'JSON'
+            'SERVICE':'WFS'
+            ,'VERSION':'1.0.0'
+            ,'REQUEST':'DescribeFeatureType'
+            ,'TYPENAME':aName
+            ,'OUTPUTFORMAT':'JSON'
         }, function(describe) {
             //console.log(describe);
             var aliases = describe.aliases;
@@ -590,7 +590,7 @@ var Petra = function() {
             qgisFieldInputs.each( function( i, e ) {
                 e.onchange();
             });
-              /*
+            /*
               aConfig['alias'] = describe.aliases;
               if ('types' in describe)
                   aConfig['types'] = describe.types;
@@ -947,7 +947,7 @@ var Petra = function() {
                 console.log(layerName);
                 // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
-                  ,OpenLayers.Util.getParameterString({map:mapParam})
+                    ,OpenLayers.Util.getParameterString({map:mapParam})
                 );
                 // Defined WMS layer parameters
                 var layerWmsParams = {
@@ -964,15 +964,16 @@ var Petra = function() {
                 var wmsLayer = new OpenLayers.Layer.WMS(layerName
                     ,serviceUrl
                     ,layerWmsParams
-                    ,{isBaseLayer:false
-                    ,visibility:true
-                    ,gutter:5
-                    ,buffer:0
-                    ,transitionEffect:'resize'
-                    ,removeBackBufferDelay:250
-                    ,singleTile:true
-                    ,ratio:1
-                });
+                    ,{
+                        isBaseLayer:false
+                        ,visibility:true
+                        ,gutter:5
+                        ,buffer:0
+                        ,transitionEffect:'resize'
+                        ,removeBackBufferDelay:250
+                        ,singleTile:true
+                        ,ratio:1
+                    });
                 map.addLayer(wmsLayer);
                 // Get the vector layer index to push WMS layer just before
                 var zIndex = -1;
@@ -1031,29 +1032,31 @@ var Petra = function() {
                 }
 
                 // Build WMS GetLegendGraphic to add image in layer tree
-                var legendParams = {SERVICE: "WMS",
-                              VERSION: "1.3.0",
-                              REQUEST: "GetLegendGraphic",
-                              LAYER: layerParam,
-                              STYLE: '',
-                              SLD_VERSION: "1.1.0",
-                              EXCEPTIONS: "application/vnd.ogc.se_inimage",
-                              FORMAT: "image/png",
-                              TRANSPARENT: "TRUE",
-                              WIDTH: 150,
-                              LAYERFONTSIZE: 9,
-                              ITEMFONTSIZE: 9,
-                              SYMBOLSPACE: 1,
-                              ICONLABELSPACE: 2,
-                              LAYERFONTSIZE: 0,
-                              LAYERSPACE: 0,
-                              LAYERFONTBOLD: "FALSE",
-                              LAYERTITLE: "FALSE",
-                              DPI: 96};
+                var legendParams = {
+                    SERVICE: "WMS",
+                    VERSION: "1.3.0",
+                    REQUEST: "GetLegendGraphic",
+                    LAYER: layerParam,
+                    STYLE: '',
+                    SLD_VERSION: "1.1.0",
+                    EXCEPTIONS: "application/vnd.ogc.se_inimage",
+                    FORMAT: "image/png",
+                    TRANSPARENT: "TRUE",
+                    WIDTH: 150,
+                    LAYERFONTSIZE: 9,
+                    ITEMFONTSIZE: 9,
+                    SYMBOLSPACE: 1,
+                    ICONLABELSPACE: 2,
+                    LAYERFONTSIZE: 0,
+                    LAYERSPACE: 0,
+                    LAYERFONTBOLD: "FALSE",
+                    LAYERTITLE: "FALSE",
+                    DPI: 96
+                };
 
                 var legendParamsString = OpenLayers.Util.getParameterString(
-                     legendParams
-                    );
+                    legendParams
+                );
                 legendParamsString = OpenLayers.Util.urlAppend(serviceUrl, legendParamsString);
                 trResults.after('<tr id="legend-wps-results-'+layerName+'" class="liz-layer child-of-layer-wps-results-'+layerName+' '+uuid+' legendGraphics initialized collapsed ui-helper-hidden"><td colspan="2" style="padding-left: 39px;"><div class="legendGraphics"><img data-src="" src="'+legendParamsString+'"></div></td></tr>');
                 trResults.after('<tr id="layer-wps-results-'+layerName+'" class="liz-layer child-of-group-wps-results '+uuid+' initialized parent collapsed visible"><td style="padding-left: 20px;"><a href="#" title="Déployer" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox checked" name="layer" value="'+layerName+'" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">'+layerParam+'</span></td><td><span class="loading">&nbsp;</span></td><td></td><td></td></tr>');
@@ -1407,12 +1410,12 @@ var Petra = function() {
     }
 
     function scheduleUpdateStatusProcesses() {
-       // Use closure to track the number of call
-       var count = 5
-       intervalStatusProcesses = window.setInterval( function() {
-                count -= 1;
-                updateStatusProcesses(count)
-       }, 1000 );
+        // Use closure to track the number of call
+        var count = 5
+        intervalStatusProcesses = window.setInterval( function() {
+            count -= 1;
+            updateStatusProcesses(count)
+        }, 1000 );
     }
 
     function updateStatusProcesses(count) {
