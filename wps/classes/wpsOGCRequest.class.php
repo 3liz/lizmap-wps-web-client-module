@@ -9,11 +9,11 @@
  *
  * @license Mozilla Public License : http://www.mozilla.org/MPL/
  */
-class wpsOGCRequest extends lizmapOGCRequest {
-
+class wpsOGCRequest extends lizmapOGCRequest
+{
     protected $params;
 
-    protected $xml_post = null;
+    protected $xml_post;
 
     protected $services;
 
@@ -24,13 +24,17 @@ class wpsOGCRequest extends lizmapOGCRequest {
     /**
      * constructor
      * params : the params array
-     * xml_post : the post request as SimpleXML element
+     * xml_post : the post request as SimpleXML element.
+     *
+     * @param mixed      $params
+     * @param null|mixed $xml_post
      */
-    public function __construct ( $params, $xml_post=null ) {
+    public function __construct($params, $xml_post = null)
+    {
         $this->services = lizmap::getServices();
         $nParams = lizmapProxy::normalizeParams($params);
-        foreach ( $params as $k=>$v ) {
-            if ( strtolower($k) === 'repository' || strtolower($k) === 'project' ){
+        foreach ($params as $k => $v) {
+            if (strtolower($k) === 'repository' || strtolower($k) === 'project') {
                 $nParams[strtolower($k)] = $v;
             }
         }
@@ -41,7 +45,7 @@ class wpsOGCRequest extends lizmapOGCRequest {
     }
 
     /**
-     * Do the process
+     * Do the process.
      *
      * @internal we override the process() method of lizmapOGCRequest to be sure
      * we have the secure version of the method, in case where the lizmap version
@@ -50,10 +54,9 @@ class wpsOGCRequest extends lizmapOGCRequest {
      * @deprecated remove this overrided method when we will mark the module compatible
      * only with Lizmap 3.5.
      *
-     *
      * @return array
      */
-    public function process ()
+    public function process()
     {
         $req = $this->param('request');
         if ($req) {
@@ -72,15 +75,18 @@ class wpsOGCRequest extends lizmapOGCRequest {
         return $this->serviceException(501);
     }
 
-    protected function constructUrl ( ) {
+    protected function constructUrl()
+    {
         $url = $this->ows_url;
-        if (strpos($url, '?') === false)
+        if (strpos($url, '?') === false) {
             $url .= '?';
+        }
 
-        $params = Array();
-        foreach ( $this->params as $k=>$v ) {
-            if ( $k !== '__httpbody' )
+        $params = array();
+        foreach ($this->params as $k => $v) {
+            if ($k !== '__httpbody') {
                 $params[$k] = $v;
+            }
         }
 
         $bparams = http_build_query($params);
@@ -90,8 +96,7 @@ class wpsOGCRequest extends lizmapOGCRequest {
         $b = array('%20', '%5F', '%2E', '%2D');
         $bparams = str_replace($a, $b, $bparams);
 
-        $querystring = $url . $bparams;
-        return $querystring;
+        return $url.$bparams;
     }
 
     protected function process_getcapabilities()
@@ -124,16 +129,15 @@ class wpsOGCRequest extends lizmapOGCRequest {
 
         if ($this->xml_post !== null) {
             $options = array(
-                "method" => "post",
-                "headers" => array(
-                    "Content-Type" => "text/xml"
+                'method' => 'post',
+                'headers' => array(
+                    'Content-Type' => 'text/xml',
                 ),
-                "body" =>$this->xml_post
+                'body' => $this->xml_post,
             );
-        }
-        else {
+        } else {
             $options = array(
-                "method" => "get",
+                'method' => 'get',
             );
         }
 
@@ -147,8 +151,7 @@ class wpsOGCRequest extends lizmapOGCRequest {
             'code' => $code,
             'mime' => $mime,
             'data' => $data,
-            'cached' => False
+            'cached' => false,
         );
     }
-
 }
