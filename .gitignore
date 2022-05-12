@@ -13,5 +13,5 @@ tests/.env
 tests/end2end/node_modules/
 node_modules/
 
-.php_cs
-.php_cs.cache
+.php-cs-fixer.php
+.php-cs-fixer.cache

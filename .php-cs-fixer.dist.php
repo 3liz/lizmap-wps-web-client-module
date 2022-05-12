@@ -6,9 +6,10 @@ $finder = PhpCsFixer\Finder::create()
               ))
         ;
 
-return PhpCsFixer\Config::create()
-          ->setCacheFile(__DIR__.'/.php_cs.cache')
-          ->setRules([
+$config = new PhpCsFixer\Config();
+return $config
+      ->setCacheFile(__DIR__.'/.php-cs-fixer.cache')
+      ->setRules([
               '@PSR2' => true,
               '@Symfony' => true,
               '@PhpCsFixer' => true,
