@@ -18,3 +18,16 @@ jobs:
       uses: docker://oskarstark/php-cs-fixer-ga:3.8.0
       with:
         args: --config=.php-cs-fixer.dist.php --allow-risky=yes --dry-run --diff -- wps
+
+#  eslint:
+#    name: "🔶 EsLint"
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#    - uses: actions/checkout@v2
+#
+#    - name: Install modules
+#      run: npm install
+#
+#    - name: Run ESLint
+#      run: npx eslint wps/
