@@ -1,4 +1,4 @@
-name: "Lint"
+name: "🔤 Lint"
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   php-cs-fixer:
-    name: "PHP-CS-Fixer"
+    name: "🐘 PHP-CS-Fixer"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
