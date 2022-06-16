@@ -1,12 +1,15 @@
 # Lizmap WPS Web Client
 
+[![🔤 Lint](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/lint.yml/badge.svg)](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/lint.yml)
+[![🚀 Release](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml/badge.svg)](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml)
+
 Lizmap WPS Web Client is a Lizmap module to add a WPS panel into [Lizmap Web Client](https://github.com/3liz/lizmap-web-client/).
 
 This is an example showing the QGIS Processing Buffer algorithm, exposed as a WPS algorithm within Lizmap Web Client:
 
-![Screenshot](screenshot.png)
+![Screenshot](docs/media/screenshot.png)
 
-![Demo gif](demo.gif)
+![Demo gif](docs/media/demo.gif)
 
 It's also providing another panel showing you the results which have been executed on the Lizmap instance.
 
@@ -17,9 +20,9 @@ with [Composer](https://getcomposer.org), the package manager for PHP.
 If you can't use it or if you are using Lizmap 3.3 or lower, use the manual way to
 install the module (jump to the corresponding section below)
 
-### Automatic install with Composer and lizmap 3.4 or higher
+### Automatic installation with Composer and lizmap 3.4 or higher
 
-* into `lizmap/my-packages`, create the file `composer.json` (if it doesn't exists)
+* into `lizmap/my-packages`, create the file `composer.json` (if it doesn't exist)
   by copying the file `composer.json.dist`, and install the module with Composer:
 
 ```bash
@@ -39,7 +42,7 @@ Go to the "Configuration" section.
 
 ### Manual installation into lizmap 3.3 or 3.4 without Composer
 
-* Download the zip archive from the [release page into github](https://github.com/3liz/lizmap-wps-web-client-module/releases).
+* Download the zip archive from the [release page into GitHub](https://github.com/3liz/lizmap-wps-web-client-module/releases).
 * Extract files from the archive and copy the directory `wps` into `lizmap/lizmap-modules/` of Lizmap.
 * Edit the file  `lizmap/var/config/localconfig.ini.php` to add this 
   into the `[modules]` section
