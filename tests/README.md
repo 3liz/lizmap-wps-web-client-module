@@ -1,22 +1,27 @@
-# Run Lizmap stack with docker-compose
+# Docker compose
 
-Just do:
+## Environment
+
+Use the `make env` command with some specific versions : 
+
+* [Lizmap Web Client tags](https://hub.docker.com/r/3liz/lizmap-web-client/tags)
+* [QGIS Server tags](https://hub.docker.com/r/3liz/qgis-map-server/tags)
 
 ```
 make env LIZMAP_VERSION_TAG=<lizmap_version_tag> QGIS_VERSION_TAG=<qgis_version_tag>
-docker-compose up -V --force-recreate [-d]
+docker compose up -V --force-recreate [-d]
 ```
 
 Stop and clean the stack with:
 ```
-docker-compose down -v 
+docker compose down -v 
 ```
 
 
 Open your browser at `http://localhost:9090`
 
 
-For more informations, refer to the [docker-compose documentation](https://docs.docker.com/compose/)
+For more information, refer to the [docker compose documentation](https://docs.docker.com/compose/)
 
 ## End-to-End tests with Cypress
 
@@ -34,4 +39,4 @@ You can also use GNU Parallel to parallelize Cypress tests execution on 8 cores 
 
 `find cypress/integration/ -name '*.js' | parallel -j8 --group  npx cypress run --spec {}`
 
-Output colors can be kept with `--tty` parameter but it won't work with `--group` which is useful to not mix outputs from different tests.
+Output colors can be kept with `--tty` parameter, but it won't work with `--group` which is useful to not mix outputs from different tests.
