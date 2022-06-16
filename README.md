@@ -2,6 +2,7 @@
 
 [![🔤 Lint](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/lint.yml/badge.svg)](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/lint.yml)
 [![🚀 Release](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml/badge.svg)](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml)
+[![Packagist](https://img.shields.io/packagist/v/lizmap/lizmap-wps-web-client)](https://packagist.org/packages/lizmap/lizmap-wps-web-client)
 
 Lizmap WPS Web Client is a Lizmap module to add a WPS panel into [Lizmap Web Client](https://github.com/3liz/lizmap-web-client/).
 
