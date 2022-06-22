@@ -7,6 +7,7 @@ from qgis.core import (QgsApplication,
                        QgsProcessingProvider)
 
 from .TestSimpleValue import TestSimpleValue
+from .TestBoundingBox import TestBoundingBox
 from .TestCopyLayer import TestCopyLayer
 from .TestContextVectorLayer import TestContextVectorLayer
 from .TestContextRasterLayer import TestContextRasterLayer
@@ -23,6 +24,7 @@ class TestAlgorithmProvider(QgsProcessingProvider):
         try:
             algs = [
                     TestSimpleValue(),
+                    TestBoundingBox(),
                     TestCopyLayer(),
                     TestFileDestination(),
                     TestContextVectorLayer(),
@@ -59,4 +61,3 @@ class DummyAlgorithmProvider(QgsProcessingProvider):
 
     def loadAlgorithms(self):
         pass
-

@@ -18,7 +18,7 @@
  */
 OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                                             OpenLayers.Format.Filter.v1_1_0, {
-    
+
     /**
      * Property: namespaces
      * {Object} Mapping of namespace aliases to namespace URIs.
@@ -92,13 +92,13 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
             "xsi:schemaLocation", this.schemaLocation
         );
         return OpenLayers.Format.XML.prototype.write.apply(this, [node]);
-    }, 
+    },
 
     /**
      * APIMethod: read
      * Parse a WPS Execute and return an object with its information.
-     * 
-     * Parameters: 
+     *
+     * Parameters:
      * data - {String} or {DOMElement} data to read/parse.
      *
      * Returns:
@@ -129,12 +129,12 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                     attributes: {
                         version: this.VERSION,
                         service: 'WPS'
-                    } 
-                }); 
+                    }
+                });
                 this.writeNode("ows:Identifier", options.identifier, node);
                 this.writeNode("wps:DataInputs", options.dataInputs, node);
                 this.writeNode("wps:ResponseForm", options.responseForm, node);
-                return node; 
+                return node;
             },
             "ResponseForm": function(responseForm) {
                 var node = this.createElementNSPlus("wps:ResponseForm", {});
@@ -217,7 +217,8 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                 } else if (data.complexData) {
                     this.writeNode("wps:ComplexData", data.complexData, node);
                 } else if (data.boundingBoxData) {
-                    this.writeNode("ows:BoundingBox", data.boundingBoxData, node);
+                    //this.writeNode("ows:BoundingBox", data.boundingBoxData, node);
+                    this.writeNode("wps:BoundingBoxData", data.boundingBoxData, node);
                 }
                 return node;
             },
@@ -236,7 +237,7 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                         mimeType: complexData.mimeType,
                         encoding: complexData.encoding,
                         schema: complexData.schema
-                    } 
+                    }
                 });
                 var data = complexData.value;
                 if (typeof data === "string") {
@@ -264,7 +265,10 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                 return node;
             },
             "BoundingBoxData": function(node, obj) {
-                this.writers['ows']['BoundingBox'].apply(this, [node, obj, "wps:BoundingBoxData"]);
+                console.log("wps:BoundingBoxData");
+                console.log(this.writers['ows']['BoundingBox']);
+                //return this.writers['ows']['BoundingBox'].apply(this, [node, obj, "wps:BoundingBoxData"]);
+                return this.writers.ows.BoundingBox.apply(this, [node, "wps:BoundingBoxData", obj]);
             },
             "Body": function(body) {
                 var node = this.createElementNSPlus("wps:Body", {});
@@ -272,7 +276,7 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                     this.writeNode("wcs:GetCoverage", body.wcs, node);
                 }
                 else if (body.wfs) {
-                    // OpenLayers.Format.WFST expects these to be on the 
+                    // OpenLayers.Format.WFST expects these to be on the
                     // instance and not in the options
                     this.featureType = body.wfs.featureType;
                     this.version = body.wfs.version;
@@ -280,7 +284,7 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                 } else {
                     this.writeNode("wps:Execute", body, node);
                 }
-                return node;                
+                return node;
             }
         },
         "wcs": OpenLayers.Format.WCSGetCoverage.prototype.writers.wcs,
@@ -356,7 +360,7 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
                     encoding: node.getAttribute("encoding"),
                     value: ""
                 };
-                
+
                 // try to get *some* value, ignore the empty text values
                 if (this.isSimpleContent(node)) {
                     var child;
@@ -389,7 +393,7 @@ OpenLayers.Format.WPSExecute = OpenLayers.Class(OpenLayers.Format.XML,
         // TODO: we should add Exception parsing here
         "ows": OpenLayers.Format.OWSCommon.v1_1_0.prototype.readers["ows"]
     },
-    
-    CLASS_NAME: "OpenLayers.Format.WPSExecute" 
+
+    CLASS_NAME: "OpenLayers.Format.WPSExecute"
 
 });

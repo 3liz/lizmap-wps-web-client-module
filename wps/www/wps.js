@@ -244,6 +244,20 @@ var Petra = function() {
             $('#processing-info-inputs tr:last').after(tr);
         }
 
+        $('#processing-input button.wps-digitizing.extent').each(function(){
+            addDigitizingExtentHandler($(this).attr('id'));
+        });
+
+        lizMap.mainEventDispatcher.addListener(
+            () => {
+                var btn = $('#processing-input button.wps-digitizing.active');
+                if (btn.hasClass('extent')) {
+                    updateDigitizingExtent(btn.attr('id'))
+                }
+            },
+            ['digitizing.featureDrawn']
+        );
+
         for (var i=0,ii=outputs.length; i<ii; ++i) {
             output = outputs[i];
             // outputs table
@@ -292,17 +306,93 @@ var Petra = function() {
 
     // helper function to dynamically create a bounding box input
     function addBoundingBoxInput(input) {
+        console.log(input);
         var name = input.identifier;
+        var container = document.getElementById("processing-input");
+
+        var control = document.createElement("div");
+        control.setAttribute('class', 'control-group');
+        var label = document.createElement("label");
+        label.setAttribute('class', 'jforms-label control-label');
+        label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
+        label.innerHTML = input.title;
+        label.id = 'processing-input-'+name.replaceAll(':', '_')+'-label';
+        control.appendChild(label);
+        var fieldDiv = document.createElement("div");
+        fieldDiv.setAttribute('class', 'controls');
+        control.appendChild(fieldDiv);
+
         var field = document.createElement("input");
         field.title = input.title;
         field.value = "left,bottom,right,top (EPSG:4326)";
-        document.getElementById("processing-input").appendChild(field);
+        field.id = 'processing-input-'+name.replaceAll(':', '_');
+        field.title = input.title;
+        fieldDiv.appendChild(field);
+
+        var qgisType = '';
+        if ( 'processMetadata' in input ) {
+            qgisType = input.processMetadata.type;
+        }
+
+        // Add simple class
+        var fieldClass = 'qgisType-'+qgisType;
+        field.setAttribute('class', fieldClass);
+
+        container.appendChild(control);
         addValueHandlers(field, function() {
+            // parse field value: number,number,number,number ESPG:integer
+            var reg = /(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *\((EPSG:\d+)\)/gi;
+            var matches = reg.exec(field.value);
+            if (matches === undefined) {
+                return;
+            }
+            if (matches.length != 6) {
+                return;
+            }
+            // get projection value to upper case
+            var proj = matches[5].toUpperCase();
+            // Build bounds
+            var b = [matches[1], matches[2], matches[3], matches[4]]
+            if (proj == 'EPSG:4326') {
+                b = [matches[2], matches[1], matches[4], matches[3]]
+            }
+            b = OpenLayers.Bounds.fromArray(b)
             input.boundingBoxData = {
-                projection: "EPSG:4326",
-                bounds: OpenLayers.Bounds.fromString(field.value)
+                projection: proj,
+                bounds: b
+            };
+            /*input.data = {
+                literalData: {
+                    value: OpenLayers.Bounds.fromString(field.value)
+                }
+            };*/
+            input.data = {
+                boundingBoxData : {
+                    projection: proj,
+                    bounds: b
+                }
             };
         });
+
+        // Add select for CRS project and map
+        var select = document.createElement("select");
+        select.id = 'processing-input-'+name.replaceAll(':', '_')+'-select';
+        select.setAttribute('class', 'span1 wps-digitizing extent');
+        var optionProject = document.createElement("option");
+        optionProject.value = lizMap.config.options.qgisProjectProjection.ref;
+        optionProject.label = lizMap.config.options.qgisProjectProjection.ref.split(':')[1];
+        select.appendChild(optionProject);
+        var optionMap = document.createElement("option");
+        optionMap.value = lizMap.config.options.projection.ref;
+        optionMap.label = lizMap.config.options.projection.ref.split(':')[1];
+        select.appendChild(optionMap);
+
+        var btn = document.createElement("button");
+        btn.id = 'processing-input-'+name.replaceAll(':', '_')+'-btn';
+        btn.setAttribute('class', 'btn btn-mini wps-digitizing extent');
+        btn.innerHTML = 'Drawing extent';
+
+        $(field).after(btn).after(select).after('<br>');
     }
 
     // helper function to create a literal input textfield or dropdown
@@ -634,6 +724,33 @@ var Petra = function() {
         };
     }
 
+    function addDigitizingExtentHandler(btnId) {
+        var btn = document.getElementById(btnId);
+        btn.onclick = function() {
+            var self = $(btn);
+            if ( self.hasClass('active') ) {
+                lizMap.mainLizmap.digitizing.toolSelected = 'deactivate';
+                $(btn).removeClass('active');
+            } else {
+                $('#processing-input button.wps-digitizing.active').removeClass('active');
+                lizMap.mainLizmap.digitizing.toolSelected = 'box';
+                $(btn).addClass('active');
+            }
+        }
+    }
+
+    function updateDigitizingExtent(btnId) {
+        var btn = document.getElementById(btnId);
+        var select = btn.previousSibling;
+        var feat = lizMap.mainLizmap.digitizing.featureDrawn.pop();
+        var bounds = new OpenLayers.Bounds(feat.geometry.bounds.toArray());
+        bounds.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
+        btn.parentElement.firstChild.value = bounds.toString() + ' (' + select.value + ')';
+        btn.parentElement.firstChild.onblur();
+        lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
+        btn.onclick();
+    }
+
     // execute the process
     function execute() {
         document.getElementById("processing-form-errors").innerHTML = '';
@@ -861,7 +978,14 @@ var Petra = function() {
                 for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
                     var input = processExecuted.dataInputs[i];
                     var td = '<td class="'+uuid+'">';
-                    if ( input.data && input.data.literalData) {
+                    console.log(input);
+                    if (input.boundingBoxData && input.data && input.data.boundingBoxData) {
+                        var bbValue = input.data.boundingBoxData.bounds;
+                        td += bbValue.left+', '+bbValue.bottom+', '+bbValue.right+', '+bbValue.top+' ('+input.data.boundingBoxData.projection+')';
+                    } else if (input.boundingBoxData && input.data && input.data.literalData) {
+                        var bbValue = input.data.literalData.value;
+                        td += bbValue.left+', '+bbValue.bottom+', '+bbValue.right+', '+bbValue.top;
+                    } else if ( input.data && input.data.literalData) {
                         td += input.data.literalData.value;
                     } else {
                         td += 'Not set';

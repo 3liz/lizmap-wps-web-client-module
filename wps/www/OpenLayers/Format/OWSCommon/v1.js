@@ -15,7 +15,7 @@
  *  - <OpenLayers.Format.XML>
  */
 OpenLayers.Format.OWSCommon.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
-   
+
     /**
      * Property: regExes
      * Compiled regular expressions for manipulating strings.
@@ -86,7 +86,7 @@ OpenLayers.Format.OWSCommon.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
             },
             "ServiceType": function(node, serviceIdentification) {
                 serviceIdentification.serviceType = {
-                    codeSpace: node.getAttribute('codeSpace'), 
+                    codeSpace: node.getAttribute('codeSpace'),
                     value: this.getChildValue(node)};
             },
             "ServiceTypeVersion": function(node, serviceIdentification) {
@@ -96,7 +96,7 @@ OpenLayers.Format.OWSCommon.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
                 serviceIdentification.fees = this.getChildValue(node);
             },
             "AccessConstraints": function(node, serviceIdentification) {
-                serviceIdentification.accessConstraints = 
+                serviceIdentification.accessConstraints =
                     this.getChildValue(node);
             },
             "ServiceProvider": function(node, obj) {
@@ -107,7 +107,7 @@ OpenLayers.Format.OWSCommon.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
                 serviceProvider.providerName = this.getChildValue(node);
             },
             "ProviderSite": function(node, serviceProvider) {
-                serviceProvider.providerSite = this.getAttributeNS(node, 
+                serviceProvider.providerSite = this.getAttributeNS(node,
                     this.namespaces.xlink, "href");
             },
             "ServiceContact": function(node, serviceProvider) {
@@ -271,6 +271,9 @@ OpenLayers.Format.OWSCommon.v1 = OpenLayers.Class(OpenLayers.Format.XML, {
     writers: {
         "ows": {
             "BoundingBox": function(options, nodeName) {
+                console.log('ows:BoundingBox');
+                console.log(options);
+                console.log(nodeName);
                 var node = this.createElementNSPlus(nodeName || "ows:BoundingBox", {
                     attributes: {
                         crs: options.projection
