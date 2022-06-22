@@ -5,14 +5,13 @@
         <label lang="en_US">PETRA Web Client</label>
         <description lang="en_US" />
         <license URL="">Mozilla Public Licence</license>
-        <copyright>2017-2021 3liz</copyright>
+        <copyright>2017-2022 3liz</copyright>
         <creator name="your name" email="your-email@yourwebsite.undefined" active="true"/>
         <!--<contributor name="hisname" email="hisemail@yoursite.undefined" active="true" since="" role=""/>-->
         <homepageURL>http://3liz.com</homepageURL>
     </info>
     <dependencies>
-        <jelix minversion="1.6.14" maxversion="1.6.*"/>
-        <module name="lizmap" />
+        <module name="lizmap" minversion="3.3.0" maxversion="3.6.*"/>
     </dependencies>
     <autoload>
         <class name="lizmapWPSRequest" file="classes/lizmapWPSRequest.class.php" />

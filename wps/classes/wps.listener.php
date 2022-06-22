@@ -10,7 +10,6 @@ class wpsListener extends jEventListener
             return;
         }
 
-        $bp = jApp::config()->urlengine['basePath'];
         $js = array(
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WCSGetCoverage.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter.js')),
@@ -43,7 +42,7 @@ class wpsListener extends jEventListener
 
         // Add Dataviz if not already available
         if (!$this->getDatavizStatus($event)) {
-            $bp = jApp::config()->urlengine['basePath'];
+            $bp = jApp::urlBasePath();
             $js[] = $bp.'assets/js/dataviz/plotly-latest.min.js';
             $js[] = $bp.'assets/js/dataviz/dataviz.js';
         }

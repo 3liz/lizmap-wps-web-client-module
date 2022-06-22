@@ -9,6 +9,7 @@
 * Update the composer.json file for Packagist
 * Start some tests using the Cypress framework
 * Update php-cs-fixer to 3.8.0
+* Experimental compatibility with Lizmap 3.6
 
 ## 0.1.1 - 2021-03-31
 
