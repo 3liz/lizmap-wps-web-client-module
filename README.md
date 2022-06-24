@@ -34,10 +34,10 @@ composer require --working-dir=lizmap/my-packages "lizmap/lizmap-wps-web-client"
 * If you are using Lizmap 3.6 or higher, execute
 
 ```bash
-php lizmap/install/configurator.php
+php lizmap/install/configurator.php wps
 ```
 
-* Then execute Lizmap install scripts into `lizmap/install/` :
+* Then for any version, execute Lizmap install scripts into `lizmap/install/` :
 
 ```bash
 php lizmap/install/installer.php
