@@ -8,8 +8,8 @@ LIZMAP_DIR=$(shell pwd)/lizmap
 LIZMAP_USER_ID:=$(shell id -u)
 LIZMAP_USER_GID:=$(shell id -g)
 
-LIZMAP_VERSION_TAG:=3.4
-QGIS_VERSION_TAG:=3.16
+LIZMAP_VERSION_TAG:=3.5
+QGIS_VERSION_TAG:=3.22
 
 QGIS_MAP_WORKERS:=1
 WPS_NUM_WORKERS:=1
@@ -27,8 +27,8 @@ main:
 		Commandes:
 			run:   initialise environnement and run stack
 			stop:  stop docker and remove containers
-			clean: reset containers and remove lizmap configuration 
-			
+			clean: reset containers and remove lizmap configuration
+
 			Note: Un fichier environment pour docker compose
 			est crée à chaque invocation de 'run'.
 			Cela permet d'utiliser les commandes 'docker compose'
@@ -42,6 +42,7 @@ dirs:
 			  $(LIZMAP_DIR)/var/lizmap-theme-config \
 			  $(LIZMAP_DIR)/var/lizmap-db \
 			  $(LIZMAP_DIR)/var/lizmap-config \
+			  $(LIZMAP_DIR)/qgis-server-plugins \
 			  $*
 
 env: dirs
@@ -60,7 +61,23 @@ env: dirs
 		QGIS_VERSION_TAG=$(QGIS_VERSION_TAG)
 		EOF
 
-run: env
+install-plugins: dirs
+	@echo "Install QGIS server plugins"
+	docker run \
+		-u $(LIZMAP_USER_ID):$(LIZMAP_USER_GID) \
+		--rm -i \
+		-e QGSRV_SERVER_PLUGINPATH=/srv/plugins \
+		-e QGIS_PLUGIN_MANAGER_SOURCES_FILE=/tmp/sources-plugin-manager.list \
+		-e QGIS_PLUGIN_MANAGER_CACHE_DIR=/tmp/cache-plugin-manager \
+		-v $(LIZMAP_DIR)/qgis-server-plugins:/srv/plugins \
+		-v $(shell pwd)/:/src \
+		--entrypoint /bin/bash \
+		3liz/qgis-map-server:$(QGIS_VERSION_TAG) \
+		-c "qgis-plugin-manager init; \
+		    qgis-plugin-manager update; \
+		    qgis-plugin-manager install 'Lizmap server'"
+
+run: env install-plugins
 	docker compose up -V --force-recreate
 
 stop:
@@ -78,5 +95,3 @@ pull:
 	docker pull 3liz/lizmap-web-client:${LIZMAP_VERSION_TAG}
 	docker pull 3liz/qgis-map-server:${QGIS_VERSION_TAG}
 	docker pull 3liz/qgis-wps:${QGIS_VERSION_TAG}
-
-
