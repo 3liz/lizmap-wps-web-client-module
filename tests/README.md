@@ -18,7 +18,7 @@ docker compose down -v
 ```
 
 
-Open your browser at `http://localhost:9090`
+Open your browser at http://localhost:9090
 
 
 For more information, refer to the [docker compose documentation](https://docs.docker.com/compose/)

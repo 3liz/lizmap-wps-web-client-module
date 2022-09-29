@@ -9,6 +9,7 @@
 tests/lizmap/www
 tests/lizmap/var
 tests/lizmap/wps-data
+tests/lizmap/qgis-server-plugins/*
 tests/.env
 tests/end2end/node_modules/
 node_modules/
