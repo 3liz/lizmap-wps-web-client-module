@@ -306,22 +306,27 @@ var Petra = function() {
 
     // helper function to dynamically create a bounding box input
     function addBoundingBoxInput(input) {
-        console.log(input);
+        //  start building input
         var name = input.identifier;
         var container = document.getElementById("processing-input");
 
+        // build the control group
         var control = document.createElement("div");
         control.setAttribute('class', 'control-group');
+        // defined the label
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
         label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
         label.innerHTML = input.title;
         label.id = 'processing-input-'+name.replaceAll(':', '_')+'-label';
         control.appendChild(label);
+
+        // defined the field group
         var fieldDiv = document.createElement("div");
         fieldDiv.setAttribute('class', 'controls');
         control.appendChild(fieldDiv);
 
+        // defined the field
         var field = document.createElement("input");
         field.title = input.title;
         field.value = "left,bottom,right,top (EPSG:4326)";
@@ -387,6 +392,7 @@ var Petra = function() {
         optionMap.label = lizMap.config.options.projection.ref.split(':')[1];
         select.appendChild(optionMap);
 
+        // Add button to draw the extent
         var btn = document.createElement("button");
         btn.id = 'processing-input-'+name.replaceAll(':', '_')+'-btn';
         btn.setAttribute('class', 'btn btn-mini wps-digitizing extent');
