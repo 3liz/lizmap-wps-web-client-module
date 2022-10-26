@@ -8,12 +8,14 @@ from qgis.core import (QgsApplication,
 
 from .TestSimpleValue import TestSimpleValue
 from .TestBoundingBox import TestBoundingBox
+from .TestPoint import TestPoint
 from .TestCopyLayer import TestCopyLayer
 from .TestContextVectorLayer import TestContextVectorLayer
 from .TestContextRasterLayer import TestContextRasterLayer
 from .TestQgisBuffer import TestQgisBuffer
 from .TestFileDestination import TestFileDestination
 from .TestPlot import TestPlot
+
 
 class TestAlgorithmProvider(QgsProcessingProvider):
 
@@ -25,6 +27,7 @@ class TestAlgorithmProvider(QgsProcessingProvider):
             algs = [
                     TestSimpleValue(),
                     TestBoundingBox(),
+                    TestPoint(),
                     TestCopyLayer(),
                     TestFileDestination(),
                     TestContextVectorLayer(),

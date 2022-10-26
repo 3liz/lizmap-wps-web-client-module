@@ -193,7 +193,9 @@ var Petra = function() {
             input = inputs[i];
             if (input.complexData) {
                 var formats = input.complexData.supported.formats;
-                if (formats["application/wkt"]) {
+                if (formats["application/vnd.geo+json"]) {
+                    addGeoJSONInput(input);
+                } else if (formats["application/wkt"]) {
                     addWKTInput(input);
                 } else if (formats["text/xml; subtype=gml/3.1.1"]) {
                     addGML3Input(input);
@@ -244,8 +246,13 @@ var Petra = function() {
             $('#processing-info-inputs tr:last').after(tr);
         }
 
-        $('#processing-input button.wps-digitizing.extent').each(function(){
-            addDigitizingExtentHandler($(this).attr('id'));
+        $('#processing-input button.wps-digitizing').each(function(){
+            var btn = $(this);
+            if (btn.hasClass('extent')) {
+                addDigitizingExtentHandler(btn.attr('id'));
+            } else if (btn.hasClass('point')) {
+                addDigitizingPointHandler(btn.attr('id'));
+            }
         });
 
         lizMap.mainEventDispatcher.addListener(
@@ -253,6 +260,8 @@ var Petra = function() {
                 var btn = $('#processing-input button.wps-digitizing.active');
                 if (btn.hasClass('extent')) {
                     updateDigitizingExtent(btn.attr('id'))
+                } else if (btn.hasClass('point')) {
+                    updateDigitizingPoint(btn.attr('id'))
                 }
             },
             ['digitizing.featureDrawn']
@@ -284,6 +293,80 @@ var Petra = function() {
         }
     }
 
+    function addGeoJSONInput(input, previousSibling) {
+        //  start building input
+        var name = input.identifier;
+        var container = document.getElementById("processing-input");
+
+        // build the control group
+        var control = document.createElement("div");
+        control.setAttribute('class', 'control-group');
+        // defined the label
+        var label = document.createElement("label");
+        label.setAttribute('class', 'jforms-label control-label');
+        label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
+        label.innerHTML = input.title;
+        label.id = 'processing-input-'+name.replaceAll(':', '_')+'-label';
+        control.appendChild(label);
+
+        // defined the field group
+        var fieldDiv = document.createElement("div");
+        fieldDiv.setAttribute('class', 'controls');
+        control.appendChild(fieldDiv);
+
+        // defined the field
+        var field = document.createElement("input");
+        field.title = input.title;
+        //field.value = "left,bottom,right,top (EPSG:4326)";
+        field.id = 'processing-input-'+name.replaceAll(':', '_');
+        field.title = input.title;
+        fieldDiv.appendChild(field);
+
+        var qgisType = '';
+        if ( 'processMetadata' in input ) {
+            qgisType = input.processMetadata.type;
+        }
+
+        // Add simple class
+        var fieldClass = 'qgisType-'+qgisType;
+        field.setAttribute('class', fieldClass);
+
+        container.appendChild(control);
+
+        addValueHandlers(field, function() {
+            input.data = field.value ? {
+                complexData: {
+                    //mimeType: 'application/wkt',
+                    mimeType: 'application/vnd.geo+json',
+                    encoding: 'utf8',
+                    schema: '',
+                    value: field.value
+                }
+            } : defaultValue;
+            //createCopy(input, field, addWKTInput);
+        });
+
+        // Add select for CRS project and map
+        var select = document.createElement("select");
+        select.id = 'processing-input-'+name.replaceAll(':', '_')+'-select';
+        select.setAttribute('class', 'span1 wps-digitizing extent');
+        var optionProject = document.createElement("option");
+        optionProject.value = lizMap.config.options.qgisProjectProjection.ref;
+        optionProject.label = lizMap.config.options.qgisProjectProjection.ref.split(':')[1];
+        select.appendChild(optionProject);
+        var optionMap = document.createElement("option");
+        optionMap.value = lizMap.config.options.projection.ref;
+        optionMap.label = lizMap.config.options.projection.ref.split(':')[1];
+        select.appendChild(optionMap);
+
+        // Add button to draw the extent
+        var btn = document.createElement("button");
+        btn.id = 'processing-input-'+name.replaceAll(':', '_')+'-btn';
+        btn.setAttribute('class', 'btn btn-mini wps-digitizing wkt '+qgisType);
+        btn.innerHTML = 'Drawing '+qgisType;
+
+        $(field).after(btn).after(select).after('<br>');
+    }
     // helper function to dynamically create a textarea for geometry (WKT) data
     // input
     function addWKTInput(input, previousSibling) {
@@ -745,6 +828,21 @@ var Petra = function() {
         }
     }
 
+    function addDigitizingPointHandler(btnId) {
+        var btn = document.getElementById(btnId);
+        btn.onclick = function() {
+            var self = $(btn);
+            if ( self.hasClass('active') ) {
+                lizMap.mainLizmap.digitizing.toolSelected = 'deactivate';
+                $(btn).removeClass('active');
+            } else {
+                $('#processing-input button.wps-digitizing.active').removeClass('active');
+                lizMap.mainLizmap.digitizing.toolSelected = 'point';
+                $(btn).addClass('active');
+            }
+        }
+    }
+
     function updateDigitizingExtent(btnId) {
         var btn = document.getElementById(btnId);
         var select = btn.previousSibling;
@@ -752,6 +850,21 @@ var Petra = function() {
         var bounds = new OpenLayers.Bounds(feat.geometry.bounds.toArray());
         bounds.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
         btn.parentElement.firstChild.value = bounds.toString() + ' (' + select.value + ')';
+        btn.parentElement.firstChild.onblur();
+        lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
+        btn.onclick();
+    }
+
+    function updateDigitizingPoint(btnId) {
+        var btn = document.getElementById(btnId);
+        var select = btn.previousSibling;
+        var feat = lizMap.mainLizmap.digitizing.featureDrawn.pop();
+        var point = feat.geometry.clone();
+        point.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
+        var geojson = new OpenLayers.Format.GeoJSON();
+        //console.log(geojson.write(point));
+        //btn.parentElement.firstChild.value = 'CRS='+ select.value.split(':')[1] +';'+ point.toString();
+        btn.parentElement.firstChild.value = '{ "geometry": '+geojson.write(point)+',  "crs": { "type": "name", "properties": { "name": "'+select.value+'" } } }';
         btn.parentElement.firstChild.onblur();
         lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
         btn.onclick();
@@ -909,6 +1022,8 @@ var Petra = function() {
             tr += '<td>';
             if ( input.data && input.data.literalData) {
                 tr += input.data.literalData.value;
+            } else if ( input.data && input.data.complexData) {
+                tr += input.data.complexData.value;
             } else {
                 tr += 'Not set';
             }
@@ -984,13 +1099,15 @@ var Petra = function() {
                 for (var i=0,ii=processExecuted.dataInputs.length; i<ii; ++i) {
                     var input = processExecuted.dataInputs[i];
                     var td = '<td class="'+uuid+'">';
-                    console.log(input);
+                    //console.log(input);
                     if (input.boundingBoxData && input.data && input.data.boundingBoxData) {
                         var bbValue = input.data.boundingBoxData.bounds;
                         td += bbValue.left+', '+bbValue.bottom+', '+bbValue.right+', '+bbValue.top+' ('+input.data.boundingBoxData.projection+')';
                     } else if (input.boundingBoxData && input.data && input.data.literalData) {
                         var bbValue = input.data.literalData.value;
                         td += bbValue.left+', '+bbValue.bottom+', '+bbValue.right+', '+bbValue.top;
+                    } else if ( input.data && input.data.complexData) {
+                        td += input.data.complexData.value;
                     } else if ( input.data && input.data.literalData) {
                         td += input.data.literalData.value;
                     } else {
