@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2022-11-22
+
 * Fix path to dataviz for Lizmap >= 3.4
 * Update to QGIS Server 3.16
 * Refactor HTTP calls
