@@ -4,12 +4,25 @@
 
 Copy the *wps* directory to lizmap/lizmap-modules/ folder.
 
-## Configuration
-
-In `var/config/localconfig.ini.php` create or update the section `[modules]`:
+For Lizmap 3.5 or lower, in `var/config/localconfig.ini.php` create or update the section `[modules]` with the value:
 ```
 wps.access=2
 ```
+
+For Lizmap 3.6 or higher, run the command `php lizmap/install/configurator.php wps`.
+
+For all Lizmap, then run 
+
+```bash
+php lizmap/install/installer.php
+lizmap/install/clean_vartmp.sh
+lizmap/install/set_rights.sh
+```
+
+
+
+## Configuration
+
 
 In `localconfig.ini.php` add:
 ```
