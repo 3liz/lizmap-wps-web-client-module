@@ -109,6 +109,16 @@ class resultsCtrl extends jController
             return $rep;
         }
 
+        // lizmap project and repository
+        $repository = $this->param('repository');
+        if (!$repository) {
+            return $rep;
+        }
+        $project = $this->param('project');
+        if (!$project) {
+            return $rep;
+        }
+
         // wps process uuid
         $uuid = $this->param('uuid');
         if (!$uuid) {
@@ -116,9 +126,9 @@ class resultsCtrl extends jController
         }
 
         $pStatus = jClasses::getService('wps~processStatus');
-        $pStatus->delete($identifier, $uuid);
+        $pStatus->delete($identifier, $repository, $project, $uuid);
 
-        $rep->content = json_encode($pStatus->get($identifier, $data['uuid']));
+        $rep->content = json_encode($pStatus->get($identifier, $repository, $project, $uuid));
 
         return $rep;
     }
