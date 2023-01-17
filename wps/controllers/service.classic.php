@@ -174,6 +174,42 @@ class serviceCtrl extends jController
         return $rep;
     }
 
+    public function files()
+    {
+        $rep = $this->getResponse('binary');
+        $rep->outputFileName = 'wps_store.json';
+        $rep->mimeType = 'application/json';
+        $content = 'null';
+        $rep->content = $content;
+
+        $uuid = $this->param('uuid');
+        if (!$uuid) {
+            return $rep;
+        }
+
+        $file = $this->param('file');
+        if (!$file) {
+            return $rep;
+        }
+
+        $wps_url = jApp::config()->wps['wps_rootUrl'];
+        $wps_url = ltrim($wps_url, '/');
+        if (substr($wps_url, -1) != '/') {
+            $wps_url .= '/';
+        }
+
+        $url = $wps_url.'jobs/'.$uuid.'/'.'files/'.$file;
+
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
+
+        $rep->outputFileName = $file;
+        $rep->mimeType = $mime;
+        $rep->content = $data;
+        $rep->doDownload = false;
+
+        return $rep;
+    }
+
     public function status()
     {
         $rep = $this->getResponse('binary');

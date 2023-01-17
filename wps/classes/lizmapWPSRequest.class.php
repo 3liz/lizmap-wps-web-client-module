@@ -265,6 +265,7 @@ class lizmapWPSRequest extends lizmapOGCRequest
             $ows_url = ltrim($this->ows_url, '/');
             $wps_url = ltrim($this->wps_url, '/');
             $store_url = $wps_url.'store/';
+            $jobs_url = $wps_url.'jobs/';
             foreach ($matches[1] as $oUrl) {
                 if (substr($oUrl, 0, strlen($store_url)) === $store_url) {
                     $exUrl = explode('/', explode('?', substr($oUrl, strlen($store_url)))[0]);
@@ -277,6 +278,19 @@ class lizmapWPSRequest extends lizmapOGCRequest
                     );
                     $sUrl = str_replace('&', '&amp;', $sUrl);
                     $data = str_replace($oUrl, $sUrl, $data);
+                } elseif (substr($oUrl, 0, strlen($jobs_url)) === $jobs_url) {
+                    $exUrl = explode('/', explode('?', substr($oUrl, strlen($jobs_url)))[0]);
+                    if (count($exUrl) > 2 && $exUrl[1] == 'files') {
+                        $fUrl = jUrl::getFull(
+                            'wps~service:files',
+                            array(
+                                'uuid' => $exUrl[0],
+                                'file' => $exUrl[2],
+                            )
+                        );
+                        $fUrl = str_replace('&', '&amp;', $fUrl);
+                        $data = str_replace($oUrl, $fUrl, $data);
+                    }
                 } elseif ($ows_url && $ows_url !== ''
                        && substr($oUrl, 0, strlen($ows_url)) === $ows_url) {
                     $sUrl = jUrl::getFull(
