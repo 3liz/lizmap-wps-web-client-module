@@ -78,7 +78,7 @@ install-plugins: dirs
 		    qgis-plugin-manager install 'Lizmap server'"
 
 run: env install-plugins
-	docker compose up -V --force-recreate
+	docker compose up -V --force-recreate -d
 
 stop:
 	docker compose down -v --remove-orphans
@@ -95,3 +95,23 @@ pull:
 	docker pull 3liz/lizmap-web-client:${LIZMAP_VERSION_TAG}
 	docker pull 3liz/qgis-map-server:${QGIS_VERSION_TAG}
 	docker pull 3liz/qgis-wps:${QGIS_VERSION_TAG}
+
+import-lizmap-acl-35:
+	@echo "Set repositories and users rights if needed"
+	@echo "Set view project"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/cmd.php acl2right add __anonymous "lizmap.repositories.view" tests ; \
+		php lizmap/cmd.php acl2right add users "lizmap.repositories.view" tests ; \
+		php lizmap/cmd.php acl2right add admins "lizmap.repositories.view" tests'
+	@echo "Display WMS links"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/cmd.php acl2right add users "lizmap.tools.displayGetCapabilitiesLinks" tests ; \
+		php lizmap/cmd.php acl2right add admins "lizmap.tools.displayGetCapabilitiesLinks" tests'
+	@echo "Edition"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/cmd.php acl2right add users "lizmap.tools.edition.use" tests ; \
+		php lizmap/cmd.php acl2right add admins "lizmap.tools.edition.use" tests'
+	@echo "Export layers"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/cmd.php acl2right add users "lizmap.tools.layer.export" tests ; \
+		php lizmap/cmd.php acl2right add admins "lizmap.tools.layer.export" tests'

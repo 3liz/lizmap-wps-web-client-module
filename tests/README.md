@@ -1,8 +1,27 @@
-# Docker compose
+# Testing Lizmap Web Client WPS module
+
+## Run docker compose
+
+Steps
+
+- Launch  with  docker compose
+
+```bash
+# Clean previous versions (optional)
+make clean
+
+# Run the different services (with lizmap 3.5)
+make run
+
+# Set Lizmap ACL
+make import-lizmap-acl-35
+```
+
+- Open your browser at http://localhost:9090
 
 ## Environment
 
-Use the `make env` command with some specific versions : 
+Use the `make env` command with some specific versions :
 
 * [Lizmap Web Client tags](https://hub.docker.com/r/3liz/lizmap-web-client/tags)
 * [QGIS Server tags](https://hub.docker.com/r/3liz/qgis-map-server/tags)
@@ -14,7 +33,7 @@ docker compose up -V --force-recreate [-d]
 
 Stop and clean the stack with:
 ```
-docker compose down -v 
+docker compose down -v
 ```
 
 
