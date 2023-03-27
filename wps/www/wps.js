@@ -1171,6 +1171,12 @@ var Petra = function() {
                         continue;
                     if ( output.reference.mimeType != 'application/x-ogc-wms' )
                         continue;
+                    // Check layer parameter
+                    var url = output.reference.href;
+                    // Extract layer parameter
+                    var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
+                    if (layerParam == undefined)
+                        continue;
                     var tr = '<tr data-value="'+output.identifier+'">';
                     tr += '<td>'+output.title+'</td>';
                     tr += '</tr>';
