@@ -334,6 +334,7 @@ var Petra = function() {
         field.title = input.title;
         //field.value = "left,bottom,right,top (EPSG:4326)";
         field.id = 'processing-input-'+name.replaceAll(':', '_');
+        field.name = name;
         field.title = input.title;
         fieldDiv.appendChild(field);
 
@@ -429,6 +430,7 @@ var Petra = function() {
         field.title = input.title;
         field.value = "left,bottom,right,top (EPSG:4326)";
         field.id = 'processing-input-'+name.replaceAll(':', '_');
+        field.name = name;
         field.title = input.title;
         fieldDiv.appendChild(field);
 
@@ -569,6 +571,7 @@ var Petra = function() {
         // anyValue means textfield, otherwise we create a dropdown
         var field = document.createElement((dataType == 'boolean' || (dataType == 'string' && !anyValue) || qgisType == 'field' || qgisType == 'vector' || qgisType == 'raster' || qgisType == 'source') ? "select" : "input");
         field.id = 'processing-input-'+name.replaceAll(':', '_');
+        field.name = name;
         field.title = input.title;
         fieldDiv.appendChild(field);
 
@@ -760,6 +763,22 @@ var Petra = function() {
             $(e).children().remove();
             $(e).append('<option>---</option>');
         });
+
+        var identifier = document.getElementById('processing-form-container').dataset.value;
+        // Restricted layers
+        var restrictedFields = [];
+        if(
+            typeof wps_wps_project_config !== 'undefined'
+            && (identifier in wps_wps_project_config)
+        ) {
+            var name = qgisFieldInputs[0].name;
+            if (name in wps_wps_project_config[identifier]) {
+                restrictedFields = wps_wps_project_config[identifier][name];
+                if ( !$.isArray(restrictedFields) )
+                    restrictedFields = [];
+            }
+        }
+
         var service = OpenLayers.Util.urlAppend(lizUrls.wms
             ,OpenLayers.Util.getParameterString(lizUrls.params)
         );
@@ -786,6 +805,8 @@ var Petra = function() {
                         return;
                     if ( $(e).hasClass('fieldDataType-String') && attType != 'string' && attType != 'Date' && attType != '' )
                         return;
+                    if (restrictedFields.length != 0 && restrictedFields.indexOf(att) == -1)
+                        return;
                     var alias = aliases[att];
                     if ( alias != '' )
                         $(e).append('<option value="'+att+'">'+alias+'</option>');
@@ -794,6 +815,9 @@ var Petra = function() {
                 });
             }
             qgisFieldInputs.each( function( i, e ) {
+                if (e.children.length == 2) {
+                    e.selectedIndex = 1;
+                }
                 e.onchange();
             });
             /*
