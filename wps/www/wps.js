@@ -649,8 +649,9 @@ var Petra = function() {
                     }
                 } : undefined;
             };
-            if (document.getElementById('processing-input-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_')).value != '') {
-                field.onchange();
+            var parentInput = document.getElementById('processing-input-'+input.processMetadata.parentLayerParameterName.replaceAll(':', '_'));
+            if (parentInput.value != '') {
+                parentInput.onchange();
             }
         } else if ( qgisType == 'raster' ) {
             var option;
