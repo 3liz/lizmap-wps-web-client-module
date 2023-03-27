@@ -90,20 +90,28 @@ var Petra = function() {
                     div.appendChild(document.createElement("hr"));
                 }
 
-                // Add toggle behaviour to processing-log-list
-                for (const li of document.querySelectorAll('#processing-log-list > li .title')) {
-                    li.addEventListener('click', e => {
-                        const liClicked = e.target.parentElement;
-                        liClicked.classList.toggle('expanded');
+                if ( dropdown.children.length == 1 ) {
+                    // No algorithm available
+                    // hide WPS
+                    document.querySelectorAll('#mapmenu ul.nav-list li.processing')[0].style.display = 'none';
+                    document.querySelectorAll('#mapmenu ul.nav-list li.processing-results')[0].style.display = 'none';
+                } else {
+                    // Algorithms available
+                    // Add toggle behaviour to processing-log-list
+                    for (const li of document.querySelectorAll('#processing-log-list > li .title')) {
+                        li.addEventListener('click', e => {
+                            const liClicked = e.target.parentElement;
+                            liClicked.classList.toggle('expanded');
 
-                        // Load and display results
-                        if (liClicked.classList.contains('expanded')) {
-                            const selection = liClicked.dataset.value;
-                            if (selection != '') {
-                                getStoredResults(selection);
+                            // Load and display results
+                            if (liClicked.classList.contains('expanded')) {
+                                const selection = liClicked.dataset.value;
+                                if (selection != '') {
+                                    getStoredResults(selection);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
