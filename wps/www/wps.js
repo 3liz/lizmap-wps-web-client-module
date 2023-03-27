@@ -75,6 +75,12 @@ var Petra = function() {
                     divLayers.innerHTML = '<h4>Layers output</h4><table class="processing-results-layer-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
                     divLayers.style = 'display:none;';
                     div.appendChild(divLayers);
+                    // The layers div
+                    const divFiles = document.createElement("div");
+                    divFiles.classList = "processing-results-file";
+                    divFiles.innerHTML = '<h4>Files output</h4><table class="processing-results-file-table table table-condensed table-striped"><tbody><tr><th>Name</th></tr></tbody></table>';
+                    divFiles.style = 'display:none;';
+                    div.appendChild(divFiles);
                     // The plots div
                     const divPlots = document.createElement("div");
                     divPlots.classList = "processing-results-plot";
@@ -1363,6 +1369,60 @@ var Petra = function() {
             });
             // Hide or show content depending on results
             divResults.find('div.processing-results-layer').toggle(hasLayer);
+
+            // FILES
+            // reference Data with mimeType not application/x-ogc-wms
+            var hasFile = false;
+            // Add layer output description
+            if (divResults.find('table.processing-results-file-table tr').length == 1) {
+                for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
+                    var output = processExecuted.processOutputs[i];
+                    if ( !output.reference )
+                        continue;
+                    if ( !output.reference.mimeType )
+                        continue;
+                    if ( output.reference.mimeType == 'application/x-ogc-wms' )
+                        continue;
+                    var tr = '<tr data-value="'+output.identifier+'">';
+                    tr += '<td>'+output.title+'</td>';
+                    tr += '</tr>';
+                    divResults.find('table.processing-results-file-table tr:last').after(tr);
+                }
+            }
+            // Add process file results
+            // Fisrt the header
+            divResults.find('table.processing-results-file-table tr:first th:last')
+                .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
+            // Then the data
+            for (var i=0,ii=processExecuted.processOutputs.length; i<ii; ++i) {
+                var output = processExecuted.processOutputs[i];
+                if ( !output.reference )
+                    continue;
+                if ( !output.reference.mimeType )
+                    continue;
+                if ( output.reference.mimeType == 'application/x-ogc-wms' )
+                    continue;
+                var url = output.reference.href;
+                // Extract file parameter
+                var fileName = getQueryParam(url, 'file');
+                if (fileName == undefined)
+                    fileName = url.split('/').pop();
+
+                // Insert file info in table file results
+                var td = '<td class="'+uuid+'">';
+                //td += '<button class="btn checkbox checked layerView" value="'+layerName+'" title="'+layerParam+'"></button>';
+                td += '<span>'+fileName+'</span>';
+                td += '&nbsp;';
+                td += '<a class="btn btn-mini" target="_blank" href="'+url+'" title="'+output.title+'">';
+                td += '<i class="icon-download-alt"></i>';
+                td += '</button>';
+                td += '</td>';
+                divResults.find('table.processing-results-file-table tr[data-value="'+output.identifier+'"] td:last').after(td);
+
+                hasFile = true;
+            }
+            // Hide or show content depending on results
+            divResults.find('div.processing-results-file').toggle(hasFile);
 
 
             // PLOTS
