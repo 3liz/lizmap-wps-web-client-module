@@ -1189,6 +1189,8 @@ var Petra = function() {
                 var mapParam = getQueryParam(url, 'map');
                 // Extract layer parameter
                 var layerParam = getQueryParam(url, 'layer') || getQueryParam(url, 'layers');
+                if (layerParam == undefined)
+                    continue;
                 // Create a layer name for the map
                 var layerName = uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_');
                 console.log(layerName);
