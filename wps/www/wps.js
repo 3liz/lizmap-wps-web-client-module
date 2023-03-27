@@ -166,6 +166,7 @@ var Petra = function() {
                 var executedProcess = d[uuid];
                 if (executedProcess) {
                     executedProcesses[uuid] = d[uuid];
+                    //updateStatusProcess( uuid );
                     updateLogTable(d[uuid]);
                 }
             }
