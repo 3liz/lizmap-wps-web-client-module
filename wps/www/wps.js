@@ -627,6 +627,10 @@ var Petra = function() {
                     }
                 });
             }
+            if (field.children.length == 2) {
+                field.selectedIndex = 1;
+                field.onchange();
+            }
         } else if ( qgisType == 'field' ) {
             var option;
             option = document.createElement("option");
@@ -666,6 +670,10 @@ var Petra = function() {
                     }
                 } : undefined;
             };
+            if (field.children.length == 2) {
+                field.selectedIndex = 1;
+                field.onchange();
+            }
         } else if ( dataType == 'boolean' ||  (dataType == 'string' && !anyValue) ) {
             var option;
             option = document.createElement("option");
