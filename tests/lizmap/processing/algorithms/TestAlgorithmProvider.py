@@ -15,6 +15,7 @@ from .TestContextRasterLayer import TestContextRasterLayer
 from .TestQgisBuffer import TestQgisBuffer
 from .TestFileDestination import TestFileDestination
 from .TestPlot import TestPlot
+from .TestConvertSourceToVector import TestConvertSourceToVector
 
 
 class TestAlgorithmProvider(QgsProcessingProvider):
@@ -33,7 +34,8 @@ class TestAlgorithmProvider(QgsProcessingProvider):
                     TestContextVectorLayer(),
                     TestContextRasterLayer(),
                     TestQgisBuffer(),
-                    TestPlot()
+                    TestPlot(),
+                    TestConvertSourceToVector(),
                 ]
         except:
             traceback.print_exc()
