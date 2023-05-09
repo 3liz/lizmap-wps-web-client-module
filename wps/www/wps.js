@@ -614,14 +614,18 @@ var Petra = function() {
                     var cbx = $(this);
                     if ( cbx.is(':checked') ) {
                         cbx.attr('checked', 'checked');
-                        var aName = input.data.literalData.value;
-                        var lConfig = lizMap.config.layers[aName];
-                        if ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.selectedFeatures.join() + ' )')
-                        } else if ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) {
-                            aName = 'layer:'+aName+'?select='+encodeURIComponent('$id IN ( ' + lConfig.filteredFeatures.join() + ' )')
+                        var theValue = input.data.literalData.value;
+                        var layerName = theValue;
+                        if ( layerName.startsWith('layer:') ) {
+                            layerName = layerName.split('?')[0].slice(6);
                         }
-                        input.data.literalData.value = aName;
+                        var layerConfig = lizMap.config.layers[layerName];
+                        if ( ('selectedFeatures' in layerConfig) && layerConfig.selectedFeatures.length > 0 ) {
+                            theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.selectedFeatures.join() + ' )')
+                        } else if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
+                            theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
+                        }
+                        input.data.literalData.value = theValue;
                     } else {
                         if ( cbx.attr('checked') != undefined )
                             cbx.removeAttr('checked');
@@ -936,6 +940,33 @@ var Petra = function() {
             input = inputs[i];
             if ((input.minOccurs === 0 || input.occurrence) && !input.data && !input.reference) {
                 OpenLayers.Util.removeItem(inputs, input);
+                continue;
+            }
+            if ( !('processMetadata' in input )) {
+                continue;
+            }
+            var qgisType = '';
+            if ( 'processMetadata' in input ) {
+                qgisType = input.processMetadata.type;
+            }
+            if ( qgisType == 'source' ) {
+                var theValue = input.data.literalData.value;
+                var layerName = theValue;
+                if ( layerName.startsWith('layer:') ) {
+                    layerName = layerName.split('?')[0].slice(6);
+                }
+                var layerConfig = lizMap.config.layers[layerName];
+                if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
+                    theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
+                }
+                var inputName = input.identifier;
+                var cbx = $('#processing-input-'+inputName.replaceAll(':', '_').replaceAll(' ', '_')+'-selection');
+                if ( cbx.is(':checked') ) {
+                    if ( ('selectedFeatures' in layerConfig) && layerConfig.selectedFeatures.length > 0 ) {
+                        theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.selectedFeatures.join() + ' )')
+                    }
+                }
+                input.data.literalData.value = theValue;
             }
         }
         /*process.responseForm = {
@@ -1985,7 +2016,17 @@ var Petra = function() {
                 elt = $(elt);
                 if ( elt.val() != e.featureType )
                     return;
+
+                var cbx = $(elt).parent().find('input[type="checkbox"].selection');
+                var cbxChecked = false;
+                if ( cbx.length != 0 ) {
+                    cbxChecked = cbx.is(':checked');
+                }
+
                 elt.change();
+                if (cbxChecked) {
+                    cbx.click();
+                }
             });
 
         }
