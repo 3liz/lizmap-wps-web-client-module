@@ -79,6 +79,27 @@ class wpsWMSRequest extends wpsOGCRequest
         return $result;
     }
 
+    protected function process_describelayer()
+    {
+        $result = $this->doRequest();
+
+        if (!$result) {
+            jMessage::add('Server Error !', 'Error');
+
+            return $this->serviceException();
+        }
+        return $result;
+
+        $data = $result->data;
+        if (empty($data) or floor($result->code / 100) >= 4) {
+            jMessage::add('Server Error !', 'Error');
+
+            return $this->serviceException();
+        }
+
+        return $result;
+    }
+
     protected function process_getlegendgraphic()
     {
         return $this->process_getlegendgraphics();
