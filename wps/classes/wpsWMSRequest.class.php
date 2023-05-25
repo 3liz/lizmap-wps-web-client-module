@@ -88,6 +88,7 @@ class wpsWMSRequest extends wpsOGCRequest
 
             return $this->serviceException();
         }
+
         return $result;
 
         $data = $result->data;
