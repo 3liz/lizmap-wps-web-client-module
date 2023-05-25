@@ -1575,6 +1575,15 @@ var Petra = function() {
                 divResults.find('div.processing-results-layer').hide();
             }
 
+            // Remove file outputs
+            divResults.find('table.processing-results-file-table tr td[class="'+uuid+'"]').remove();
+            divResults.find('table.processing-results-file-table tr th[class="'+uuid+'"]').remove();
+            // Hide or show content depending on results
+            var hasLiteral = (divResults.find('table.processing-results-file-table tr th').length != 1);
+            if (!hasLiteral) {
+                divResults.find('div.processing-results-file').hide();
+            }
+
             // Remove literal outputs
             divResults.find('table.processing-results-literal-table tr td[class="'+uuid+'"]').remove();
             divResults.find('table.processing-results-literal-table tr th[class="'+uuid+'"]').remove();
