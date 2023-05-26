@@ -624,6 +624,10 @@ var Petra = function() {
                             theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.selectedFeatures.join() + ' )')
                         } else if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
                             theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
+                        } else if ( ('request_params' in layerConfig) &&
+                                    ('exp_filter' in layerConfig['layerConfig']) &&
+                                    layerConfig['request_params']['exp_filter'] ) {
+                            theValue = 'layer:'+layerName+'?select='+encodeURIComponent(layerConfig['request_params']['exp_filter'])
                         }
                         input.data.literalData.value = theValue;
                     } else {
@@ -748,7 +752,8 @@ var Petra = function() {
             cbx.removeAttr('checked');
 
         if ( ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) ||
-             ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 ) ) {
+             ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 )  ||
+             ( ('request_params' in lConfig) && ('exp_filter' in lConfig['layerConfig']) && lConfig['request_params']['exp_filter'] ) ) {
             cbx.removeAttr('disabled');
             cbx.parent().removeClass('disabled');
         }
@@ -958,6 +963,10 @@ var Petra = function() {
                 var layerConfig = lizMap.config.layers[layerName];
                 if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
                     theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
+                } else if ( ('request_params' in layerConfig) &&
+                            ('exp_filter' in layerConfig['layerConfig']) &&
+                            layerConfig['request_params']['exp_filter'] ) {
+                    theValue = 'layer:'+layerName+'?select='+encodeURIComponent(layerConfig['request_params']['exp_filter'])
                 }
                 var inputName = input.identifier;
                 var cbx = $('#processing-input-'+inputName.replaceAll(':', '_').replaceAll(' ', '_')+'-selection');
