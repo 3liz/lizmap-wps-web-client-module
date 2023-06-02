@@ -625,7 +625,7 @@ var Petra = function() {
                         } else if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
                             theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
                         } else if ( ('request_params' in layerConfig) &&
-                                    ('exp_filter' in layerConfig['layerConfig']) &&
+                                    ('exp_filter' in layerConfig['request_params']) &&
                                     layerConfig['request_params']['exp_filter'] ) {
                             theValue = 'layer:'+layerName+'?select='+encodeURIComponent(layerConfig['request_params']['exp_filter'])
                         }
@@ -753,7 +753,7 @@ var Petra = function() {
 
         if ( ( ('selectedFeatures' in lConfig) && lConfig.selectedFeatures.length > 0 ) ||
              ( ('filteredFeatures' in lConfig) && lConfig.filteredFeatures.length > 0 )  ||
-             ( ('request_params' in lConfig) && ('exp_filter' in lConfig['layerConfig']) && lConfig['request_params']['exp_filter'] ) ) {
+             ( ('request_params' in lConfig) && ('exp_filter' in lConfig['request_params']) && lConfig['request_params']['exp_filter'] ) ) {
             cbx.removeAttr('disabled');
             cbx.parent().removeClass('disabled');
         }
