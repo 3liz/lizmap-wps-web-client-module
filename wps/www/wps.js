@@ -964,7 +964,7 @@ var Petra = function() {
                 if ( ('filteredFeatures' in layerConfig) && layerConfig.filteredFeatures.length > 0 ) {
                     theValue = 'layer:'+layerName+'?select='+encodeURIComponent('$id IN ( ' + layerConfig.filteredFeatures.join() + ' )')
                 } else if ( ('request_params' in layerConfig) &&
-                            ('exp_filter' in layerConfig['layerConfig']) &&
+                            ('exp_filter' in layerConfig['request_params']) &&
                             layerConfig['request_params']['exp_filter'] ) {
                     theValue = 'layer:'+layerName+'?select='+encodeURIComponent(layerConfig['request_params']['exp_filter'])
                 }
