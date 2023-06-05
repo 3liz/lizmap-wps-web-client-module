@@ -316,6 +316,7 @@ var Petra = function() {
         // build the control group
         var control = document.createElement("div");
         control.setAttribute('class', 'control-group');
+        control.id = 'processing-input-'+name.replaceAll(':', '_')+'-group';
         // defined the label
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
@@ -412,6 +413,7 @@ var Petra = function() {
         // build the control group
         var control = document.createElement("div");
         control.setAttribute('class', 'control-group');
+        control.id = 'processing-input-'+name.replaceAll(':', '_')+'-group';
         // defined the label
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
@@ -508,6 +510,7 @@ var Petra = function() {
 
         var control = document.createElement("div");
         control.setAttribute('class', 'control-group');
+        control.id = 'processing-input-'+name.replaceAll(':', '_')+'-group';
         var label = document.createElement("label");
         label.setAttribute('class', 'jforms-label control-label');
         label.setAttribute('for', 'processing-input-'+name.replaceAll(':', '_'));
