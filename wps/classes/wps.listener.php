@@ -109,10 +109,19 @@ class wpsListener extends jEventListener
 
     protected function isAvailable($event)
     {
+        // WPS Config
+        $wpsConfig = jApp::config()->wps;
 
         // get wps rootDirectories
-        $rootDirectories = jApp::config()->wps['wps_rootDirectories'];
+        $rootDirectories = $wpsConfig['wps_rootDirectories'];
         if (!$rootDirectories) {
+            return false;
+        }
+
+        // WPS only available to authenticated users
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && !jAuth::isConnected()) {
             return false;
         }
 
@@ -125,7 +134,7 @@ class wpsListener extends jEventListener
         }
 
         if (strpos($lrep->getPath(), $rootDirectories) !== 0) {
-            return;
+            return false;
         }
 
         $lproj = lizmap::getProject($repository.'~'.$project);
@@ -134,6 +143,13 @@ class wpsListener extends jEventListener
         }
 
         $this->lproj = $lproj;
+
+        // WPS only available for configured projects
+        if (array_key_exists('restrict_to_config_projects', $wpsConfig)
+            && $wpsConfig['restrict_to_config_projects']
+            && !file_exists($lproj->getQgisPath().'.json')) {
+            return false;
+        }
 
         return true;
     }

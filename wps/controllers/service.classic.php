@@ -73,6 +73,20 @@ class serviceCtrl extends jController
 
             return $this->serviceException();
         }
+
+        // WPS Config
+        $wpsConfig = jApp::config()->wps;
+
+        // WPS only available to authenticated users
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && !jAuth::isConnected()) {
+            jMessage::add('Authorization is required to access WPS!', 'AuthorizationRequired');
+
+            return $this->serviceException();
+        }
+
+
         $request = strtolower($params['request']);
         $wpsRequest = null;
         if ($request == 'getcapabilities') {

@@ -12,6 +12,7 @@
 class processStatus
 {
     protected static $profile = 'wpsProcessStatus';
+    protected $available;
     protected $db;
 
     /**
@@ -21,6 +22,12 @@ class processStatus
      */
     public function __construct()
     {
+        $this->available = self::isAvailable();
+
+        if (!$this->available) {
+            return;
+        }
+
         self::declareRedisProfile();
         $this->db = jKVDb::getConnection(self::$profile);
         $wps_url = jApp::config()->wps['wps_rootUrl'];
@@ -34,6 +41,14 @@ class processStatus
 
     public function saved($identifier, $repository, $project)
     {
+        if (!$this->available) {
+            return array();
+        }
+
+        if (!self::isAvailableForProject($repository, $project)) {
+            return array();
+        }
+
         $url = $this->url.'?SERVICE=WPS';
         list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
 
@@ -76,6 +91,14 @@ class processStatus
 
     public function get($identifier, $repository, $project, $uuid)
     {
+        if (!$this->available) {
+            return null;
+        }
+
+        if (!self::isAvailableForProject($repository, $project)) {
+            return null;
+        }
+
         $url = $this->url.$uuid.'?SERVICE=WPS';
         list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
 
@@ -98,6 +121,14 @@ class processStatus
 
     public function update($identifier, $repository, $project, $uuid, $status)
     {
+        if (!$this->available) {
+            return false;
+        }
+
+        if (!self::isAvailableForProject($repository, $project)) {
+            return false;
+        }
+
         $saved = $this->saved($identifier, $repository, $project);
 
         if (!in_array($uuid, $saved)) {
@@ -117,6 +148,14 @@ class processStatus
 
     public function delete($identifier, $repository, $project, $uuid)
     {
+        if (!$this->available) {
+            return false;
+        }
+
+        if (!self::isAvailableForProject($repository, $project)) {
+            return false;
+        }
+
         $saved = $this->saved($identifier, $repository, $project);
 
         if (!in_array($uuid, $saved)) {
@@ -157,5 +196,60 @@ class processStatus
 
         // Create the virtual status profile
         jProfiles::createVirtualProfile('jkvdb', self::$profile, $statusParams);
+    }
+
+    protected static function isAvailable() {
+        // WPS Config
+        $wpsConfig = jApp::config()->wps;
+
+        // get wps rootDirectories
+        $rootDirectories = $wpsConfig['wps_rootDirectories'];
+        if (!$rootDirectories) {
+            return false;
+        }
+
+        // WPS only available to authenticated users
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && !jAuth::isConnected()) {
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected static function isAvailableForProject($repository, $project) {
+        // WPS Config
+        $wpsConfig = jApp::config()->wps;
+
+        // get wps rootDirectories
+        $rootDirectories = $wpsConfig['wps_rootDirectories'];
+        if (!$rootDirectories) {
+            return false;
+        }
+
+        $lrep = lizmap::getRepository($repository);
+        if (!$lrep) {
+            return false;
+        }
+
+        if (strpos($lrep->getPath(), $rootDirectories) !== 0) {
+            return false;
+        }
+
+        $lproj = lizmap::getProject($repository.'~'.$project);
+        if (!$lproj) {
+            return false;
+        }
+
+        // WPS only available for configured projects
+        if (array_key_exists('restrict_to_config_projects', $wpsConfig)
+            && $wpsConfig['restrict_to_config_projects']
+            && !file_exists($lproj->getQgisPath().'.json')) {
+            return false;
+        }
+
+        return true;
     }
 }
