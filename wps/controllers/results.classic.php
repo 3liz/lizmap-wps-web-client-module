@@ -23,6 +23,7 @@ class resultsCtrl extends jController
         $identifier = $this->param('identifier');
         if (!$identifier) {
             jLog::log('results controller, index: No identifier param', 'errors');
+
             return $rep;
         }
 
@@ -30,11 +31,13 @@ class resultsCtrl extends jController
         $repository = $this->param('repository');
         if (!$repository) {
             jLog::log('results controller, index: No repository param', 'errors');
+
             return $rep;
         }
         $project = $this->param('project');
         if (!$project) {
             jLog::log('results controller, index: No project param', 'errors');
+
             return $rep;
         }
 
@@ -64,6 +67,7 @@ class resultsCtrl extends jController
         $identifier = $this->param('identifier');
         if (!$identifier) {
             jLog::log('results controller, update: No identifier param', 'errors');
+
             return $rep;
         }
 
@@ -71,11 +75,13 @@ class resultsCtrl extends jController
         $repository = $this->param('repository');
         if (!$repository) {
             jLog::log('results controller, update: No repository param', 'errors');
+
             return $rep;
         }
         $project = $this->param('project');
         if (!$project) {
             jLog::log('results controller, update: No project param', 'errors');
+
             return $rep;
         }
 
@@ -87,6 +93,7 @@ class resultsCtrl extends jController
 
         if (!$requestJson) {
             jLog::log('results controller, update: No request JSON', 'errors');
+
             return $rep;
         }
         // depending on how jelix is configured, we could have directly
@@ -95,6 +102,7 @@ class resultsCtrl extends jController
 
         if (!array_key_exists('uuid', $data)) {
             jLog::log('results controller, update: No uuid in request JSON');
+
             return $rep;
         }
 
@@ -118,6 +126,7 @@ class resultsCtrl extends jController
         $identifier = $this->param('identifier');
         if (!$identifier) {
             jLog::log('results controller, delete: No identifier param', 'errors');
+
             return $rep;
         }
 
@@ -125,11 +134,13 @@ class resultsCtrl extends jController
         $repository = $this->param('repository');
         if (!$repository) {
             jLog::log('results controller, delete: No repository param', 'errors');
+
             return $rep;
         }
         $project = $this->param('project');
         if (!$project) {
             jLog::log('results controller, delete: No project param', 'errors');
+
             return $rep;
         }
 
