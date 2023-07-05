@@ -1677,13 +1677,40 @@ var Petra = function() {
 
         // Title info
         let titleInfo = [];
+        let label = '';
+        let inputLabel = '';
+        if(
+            typeof wps_wps_project_config !== 'undefined'
+            && (executedProcess.identifier in wps_wps_project_config)
+            && ('__job_label' in wps_wps_project_config[executedProcess.identifier])
+        ){
+            inputLabel = wps_wps_project_config[executedProcess.identifier]['__job_label'];
+        }
         if (executedProcess.dataInputs) {
             for (var i=0,ii=executedProcess.dataInputs.length; i<ii; ++i) {
                 var input = executedProcess.dataInputs[i];
                 if ( input.data && input.data.literalData) {
                     titleInfo.push(input.data.literalData.value);
                 }
+                if ( inputLabel != '' && input.identifier == inputLabel ) {
+                    label = input.data.literalData.value;
+                }
+                if (inputLabel == '' && input.processMetadata && input.processMetadata.type
+                    && (
+                        input.processMetadata.type == 'sink'
+                        || input.processMetadata.type == 'vectorDestination'
+                        || input.processMetadata.type == 'rasterDestination'
+                        || input.processMetadata.type == 'fileDestination'
+                    )
+                ) {
+                    label = input.data.literalData.value;
+                }
             }
+        }
+        if (label == '') {
+            label = (new Date(startTime)).toLocaleString();
+        } else {
+            titleInfo.unshift((new Date(startTime)).toLocaleString());
         }
 
         // Display start time
@@ -1694,7 +1721,7 @@ var Petra = function() {
         else if (status == 'Failed'){
             tr += '<button class="btn btn-mini btn-link" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
         }
-        tr += (new Date(startTime)).toLocaleString();
+        tr += label
         tr += '</button></td>';
 
         // Display status
