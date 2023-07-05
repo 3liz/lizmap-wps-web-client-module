@@ -2064,6 +2064,18 @@ var Petra = function() {
             processingResultsObserver.observe(document.querySelector('#processing-results'));
         },
 
+        'dockopened': function(e) {
+            if (e.id = 'processing') {
+                var options = $("#processing-processes option");
+                if (options.length == 2) {
+                    if (options.last().parent().val() != options.last().val()) {
+                        options.last().parent().val(options.last().val());
+                        options.last().parent().change();
+                    }
+                }
+            }
+        },
+
         'layerSelectionChanged': function(e) {
 
             $('#processing-form-container select.qgisType-source').each(function(idx, elt){

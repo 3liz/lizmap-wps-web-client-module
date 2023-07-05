@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * Support Administrator realm token
 * Tests: enhancing Test environment to work with lizmap 3.6
 * Job label based on input value
+* Select the algorithm if only one is available
 
 ## 0.2.0 - 2022-11-22
 
