@@ -2,7 +2,7 @@
 
 <!--
 All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog](https://keepachangelog.com/), 
+The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 -->
 
@@ -10,7 +10,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+* Fixing the delete method of results controller
+* Supports outputs files and jobs
+* UI: No output displayed for undefined layer name
+* UI: The triangle before title not cliquable in results
+* UI: Hide WPS if no algorithm available
+* Fixing the way to manage selection for FeatureSource
+* Fixing the results controller
+* UI: Adding status in log table
+
 ### Added
+
+* Tests: enhancing Test input file destination algorithm
+* UI: Display file outputs
+* UI: Select default layer
+* UI: Update field parameter at stratup
+* Config: Field parameter can be restricted
+* Tests: Algorithm to convert feature source to vector layer
+* Support WMS DescribeLayer request
+* Using Expression filter when it is provided
+* CSS: Add id to processing input control-group
 
 ## 0.2.0 - 2022-11-22
 
