@@ -378,12 +378,12 @@ class lizmapWPSRequest extends lizmapOGCRequest
             $lrep = lizmap::getRepository($repository);
             $lproj = lizmap::getProject($repository.'~'.$project);
             $realm = jApp::coord()->request->getDomainName()
-                .'~'. $lrep->getKey()
-                .'~'. $lproj->getKey()
-                .'~'. jAuth::getUserSession()->login;
+                .'~'.$lrep->getKey()
+                .'~'.$lproj->getKey()
+                .'~'.jAuth::getUserSession()->login;
             $headers['X-Job-Realm'] = sha1($realm);
 
-            if( $this->param('request') == 'getresults'
+            if ($this->param('request') == 'getresults'
                 && jAcl2::check('lizmap.admin.access')
                 && array_key_exists('admin_job_realm', $wpsConfig)
                 && $wpsConfig['admin_job_realm']

@@ -166,7 +166,6 @@ class processStatus
         return $this->setToDb($identifier, $repository, $project, $uuid);
     }
 
-
     protected function getFromDb($identifier, $repository, $project, $uuid = null)
     {
         // Get the list of uuids saved in db
@@ -177,7 +176,8 @@ class processStatus
             // return an empty list, it is probably the first time
             // db is requested
             return array();
-        } else if (!$saved && $uuid) {
+        }
+        if (!$saved && $uuid) {
             // the list of uuids is empty and a uuid provided
             // log message and set an empty array
             jLog::log('Status getFromDb '.$identifier.':'.$repository.':'.$project.' not in db');
@@ -186,7 +186,7 @@ class processStatus
             // the list of uuids is not empty in db
             // transform to an aray and removed empty string
             $saved = explode(',', $saved);
-            $saved = array_filter($saved, function($s) {
+            $saved = array_filter($saved, function ($s) {
                 return strlen($s) != 0;
             });
         }
@@ -204,9 +204,8 @@ class processStatus
             $this->setToDb($identifier, $repository, $project, $uuid);
 
             return null;
-        } else {
-            $this->setToDb($identifier, $repository, $project, $uuid, $status);
         }
+        $this->setToDb($identifier, $repository, $project, $uuid, $status);
 
         return json_decode($status);
     }
@@ -222,6 +221,7 @@ class processStatus
                 // check if uuid is in db and removed it
                 if ($this->db->get($uuid)) {
                     $this->db->delete($uuid);
+
                     return true;
                 }
                 // Nothing has been done
@@ -284,7 +284,8 @@ class processStatus
         jProfiles::createVirtualProfile('jkvdb', self::$profile, $statusParams);
     }
 
-    protected static function isAvailable() {
+    protected static function isAvailable()
+    {
         // WPS Config
         $wpsConfig = jApp::config()->wps;
 
@@ -298,14 +299,14 @@ class processStatus
         if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
             && $wpsConfig['restrict_to_authenticated_users']
             && !jAuth::isConnected()) {
-
             return false;
         }
 
         return true;
     }
 
-    protected static function isAvailableForProject($repository, $project) {
+    protected static function isAvailableForProject($repository, $project)
+    {
         // WPS Config
         $wpsConfig = jApp::config()->wps;
 
@@ -383,12 +384,12 @@ class processStatus
             $lrep = lizmap::getRepository($repository);
             $lproj = lizmap::getProject($repository.'~'.$project);
             $realm = jApp::coord()->request->getDomainName()
-                .'~'. $lrep->getKey()
-                .'~'. $lproj->getKey()
-                .'~'. jAuth::getUserSession()->login;
+                .'~'.$lrep->getKey()
+                .'~'.$lproj->getKey()
+                .'~'.jAuth::getUserSession()->login;
             $headers['X-Job-Realm'] = sha1($realm);
 
-            if( jAcl2::check('lizmap.admin.access')
+            if (jAcl2::check('lizmap.admin.access')
                 && array_key_exists('admin_job_realm', $wpsConfig)
                 && $wpsConfig['admin_job_realm']
             ) {

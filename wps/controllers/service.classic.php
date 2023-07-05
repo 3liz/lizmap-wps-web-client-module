@@ -86,7 +86,6 @@ class serviceCtrl extends jController
             return $this->serviceException();
         }
 
-
         $request = strtolower($params['request']);
         $wpsRequest = null;
         if ($request == 'getcapabilities') {
