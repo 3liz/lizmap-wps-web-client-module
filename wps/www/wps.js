@@ -1655,6 +1655,7 @@ var Petra = function() {
             return;
         if ( !executedProcess.uuid )
             return;
+
         const uuid = executedProcess.uuid;
         const startTime = executedProcess.startTime;
         const status = executedProcess.status;
@@ -1714,16 +1715,21 @@ var Petra = function() {
         var isChecked = false;
         if ( logTr.length == 0 ){
             logTrList = $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results tr');
-            if (!logTrList.length) {
+            var keepLogTrListLen = logTrList.length;
+
+            // Add the tr in right order
+            logTrList.each(function(idx, elt){
+                elt = $(elt);
+                if (startTime > elt.attr('data-value')) {
+                    elt.before(tr);
+                    return false;
+                }
+            });
+
+            // Check if the tr has been added
+            var newLogTrListLen = $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results tr').length;
+            if (newLogTrListLen == keepLogTrListLen) {
                 $('#processing-log-list li[data-value="' + executedProcess.identifier + '"] .processing-log-list-results').append(tr);
-            } else {
-                logTrList.each(function(idx, elt){
-                    elt = $(elt);
-                    if (startTime > elt.attr('data-value')) {
-                        elt.before(tr);
-                        return false;
-                    }
-                });
             }
         }
         else {
