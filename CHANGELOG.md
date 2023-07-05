@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * Support WMS DescribeLayer request
 * Using Expression filter when it is provided
 * CSS: Add id to processing input control-group
+* new config to restrict access to WPS
+* Support X-Job-Realm for use
+* Support Administrator realm token
 
 ## 0.2.0 - 2022-11-22
 
