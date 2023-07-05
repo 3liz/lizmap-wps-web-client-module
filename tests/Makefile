@@ -120,3 +120,38 @@ import-lizmap-acl-35:
 	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
 		php lizmap/cmd.php acl2right add users "lizmap.tools.layer.export" tests ; \
 		php lizmap/cmd.php acl2right add admins "lizmap.tools.layer.export" tests'
+
+install-module:
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap php /www/lizmap/install/configurator.php --no-interaction wps
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap php /www/lizmap/install/installer.php -v
+
+import-lizmap-acl:
+	@echo "Create users"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php jcommunity:user:create user_in_group_a user_in_group_a@nomail.nomail admin ; \
+		php lizmap/console.php jcommunity:user:create publisher publisher@nomail.nomail admin'
+	@echo "Create groups"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2group:create group_a group_a'
+	@echo "Add users to groups"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2user:addgroup user_in_group_a group_a ; \
+		php lizmap/console.php acl2user:addgroup publisher publishers'
+	@echo "Set repositories and users rights if needed"
+	@echo "Set view project"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2:add __anonymous "lizmap.repositories.view" tests ; \
+		php lizmap/console.php acl2:add users "lizmap.repositories.view" tests ; \
+		php lizmap/console.php acl2:add admins "lizmap.repositories.view" tests'
+	@echo "Display WMS links"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2:add users "lizmap.tools.displayGetCapabilitiesLinks" tests ; \
+		php lizmap/console.php acl2:add admins "lizmap.tools.displayGetCapabilitiesLinks" tests'
+	@echo "Edition"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2:add users "lizmap.tools.edition.use" tests ; \
+		php lizmap/console.php acl2:add admins "lizmap.tools.edition.use" tests'
+	@echo "Export layers"
+	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
+		php lizmap/console.php acl2:add users "lizmap.tools.layer.export" tests ; \
+		php lizmap/console.php acl2:add admins "lizmap.tools.layer.export" tests'

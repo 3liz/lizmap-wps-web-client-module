@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * new config to restrict access to WPS
 * Support X-Job-Realm for use
 * Support Administrator realm token
+* Tests: enhancing Test environment to work with lizmap 3.6
 
 ## 0.2.0 - 2022-11-22
 
