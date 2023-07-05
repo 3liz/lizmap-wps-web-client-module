@@ -378,7 +378,8 @@ class processStatus
         if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
             && $wpsConfig['restrict_to_authenticated_users']
             && array_key_exists('enable_job_realm', $wpsConfig)
-            && $wpsConfig['enable_job_realm']) {
+            && $wpsConfig['enable_job_realm']
+        ) {
             $lrep = lizmap::getRepository($repository);
             $lproj = lizmap::getProject($repository.'~'.$project);
             $realm = jApp::coord()->request->getDomainName()
@@ -386,6 +387,13 @@ class processStatus
                 .'~'. $lproj->getKey()
                 .'~'. jAuth::getUserSession()->login;
             $headers['X-Job-Realm'] = sha1($realm);
+
+            if( jAcl2::check('lizmap.admin.access')
+                && array_key_exists('admin_job_realm', $wpsConfig)
+                && $wpsConfig['admin_job_realm']
+            ) {
+                $headers['X-Job-Realm'] = $wpsConfig['admin_job_realm'];
+            }
         }
 
         return $headers;

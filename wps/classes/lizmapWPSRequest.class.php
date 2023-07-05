@@ -382,6 +382,14 @@ class lizmapWPSRequest extends lizmapOGCRequest
                 .'~'. $lproj->getKey()
                 .'~'. jAuth::getUserSession()->login;
             $headers['X-Job-Realm'] = sha1($realm);
+
+            if( $this->param('request') == 'getresults'
+                && jAcl2::check('lizmap.admin.access')
+                && array_key_exists('admin_job_realm', $wpsConfig)
+                && $wpsConfig['admin_job_realm']
+            ) {
+                $headers['X-Job-Realm'] = $wpsConfig['admin_job_realm'];
+            }
         }
 
         return $headers;
