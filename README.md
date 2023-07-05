@@ -81,6 +81,8 @@ redis_key_prefix=lzmwps
 ows_url=http://map:8080
 restrict_to_config_projects=off
 restrict_to_authenticated_users=off
+enable_job_realm=off
+admin_job_realm=
 ```
 
 The WPS configuration:
@@ -102,3 +104,5 @@ The availability of WPS algorithms in the Lizmap Web Client web maps
 
 * `restrict_to_config_projects` the module is not enabled for projects without a json config for processes.
 * `restrict_to_authenticated_users` the module is not enabled if the user is not authenticated.
+* `enable_job_realm` enable job access control by associating a realm token to each job. Job realm will be build at user level.
+* `admin_job_realm` administrator realm token. It allows bearer to bypass any other token.

@@ -55,6 +55,43 @@ class resultsCtrl extends jController
         return $rep;
     }
 
+    public function all()
+    {
+        $rep = $this->getResponse('binary');
+        $rep->outputFileName = 'wps_results.json';
+        $rep->mimeType = 'application/json';
+        $content = 'null';
+        $rep->content = $content;
+
+        // wps process identifier
+        $identifier = $this->param('identifier');
+        if (!$identifier) {
+            jLog::log('results controller, index: No identifier param', 'errors');
+
+            return $rep;
+        }
+
+        // lizmap project and repository
+        $repository = $this->param('repository');
+        if (!$repository) {
+            jLog::log('results controller, index: No repository param', 'errors');
+
+            return $rep;
+        }
+        $project = $this->param('project');
+        if (!$project) {
+            jLog::log('results controller, index: No project param', 'errors');
+
+            return $rep;
+        }
+
+        $pStatus = jClasses::getService('wps~processStatus');
+
+        $rep->content = json_encode($pStatus->allFromServer($identifier, $repository, $project));
+
+        return $rep;
+    }
+
     public function update()
     {
         $rep = $this->getResponse('binary');

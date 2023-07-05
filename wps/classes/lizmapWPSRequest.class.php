@@ -361,9 +361,29 @@ class lizmapWPSRequest extends lizmapOGCRequest
         $user = jAuth::getUserSession();
         $userGroups = jAcl2DbUserGroup::getGroups();
 
-        return array(
+        $headers = array(
             'X-Lizmap-User' => $user->login,
             'X-Lizmap-User-Groups' => implode(', ', $userGroups),
         );
+
+        $wpsConfig = jApp::config()->wps;
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && array_key_exists('enable_job_realm', $wpsConfig)
+            && $wpsConfig['enable_job_realm']
+            && array_key_exists('repository', $this->params)
+            && array_key_exists('project', $this->params)) {
+            $project = $this->params['project'];
+            $repository = $this->params['repository'];
+            $lrep = lizmap::getRepository($repository);
+            $lproj = lizmap::getProject($repository.'~'.$project);
+            $realm = jApp::coord()->request->getDomainName()
+                .'~'. $lrep->getKey()
+                .'~'. $lproj->getKey()
+                .'~'. jAuth::getUserSession()->login;
+            $headers['X-Job-Realm'] = sha1($realm);
+        }
+
+        return $headers;
     }
 }

@@ -50,36 +50,55 @@ class processStatus
         }
 
         $url = $this->url.'?SERVICE=WPS';
-        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
+        $options = array(
+            'method' => 'get',
+            'headers' => self::userHttpHeader($repository, $project),
+        );
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url, $options);
 
         if (empty($data) or floor($code / 100) >= 4) {
+            jLog::log('Status get all is empty or failed with code '.$code, 'errors');
+
             $data = array();
         }
 
+        $wpsConfig = jApp::config()->wps;
+        $realm = null;
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && array_key_exists('enable_job_realm', $wpsConfig)
+            && $wpsConfig['enable_job_realm']
+            && array_key_exists('X-Job-Realm', $options['headers'])) {
+            $realm = $options['headers']['X-Job-Realm'];
+        }
+        $adminRealm = $wpsConfig['admin_job_realm'];
         $data = json_decode($data);
 
         if (property_exists($data, 'status')) {
             $uuids = array();
             foreach ($data->status as $s) {
-                $uuids[] = $s->uuid;
+                if ($realm === null
+                    || $realm === $adminRealm
+                    || $s->realm === $realm) {
+                    $uuids[] = $s->uuid;
+                }
             }
             $data = $uuids;
         } else {
             $data = array();
         }
 
-        $saved = $this->db->get($identifier.':'.$repository.':'.$project);
+        $saved = $this->getFromDb($identifier, $repository, $project);
 
         if (!$saved) {
             return array();
         }
 
-        $saved = explode(',', $saved);
         if (count($saved) > 0) {
             $uuids = array();
-            foreach ($saved as $s) {
-                if (in_array($s, $data)) {
-                    $uuids[] = $s;
+            foreach ($data as $d) {
+                if (in_array($d, $saved)) {
+                    $uuids[] = $d;
                 }
             }
 
@@ -100,23 +119,25 @@ class processStatus
         }
 
         $url = $this->url.$uuid.'?SERVICE=WPS';
-        list($data, $mime, $code) = lizmapProxy::getRemoteData($url);
-
-        $saved = $this->saved($identifier, $repository, $project);
-
-        $status = $this->db->get($uuid);
+        $options = array(
+            'method' => 'get',
+            'headers' => self::userHttpHeader($repository, $project),
+        );
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url, $options);
         if (empty($data) or floor($code / 100) >= 4) {
-            $status = null;
-        }
-
-        if (!$status) {
-            unset($saved[array_search($uuid, $saved)]);
-            $this->db->set($identifier.':'.$repository.':'.$project, implode(',', $saved));
+            jLog::log('Status get '.$uuid.' is empty or failed with code '.$code, 'errors');
 
             return null;
         }
 
-        return json_decode($status);
+        $status = $this->getFromDb($identifier, $repository, $project, $uuid);
+        if (!$status) {
+            jLog::log('Status get '.$uuid.' not in db', 'errors');
+
+            return null;
+        }
+
+        return $status;
     }
 
     public function update($identifier, $repository, $project, $uuid, $status)
@@ -129,21 +150,7 @@ class processStatus
             return false;
         }
 
-        $saved = $this->saved($identifier, $repository, $project);
-
-        if (!in_array($uuid, $saved)) {
-            $saved[] = $uuid;
-        }
-
-        if (is_object($status) || is_array($status)) {
-            $this->db->set($uuid, json_encode($status));
-        } else {
-            $this->db->set($uuid, $status);
-        }
-
-        $this->db->set($identifier.':'.$repository.':'.$project, implode(',', $saved));
-
-        return true;
+        return $this->setToDb($identifier, $repository, $project, $uuid, $status);
     }
 
     public function delete($identifier, $repository, $project, $uuid)
@@ -156,15 +163,94 @@ class processStatus
             return false;
         }
 
-        $saved = $this->saved($identifier, $repository, $project);
+        return $this->setToDb($identifier, $repository, $project, $uuid);
+    }
 
-        if (!in_array($uuid, $saved)) {
-            return false;
+
+    protected function getFromDb($identifier, $repository, $project, $uuid = null)
+    {
+        // Get the list of uuids saved in db
+        $saved = $this->db->get($identifier.':'.$repository.':'.$project);
+
+        if (!$saved && !$uuid) {
+            // the list of uuids is empty and no uuid provided
+            // return an empty list, it is probably the first time
+            // db is requested
+            return array();
+        } else if (!$saved && $uuid) {
+            // the list of uuids is empty and a uuid provided
+            // log message and set an empty array
+            jLog::log('Status getFromDb '.$identifier.':'.$repository.':'.$project.' not in db');
+            $saved = array();
+        } else {
+            // the list of uuids is not empty in db
+            // transform to an aray and removed empty string
+            $saved = explode(',', $saved);
+            $saved = array_filter($saved, function($s) {
+                return strlen($s) != 0;
+            });
         }
 
-        $this->db->delete($uuid);
-        unset($saved[array_search($uuid, $saved)]);
+        // No uuid provided, returns the list of uuids as an array
+        if (!$uuid) {
+            return $saved;
+        }
 
+        // Get the status from DB
+        $status = $this->db->get($uuid);
+        if (!$status) {
+            jLog::log('Status getFromDb '.$uuid.' not in db');
+
+            $this->setToDb($identifier, $repository, $project, $uuid);
+
+            return null;
+        } else {
+            $this->setToDb($identifier, $repository, $project, $uuid, $status);
+        }
+
+        return json_decode($status);
+    }
+
+    public function setToDb($identifier, $repository, $project, $uuid, $status = null)
+    {
+        // Get list of uuids
+        $saved = $this->getFromDb($identifier, $repository, $project);
+
+        // if status is null, update the db by removing uuid from list and status in db associated
+        if ($status === null) {
+            if (!in_array($uuid, $saved)) {
+                // check if uuid is in db and removed it
+                if ($this->db->get($uuid)) {
+                    $this->db->delete($uuid);
+                    return true;
+                }
+                // Nothing has been done
+                return false;
+            }
+
+            // Reduced the list of uuids
+            unset($saved[array_search($uuid, $saved)]);
+
+            // removed uuid and saved new uuids list
+            $this->db->delete($uuid);
+            $this->db->set($identifier.':'.$repository.':'.$project, implode(',', $saved));
+
+            return true;
+        }
+
+        // Adding uuid to the list if needed
+        if (!in_array($uuid, $saved)) {
+            $saved[] = $uuid;
+        }
+
+        // Save status associated to the uuid to the db
+        if (is_object($status) || is_array($status)) {
+            $this->db->set($uuid, json_encode($status));
+        } else {
+            $this->db->set($uuid, $status);
+        }
+
+        // Save list of uuids
         $this->db->set($identifier.':'.$repository.':'.$project, implode(',', $saved));
 
         return true;
@@ -251,5 +337,57 @@ class processStatus
         }
 
         return true;
+    }
+
+    public function allFromServer($identifier, $repository, $project)
+    {
+        $url = $this->url.'?SERVICE=WPS';
+        $headers = $this->userHttpHeader($repository, $project);
+        $options = array(
+            'method' => 'get',
+            'headers' => $headers,
+        );
+        list($data, $mime, $code) = lizmapProxy::getRemoteData($url, $options);
+
+        if (empty($data) or floor($code / 100) >= 4) {
+            $data = array();
+        } else {
+            $data = json_decode($data);
+        }
+
+        return $data;
+    }
+
+    protected static function userHttpHeader($repository, $project)
+    {
+        // Check if a user is authenticated
+        if (!jAuth::isConnected()) {
+            // return empty header array
+            return array();
+        }
+
+        $user = jAuth::getUserSession();
+        $userGroups = jAcl2DbUserGroup::getGroups();
+
+        $headers = array(
+            'X-Lizmap-User' => $user->login,
+            'X-Lizmap-User-Groups' => implode(', ', $userGroups),
+        );
+
+        $wpsConfig = jApp::config()->wps;
+        if (array_key_exists('restrict_to_authenticated_users', $wpsConfig)
+            && $wpsConfig['restrict_to_authenticated_users']
+            && array_key_exists('enable_job_realm', $wpsConfig)
+            && $wpsConfig['enable_job_realm']) {
+            $lrep = lizmap::getRepository($repository);
+            $lproj = lizmap::getProject($repository.'~'.$project);
+            $realm = jApp::coord()->request->getDomainName()
+                .'~'. $lrep->getKey()
+                .'~'. $lproj->getKey()
+                .'~'. jAuth::getUserSession()->login;
+            $headers['X-Job-Realm'] = sha1($realm);
+        }
+
+        return $headers;
     }
 }
