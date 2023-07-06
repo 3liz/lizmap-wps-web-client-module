@@ -301,6 +301,8 @@ var Petra = function() {
             executeDiv.appendChild(executeButton);
             document.getElementById("processing-input").appendChild(executeDiv);
             executeButton.onclick = execute;
+
+            lizMap.events.triggerEvent("processingFormBuild", {identifier: process.identifier});
         } else {
             document.getElementById("processing-input").innerHTML = '<span class="notsupported">' +
                 "Sorry, the WPS builder does not support the selected process." +
