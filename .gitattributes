@@ -3,6 +3,7 @@
 .github export-ignore
 .php_cs.dist  export-ignore
 .eslintrc.json  export-ignore
+.gitlab-ci.yml export-ignore
 tests  export-ignore
 Makefile  export-ignore
 package.json  export-ignore
