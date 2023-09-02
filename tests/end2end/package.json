@@ -4,7 +4,7 @@
   "description": "End2end tests for WPS",
   "main": "index.js",
   "devDependencies": {
-    "cypress": "^9.6.1"
+    "cypress": "^13.1.0"
   },
   "scripts": {
     "cy:open": "cypress open",
