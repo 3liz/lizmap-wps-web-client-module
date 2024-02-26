@@ -41,6 +41,7 @@ class resultsCtrl extends jController
             return $rep;
         }
 
+        /** @var processStatus $pStatus */
         $pStatus = jClasses::getService('wps~processStatus');
 
         $data = array();
