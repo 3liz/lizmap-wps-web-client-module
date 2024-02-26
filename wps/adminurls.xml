@@ -4,4 +4,9 @@
     <url pathinfo="/wpsadmin/m3/upload"   action="admin:showUpload" />
     <url pathinfo="/wpsadmin/m3/upload-save"   action="admin:saveUpload" />
     <url pathinfo="/wpsadmin/m3/delete/:fileId"   action="admin:delete" />
+    <!-- ctrler for projects restriction config -->
+    <url pathinfo="/wpsadmin/projects/conf"   action="restrictionsAdmin:show" />
+    <url pathinfo="/wpsadmin/projects/conf/pre"   action="restrictionsAdmin:prepare" />
+    <url pathinfo="/wpsadmin/projects/conf/edit"   action="restrictionsAdmin:edit" />
+    <url pathinfo="/wpsadmin/projects/conf/save"   action="restrictionsAdmin:save" />
 </suburls>

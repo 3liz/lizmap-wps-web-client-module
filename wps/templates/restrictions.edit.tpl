@@ -1,5 +1,5 @@
-<h1>{@wps.ui.page.upload.title@}</h1>
-{form $form ,'wps~admin:saveUpload' , array(), 'htmlbootstrap'}
+<h1>{@wps.ui.page.conf.title@}</h1>
+{form $form , 'wps~restrictionsAdmin:save' , array(),'htmlbootstrap'}
 <div>
     {formcontrols}
     <div class="control-group">
@@ -9,6 +9,6 @@
     {/formcontrols}
 </div>
 <div class="jforms-submit-buttons form-actions">{formsubmit}
-<a href="{jurl 'admin:list'}" class='btn'>{@jelix~ui.buttons.back@}</a>
 </div>
 {/form}
+ 
