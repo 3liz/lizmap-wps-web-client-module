@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<suburls xmlns="http://jelix.org/ns/suburls/1.0">
+    <!-- ows ctrler -->
+    <url pathinfo="/ows"   action="ows:index" />
+    <!-- service ctrler -->
+    <url pathinfo="/service"   action="service:index" />
+    <url pathinfo="/service/serviceException"   action="service:serviceException" />
+    <url pathinfo="/service/files"   action="service:files" />
+    <url pathinfo="/service/store"   action="service:store" />
+    <url pathinfo="/service/status"   action="service:status" />
+    <!-- results ctrler -->
+    <url pathinfo="/results"   action="results:index" />
+    <url pathinfo="/results/all"   action="results:all" />
+    <url pathinfo="/results/update"   action="results:update" />
+    <url pathinfo="/results/delete"   action="results:delete" />
+</suburls>

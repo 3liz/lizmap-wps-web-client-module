@@ -3,5 +3,6 @@
        <event name="getMapAdditions" />
        <event name="mapDockable" />
        <event name="mapBottomDockable" />
+       <event name="masteradminGetMenuContent" />
    </listener>
 </events>

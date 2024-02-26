@@ -8,8 +8,8 @@ LIZMAP_DIR=$(shell pwd)/lizmap
 LIZMAP_USER_ID:=$(shell id -u)
 LIZMAP_USER_GID:=$(shell id -g)
 
-LIZMAP_VERSION_TAG:=3.5
-QGIS_VERSION_TAG:=3.22
+LIZMAP_VERSION_TAG:=3.6
+QGIS_VERSION_TAG:=3.28
 
 QGIS_MAP_WORKERS:=1
 WPS_NUM_WORKERS:=1
@@ -155,3 +155,6 @@ import-lizmap-acl:
 	docker compose exec -u $(LIZMAP_USER_ID) lizmap /bin/sh -c ' \
 		php lizmap/console.php acl2:add users "lizmap.tools.layer.export" tests ; \
 		php lizmap/console.php acl2:add admins "lizmap.tools.layer.export" tests'
+
+shell:
+	docker compose exec -u $(LIZMAP_USER_ID) -it lizmap /bin/sh -l

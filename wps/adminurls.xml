@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<suburls xmlns="http://jelix.org/ns/suburls/1.0">
+    <url pathinfo="/wpsadmin/m3"   action="admin:list" />
+    <url pathinfo="/wpsadmin/m3/upload"   action="admin:showUpload" />
+    <url pathinfo="/wpsadmin/m3/upload-save"   action="admin:saveUpload" />
+    <url pathinfo="/wpsadmin/m3/delete/:fileId"   action="admin:delete" />
+</suburls>
