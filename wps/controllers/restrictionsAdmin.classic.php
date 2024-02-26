@@ -13,7 +13,7 @@ class restrictionsAdminCtrl extends jController
     public function __construct($request)
     {
         parent::__construct($request);
-        $file = jApp::varconfigPath('localconfig.ini.php');
+        $file = jApp::varConfigPath('liveconfig.ini.php');
         $this->iniFile = new \Jelix\IniFile\IniModifier($file);
     }
 
@@ -90,9 +90,12 @@ class restrictionsAdminCtrl extends jController
 
     private function initFormWithIni($form)
     {
+        // read the value from the actual config, not the ini file, as we
+        // don't know if the value is set into mainconfig, localconfig or liveconfig.
+        $config = \jApp::config()->wps;
         foreach ($form->getControls() as $ctrl) {
             if ($ctrl->type != 'submit') {
-                $form->setData($ctrl->ref, $this->iniFile->getValue($ctrl->ref, $this->wpsSection));
+                $form->setData($ctrl->ref, $config[$ctrl->ref]);
             }
         }
     }
