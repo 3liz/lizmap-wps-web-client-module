@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.3.0 - 2024-02-26
+
 ### Fixed
 
 * Fixing the delete method of results controller
@@ -36,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * Tests: enhancing Test environment to work with lizmap 3.6
 * Job label based on input value
 * Select the algorithm if only one is available
+* UI: Admin page to upload model3 files
+* UI: Admin page to manage WPS enabling restictions on projects
 
 ## 0.2.0 - 2022-11-22
 
