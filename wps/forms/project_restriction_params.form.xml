@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://jelix.org/ns/forms/1.1">
+  <checkbox ref="restrict_to_authenticated_users"  >
+    <label locale="wps~wps.form.projects.restrict_to_authenticated_users"/>
+    <oncheckvalue locale="jelix~ui.buttons.yes" />
+    <onuncheckvalue locale="jelix~ui.buttons.no"/>
+  </checkbox>
+  <checkbox ref="restrict_to_config_projects"  >
+    <label locale="wps~wps.form.projects.restrict_to_config_projects"/>
+    <oncheckvalue locale="jelix~ui.buttons.yes" />
+    <onuncheckvalue locale="jelix~ui.buttons.no"/>
+  </checkbox>
+  <submit ref="submit">
+    <label locale="jelix~ui.buttons.save"></label>
+  </submit>
+</form>

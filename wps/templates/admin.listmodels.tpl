@@ -4,9 +4,9 @@
     <tbody>
 {foreach $models as $file}
     <tr>
-    <td>{$file->fileName()}</td><td><a href='{jurl 'admin:delete', array('fileId' =>$file->uniqueID()) }'  class="btn">{@jelix~ui.buttons.delete@}</a></td>
+    <td>{$file->fileName()}</td><td><a href="{jurl 'admin:delete', array('fileId' =>$file->uniqueID()) }"  class="btn">{@jelix~ui.buttons.delete@}</a></td>
     </tr>
-{/foreach} 
+{/foreach}
     </tbody>
     </table>
 {else }
@@ -14,4 +14,4 @@
     {@wps.ui.page.list.empty_dir@}
     </p>
 {/if}
-<a href='{jurl 'admin:showUpload'}' class="btn">{@wps.ui.button.file.add@}</a>
+<a href="{jurl 'admin:showUpload'}" class="btn">{@wps.ui.button.file.add@}</a>

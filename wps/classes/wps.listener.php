@@ -168,13 +168,18 @@ class wpsListener extends jEventListener
 
     protected function onmasteradminGetMenuContent($event)
     {
+        // new section
+        $sectionAuth = new masterAdminMenuItem('wps_admin', \jLocale::get('wps~wps.ui.admin.menu.group'), '', 150);
+
         if (jAcl2::check('wps.modelfile.manage')) {
-            // new section
-            $sectionAuth = new masterAdminMenuItem('wps_admin', \jLocale::get('wps~wps.ui.admin.menu.group'), '', 150);
             // add config page
             $sectionAuth->childItems[] = new masterAdminMenuItem('wps_admin_upload', \jLocale::get('wps~wps.ui.admin.menu.model3list'), jUrl::get('wps~admin:list'), 150, 'wps_admin');
-
-            $event->add($sectionAuth);
         }
+        if (jAcl2::check('wps.options.manage')) {
+            // add config page for projects restriction options
+              $sectionAuth->childItems[] = new masterAdminMenuItem('wps_proj_restrict', \jLocale::get('wps~wps.ui.admin.menu.project_restriction'), jUrl::get('wps~restrictionsAdmin:show'), 160, 'wps_admin');
+        }
+        $event->add($sectionAuth);
+
     }
 }
