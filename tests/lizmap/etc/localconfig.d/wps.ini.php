@@ -13,3 +13,5 @@ restrict_to_config_projects=off
 restrict_to_authenticated_users=off
 enable_job_realm=off
 admin_job_realm=e8c10c9dc66f62dec1d52af7549bfc67a11dd6a2
+wps_processingModelsPath="/www/lizmap/var/models/"
+wps_restartmonPath="/srv/projects/test_france_parts/restart.dummy"

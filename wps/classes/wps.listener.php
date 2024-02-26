@@ -165,4 +165,16 @@ class wpsListener extends jEventListener
 
         return $dv->getStatus();
     }
+
+    protected function onmasteradminGetMenuContent($event)
+    {
+        if (jAcl2::check('wps.modelfile.manage')) {
+            // new section
+            $sectionAuth = new masterAdminMenuItem('wps_admin', \jLocale::get('wps~wps.ui.admin.menu.group'), '', 150);
+            // add config page
+            $sectionAuth->childItems[] = new masterAdminMenuItem('wps_admin_upload', \jLocale::get('wps~wps.ui.admin.menu.model3list'), jUrl::get('wps~admin:list'), 150, 'wps_admin');
+
+            $event->add($sectionAuth);
+        }
+    }
 }

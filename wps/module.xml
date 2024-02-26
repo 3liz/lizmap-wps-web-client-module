@@ -20,5 +20,6 @@
         <class name="wpsWFSRequest" file="classes/wpsWFSRequest.class.php" />
         <class name="wpsWCSRequest" file="classes/wpsWCSRequest.class.php" />
         <class name="processStatus" file="classes/processStatus.class.php" />
+        <psr4 name="\LizmapWPS\WPS" dir="lib"/>
     </autoload>
 </module>
