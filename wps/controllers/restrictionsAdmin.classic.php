@@ -1,5 +1,4 @@
 <?php
-use LizmapWPS\WPS;
 
 class restrictionsAdminCtrl extends jController
 {
@@ -11,13 +10,15 @@ class restrictionsAdminCtrl extends jController
 
     private $wpsSection = 'wps';
 
-    public function __construct($request) {
+    public function __construct($request)
+    {
         parent::__construct($request);
         $file = jApp::varconfigPath('localconfig.ini.php');
         $this->iniFile = new \Jelix\IniFile\IniModifier($file);
     }
 
-    public function show() {
+    public function show()
+    {
         $resp = $this->getResponse('html');
         $form = jForms::create('wps~project_restriction_params');
         $tpl = new jTpl();
@@ -30,20 +31,23 @@ class restrictionsAdminCtrl extends jController
         return $resp;
     }
 
-    public function prepare() {
+    public function prepare()
+    {
         $form = jForms::create('wps~project_restriction_params');
         $this->initFormWithIni($form);
+
         return $this->redirect('restrictionsAdmin:edit');
     }
 
-    public function edit() {
+    public function edit()
+    {
         /**
-         * @var $resp jResponseHTML;
+         * @var jResponseHTML; $resp
          */
         $resp = $this->getResponse('html');
 
         $form = jForms::get('wps~project_restriction_params');
-        if ( is_null($form) ) {
+        if (is_null($form)) {
             // redirect to default page
             return $this->redirect('restrictionsAdmin:prepare');
         }
@@ -56,9 +60,10 @@ class restrictionsAdminCtrl extends jController
         return $resp;
     }
 
-    public function save() {
+    public function save()
+    {
         $form = jForms::fill('wps~project_restriction_params');
-        if ( is_null($form) ) {
+        if (is_null($form)) {
             // redirect to default page
             return $this->redirect('restrictionsAdmin:prepare');
         }
@@ -79,16 +84,16 @@ class restrictionsAdminCtrl extends jController
         }
         $this->iniFile->save();
         jForms::destroy('wps~project_restriction_params');
+
         return $this->redirect('restrictionsAdmin:show');
     }
 
-
-    private function initFormWithIni($form) {
+    private function initFormWithIni($form)
+    {
         foreach ($form->getControls() as $ctrl) {
             if ($ctrl->type != 'submit') {
-                $form->setData($ctrl->ref, $this->iniFile->getValue($ctrl->ref , $this->wpsSection));
+                $form->setData($ctrl->ref, $this->iniFile->getValue($ctrl->ref, $this->wpsSection));
             }
         }
     }
-
 }

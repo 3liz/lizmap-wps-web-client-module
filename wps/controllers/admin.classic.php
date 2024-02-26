@@ -1,11 +1,12 @@
 <?php
+
 use LizmapWPS\WPS;
 
 class adminCtrl extends jController
 {
     // only for admin
     public $pluginParams = array(
-        '*' => array('jacl2.right' => 'wps.modelfile.manage')
+        '*' => array('jacl2.right' => 'wps.modelfile.manage'),
     );
 
     public function showUpload()
@@ -14,7 +15,8 @@ class adminCtrl extends jController
         if (is_null($form)) {
             $form = jForms::create('wps~model_upload');
         }
-         /**
+
+        /**
          * @var jResponseHTML; $resp
          */
         $resp = $this->getResponse('html');
@@ -84,13 +86,15 @@ class adminCtrl extends jController
         $tpl = new jTpl();
         $finder = new WPS\ModelFileManager();
         $files = array();
-        try{
-            $files= $finder->getModelFiles();
-        }catch(\Exception $e) {
+
+        try {
+            $files = $finder->getModelFiles();
+        } catch (\Exception $e) {
             \jMessage::add(\jLocale::get('wps.message.error.model3_path_invalid'), 'error');
+
             return $resp;
         }
-        $tpl->assign('models',$files);
+        $tpl->assign('models', $files);
         $resp->body->assign('MAIN', $tpl->fetch('admin.listmodels'));
 
         return $resp;

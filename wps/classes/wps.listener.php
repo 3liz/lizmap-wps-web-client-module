@@ -177,9 +177,8 @@ class wpsListener extends jEventListener
         }
         if (jAcl2::check('wps.options.manage')) {
             // add config page for projects restriction options
-              $sectionAuth->childItems[] = new masterAdminMenuItem('wps_proj_restrict', \jLocale::get('wps~wps.ui.admin.menu.project_restriction'), jUrl::get('wps~restrictionsAdmin:show'), 160, 'wps_admin');
+            $sectionAuth->childItems[] = new masterAdminMenuItem('wps_proj_restrict', \jLocale::get('wps~wps.ui.admin.menu.project_restriction'), jUrl::get('wps~restrictionsAdmin:show'), 160, 'wps_admin');
         }
         $event->add($sectionAuth);
-
     }
 }

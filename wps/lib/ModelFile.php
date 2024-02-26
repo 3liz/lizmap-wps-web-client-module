@@ -14,11 +14,13 @@ class ModelFile
         $this->sha1 = sha1($fileName);
     }
 
-    public function fileName() {
+    public function fileName()
+    {
         return $this->fileName;
     }
 
-    public function uniqueID() {
+    public function uniqueID()
+    {
         return $this->sha1;
     }
 }

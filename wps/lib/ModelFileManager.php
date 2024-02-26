@@ -8,7 +8,7 @@ class ModelFileManager
 
     public const RESTART_FILE_PATH_PARAM_NAME = 'wps_restartmonPath';
 
-    private $modelPath = null;
+    private $modelPath;
 
     private function getModelsPath()
     {
@@ -16,17 +16,20 @@ class ModelFileManager
             $this->modelPath = \jApp::config()->wps[self::MODEL_PATH_PARAM_NAME];
             if (empty($this->modelPath)) {
                 \jlog::log('WPS path is empty', 'lizmapadmin');
+
                 throw new \Exception('WPS path is empty');
             }
             // ensure trailing slash is here
-            if(substr($this->modelPath, -1) == '/') {
+            if (substr($this->modelPath, -1) == '/') {
                 $this->modelPath.'/';
             }
             if (!is_dir($this->modelPath)) {
                 \jlog::log('WPS path is invalid', 'lizmapadmin');
+
                 throw new \Exception('WPS path is invalid');
             }
         }
+
         return $this->modelPath;
     }
 
@@ -61,7 +64,8 @@ class ModelFileManager
         $this->notifyWPS();
     }
 
-    public function saveFile(\jFormsControlUpload2 $ctrl) {
+    public function saveFile(\jFormsControlUpload2 $ctrl)
+    {
         // check filename
         $filePath = $this->getModelsPath().$ctrl->getNewFile();
         if (!preg_match('/^.+\.model3$/i', $ctrl->getNewFile())) {
@@ -74,8 +78,9 @@ class ModelFileManager
         $previouXMLErrorConfig = libxml_use_internal_errors(true);
         $ctrl->saveFile($this->getModelsPath());
         $fileAsXML = simplexml_load_file($filePath);
-        if ($fileAsXML === false || (!property_exists($fileAsXML, "Option")) || $fileAsXML->attributes()['type'] != "Map" ) {
+        if ($fileAsXML === false || (!property_exists($fileAsXML, 'Option')) || $fileAsXML->attributes()['type'] != 'Map') {
             unlink($filePath);
+
             throw new \Exception(\jLocale::get('wps.message.error.upload.bad_content'));
         }
         // restore xml error conf
@@ -84,7 +89,8 @@ class ModelFileManager
         $this->notifyWPS();
     }
 
-    private function notifyWPS() {
+    private function notifyWPS()
+    {
         $restartMon = \jApp::config()->wps[self::RESTART_FILE_PATH_PARAM_NAME];
         if (empty($restartMon)) {
             \jMessage::add(\jLocale::get('wps.message.error.restart_notify'), 'danger');
