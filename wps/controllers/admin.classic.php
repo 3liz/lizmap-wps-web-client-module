@@ -58,9 +58,29 @@ class adminCtrl extends jController
         return $resp;
     }
 
+    public function confirmDelete()
+    {
+        $finder = new WPS\ModelFileManager();
+
+        $file = $finder->findBySHA1($this->param('fileId'));
+        if ($file === false) {
+            \jMessage::add(\jLocale::get('wps.message.error.unknow_file'), 'error');
+
+            return $this->redirect('admin:list');
+        }
+
+        $tpl = \lizmap::getAppContext()->getTpl();
+        $tpl->assign('file', $file);
+         /**
+         * @var jResponseHTML; $resp
+         */
+        $resp = $this->getResponse('html');
+        $resp->body->assign('MAIN', $tpl->fetch('wps~admin.confirmdelete'));
+        return $resp;
+    }
+
     public function delete()
     {
-        // TODO confirm ?
         $finder = new WPS\ModelFileManager();
 
         $file = $finder->findBySHA1($this->param('fileId'));
