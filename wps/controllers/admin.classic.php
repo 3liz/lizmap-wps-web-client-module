@@ -11,9 +11,25 @@ class adminCtrl extends jController
 
     public function showUpload()
     {
-        $form = jForms::get('wps~model_upload');
+        $formID = null;
+        if (!empty($this->param('fileId'))) {
+            $formID = $this->param('fileId');
+        }
+        $form = jForms::get('wps~model_upload', $formID);
         if (is_null($form)) {
-            $form = jForms::create('wps~model_upload');
+            $form = jForms::create('wps~model_upload', $formID);
+        }
+        if ($formID != null) {
+            // file update : ensure it exists and set data
+            $finder = new WPS\ModelFileManager();
+            $file = $finder->findBySHA1($formID);
+            if ($file === false) {
+                \jMessage::add(\jLocale::get('wps.message.error.unknow_file'), 'error');
+
+                return $this->redirect('admin:list');
+            }
+            $formUploadCtrl = $form->getControl('modelfile');
+            $formUploadCtrl->setDataFromDao($file->fileName(), 'string');
         }
 
         /**
@@ -23,6 +39,7 @@ class adminCtrl extends jController
         $resp->body->assign('selectedMenuItem', 'wps_admin_upload');
         $tpl = new jTpl();
         $tpl->assign('form', $form);
+        $tpl->assign('fileId', $formID);
         $resp->body->assign('MAIN', $tpl->fetch('admin.showform'));
 
         return $resp;
@@ -30,14 +47,21 @@ class adminCtrl extends jController
 
     public function saveUpload()
     {
+        $formID = null;
+        $newFile = true;
+        if (!empty($this->param('fileId'))) {
+            $formID = $this->param('fileId');
+            $newFile = false;
+        }
+
         /**
          * @var jResponseHTML; $resp
          */
         $resp = $this->getResponse('redirect');
-        $form = jForms::fill('wps~model_upload');
+        $form = jForms::fill('wps~model_upload', $formID);
 
         if (is_null($form) || !$form->check()) {
-            return $this->redirect('admin:showUpload');
+            return $this->redirect('admin:showUpload', array('fileId' => $formID));
         }
         $finder = new WPS\ModelFileManager();
 
@@ -45,14 +69,20 @@ class adminCtrl extends jController
         $uploadCtrl = $form->getControl('modelfile');
 
         try {
-            $finder->saveFile($uploadCtrl);
+            $finder->saveFile($uploadCtrl, $newFile);
         } catch (Exception $e) {
             $form->setErrorOn('modelfile', $e->getMessage());
 
-            return $this->redirect('admin:showUpload');
+            return $this->redirect('admin:showUpload', array('fileId' => $formID));
         }
-        \jMessage::add(\jLocale::get('wps.message.ok.file_added'), 'success');
-        jForms::destroy('wps~model_upload');
+        if ($newFile) {
+            \jMessage::add(\jLocale::get('wps.message.ok.file_added'), 'success');
+            jForms::destroy('wps~model_upload');
+        } else {
+            \jMessage::add(\jLocale::get('wps.message.ok.file_modified'), 'success');
+            jForms::destroy('wps~model_upload', $formID);
+        }
+
         $resp->action = 'wps~admin:list';
 
         return $resp;
@@ -71,11 +101,13 @@ class adminCtrl extends jController
 
         $tpl = \lizmap::getAppContext()->getTpl();
         $tpl->assign('file', $file);
-         /**
+
+        /**
          * @var jResponseHTML; $resp
          */
         $resp = $this->getResponse('html');
         $resp->body->assign('MAIN', $tpl->fetch('wps~admin.confirmdelete'));
+
         return $resp;
     }
 
