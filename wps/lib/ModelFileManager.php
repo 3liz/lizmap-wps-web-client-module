@@ -64,28 +64,41 @@ class ModelFileManager
         $this->notifyWPS();
     }
 
-    public function saveFile(\jFormsControlUpload2 $ctrl)
+    public function saveFile(\jFormsControlUpload2 $ctrl, bool $new)
     {
         // check filename
         $filePath = $this->getModelsPath().$ctrl->getNewFile();
-        if (!preg_match('/^.+\.model3$/i', $ctrl->getNewFile())) {
+        if ($ctrl->isModified() && !preg_match('/^.+\.model3$/i', $ctrl->getNewFile())) {
             throw new \Exception(\jLocale::get('wps.message.error.upload.bad_filename'));
         }
-        if (is_file($filePath)) {
+        if (!$new && $ctrl->isModified() && $ctrl->getOriginalFile() != $ctrl->getNewFile()) {
+            throw new \Exception(\jLocale::get('wps.message.error.upload.modify.not_same'));
+        }
+        if ($new && is_file($filePath)) {
             throw new \Exception(\jLocale::get('wps.message.error.upload.existing'));
         }
         // disable xml reader error
         $previouXMLErrorConfig = libxml_use_internal_errors(true);
-        $ctrl->saveFile($this->getModelsPath());
+        $alternateName = '';
+        $originalFilePath = $this->getModelsPath().$ctrl->getNewFile();
+        if (!$new) {
+            // use a temp file to perform check content
+            $alternateName = $ctrl->getUniqueFileName($this->getModelsPath());
+            $filePath = $this->getModelsPath().$alternateName;
+        }
+        $ctrl->saveFile($this->getModelsPath(), $alternateName);
         $fileAsXML = simplexml_load_file($filePath);
-        if ($fileAsXML === false || (!property_exists($fileAsXML, 'Option')) || $fileAsXML->attributes()['type'] != 'Map') {
+        if ($ctrl->isModified() && ($fileAsXML === false || (!property_exists($fileAsXML, 'Option')) || $fileAsXML->attributes()['type'] != 'Map')) {
             unlink($filePath);
 
             throw new \Exception(\jLocale::get('wps.message.error.upload.bad_content'));
         }
         // restore xml error conf
         libxml_use_internal_errors($previouXMLErrorConfig);
-
+        if (!$new) {
+            // content is ok, rename tempfile to initial fileName
+            rename($filePath, $originalFilePath);
+        }
         $this->notifyWPS();
     }
 
