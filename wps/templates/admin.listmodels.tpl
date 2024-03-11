@@ -4,7 +4,9 @@
     <tbody>
 {foreach $models as $file}
     <tr>
-    <td>{$file->fileName()}</td><td><a href="{jurl 'admin:delete', array('fileId' =>$file->uniqueID()) }"  class="btn">{@jelix~ui.buttons.delete@}</a></td>
+    <td>{$file->fileName()}</td>
+    <td><a href="{jurl 'admin:showUpload', array('fileId' =>$file->uniqueID()) }" class="btn">{@jelix~crud.link.edit.record@}</a></td>
+    <td><a href="{jurl 'admin:confirmDelete', array('fileId' =>$file->uniqueID()) }" class="btn">{@jelix~ui.buttons.delete@}</a></td>
     </tr>
 {/foreach}
     </tbody>
