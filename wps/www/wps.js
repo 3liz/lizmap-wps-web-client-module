@@ -2000,6 +2000,11 @@ var Petra = function() {
     lizMap.events.on({
 
         'uicreated': function(e) {
+            const processingProcessesElement = document.querySelector('#processing-processes');
+            const processingResultsElement = document.querySelector('#processing-results');
+            if (processingProcessesElement === null || processingResultsElement === null) {
+                return;
+            }
             config = lizMap.config;
             map = lizMap.map;
 
@@ -2063,40 +2068,42 @@ var Petra = function() {
             const processingResultsObserver = new ResizeObserver(() => {
                 refreshPlotsWidth();
             });
-            processingResultsObserver.observe(document.querySelector('#processing-results'));
-        },
 
-        'dockopened': function(e) {
-            if (e.id = 'processing') {
-                var options = $("#processing-processes option");
-                if (options.length == 2) {
-                    if (options.last().parent().val() != options.last().val()) {
-                        options.last().parent().val(options.last().val());
-                        options.last().parent().change();
+            processingResultsObserver.observe(processingResultsElement);
+
+            lizMap.events.on({
+                'dockopened': function(e) {
+                    if (e.id = 'processing') {
+                        var options = $("#processing-processes option");
+                        if (options.length == 2) {
+                            if (options.last().parent().val() != options.last().val()) {
+                                options.last().parent().val(options.last().val());
+                                options.last().parent().change();
+                            }
+                        }
                     }
-                }
-            }
-        },
+                },
 
-        'layerSelectionChanged': function(e) {
+                'layerSelectionChanged': function(e) {
 
-            $('#processing-form-container select.qgisType-source').each(function(idx, elt){
-                elt = $(elt);
-                if ( elt.val() != e.featureType )
-                    return;
+                    $('#processing-form-container select.qgisType-source').each(function(idx, elt){
+                        elt = $(elt);
+                        if ( elt.val() != e.featureType )
+                            return;
 
-                var cbx = $(elt).parent().find('input[type="checkbox"].selection');
-                var cbxChecked = false;
-                if ( cbx.length != 0 ) {
-                    cbxChecked = cbx.is(':checked');
-                }
+                        var cbx = $(elt).parent().find('input[type="checkbox"].selection');
+                        var cbxChecked = false;
+                        if ( cbx.length != 0 ) {
+                            cbxChecked = cbx.is(':checked');
+                        }
 
-                elt.change();
-                if (cbxChecked) {
-                    cbx.click();
+                        elt.change();
+                        if (cbxChecked) {
+                            cbx.click();
+                        }
+                    });
                 }
             });
-
         }
 
     });
