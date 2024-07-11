@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.3.1 - 2024-07-11
+
+### Fixed
+
+* Bugfix JS: Check wps elements are loaded
+
 ## 0.3.0 - 2024-02-26
 
 ### Fixed
