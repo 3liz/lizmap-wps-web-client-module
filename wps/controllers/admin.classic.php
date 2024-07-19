@@ -65,7 +65,7 @@ class adminCtrl extends jController
 
         $file = $finder->findBySHA1($this->param('fileId'));
         if ($file === false) {
-            \jMessage::add(\jLocale::get('wps.message.error.unknow_file'), 'error');
+            \jMessage::add(\jLocale::get('wps.message.error.unknown_file'), 'error');
 
             return $this->redirect('admin:list');
         }
