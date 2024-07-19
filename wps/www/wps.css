@@ -48,7 +48,16 @@
     display: block;
 }
 
-#processing-log-list li .processing-log-list-results button.btn-link {
+#processing-log-list li .processing-log-list-results input[type="checkbox"] {
+    margin: 0;
+    align-self: baseline;
+    accent-color: var(--color-contrasted-elements);
+    flex: 0 0 18px;
+    height: 18px;
+    width: 18px;
+}
+
+#processing-log-list li .processing-log-list-results label {
   font-size: 12px;
 }
 

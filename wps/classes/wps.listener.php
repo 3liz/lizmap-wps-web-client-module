@@ -11,14 +11,20 @@ class wpsListener extends jEventListener
         }
 
         $js = array(
-            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WCSGetCoverage.js')),
-            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter.js')),
-            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter/v1.js')),
-            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Request.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Request/XMLHttpRequest.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/OWSCommon.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/OWSCommon/v1.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/OWSCommon/v1_0_0.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/OWSCommon/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/GML.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/GML/Base.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/GML/v2.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/GML/v3.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter/v1.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/Filter/v1_1_0.js')),
+            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WCSGetCoverage.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WFST.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WFST/v1.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WFST/v1_1_0.js')),
@@ -29,12 +35,16 @@ class wpsListener extends jEventListener
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'wps.js')),
         );
         $jscode = array(
-            'lizUrls[\'wps_wps\'] = \''.jUrl::get('wps~service:index').'\'',
-            'lizUrls[\'wps_wps_results\'] = \''.jUrl::get('wps~results:index').'\'',
-            'lizUrls[\'wps_wps_results_update\'] = \''.jUrl::get('wps~results:update').'\'',
-            'lizUrls[\'wps_wps_results_delete\'] = \''.jUrl::get('wps~results:delete').'\'',
-            'lizUrls[\'wps_wps_status\'] = \''.jUrl::get('wps~service:status').'\'',
-            'lizUrls[\'wps_wps_store\'] = \''.jUrl::get('wps~service:store').'\'',
+        );
+        $jsvars = array(
+            'lizWpsUrls' => array(
+                'wps_wps' => jUrl::get('wps~service:index'),
+                'wps_wps_results' => jUrl::get('wps~results:index'),
+                'wps_wps_results_update' => jUrl::get('wps~results:update'),
+                'wps_wps_results_delete' => jUrl::get('wps~results:delete'),
+                'wps_wps_status' => jUrl::get('wps~service:status'),
+                'wps_wps_store' => jUrl::get('wps~service:store'),
+            ),
         );
         $css = array(
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'wps.css')),
@@ -61,6 +71,7 @@ class wpsListener extends jEventListener
         $event->add(
             array(
                 'js' => $js,
+                'jsvars' => $jsvars,
                 'jscode' => $jscode,
                 'css' => $css,
             )
