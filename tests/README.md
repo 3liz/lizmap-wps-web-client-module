@@ -13,12 +13,7 @@ make clean
 # Run the different services
 make run
 
-# If you work with lizmap 3.5
-# Set Lizmap ACL
-make import-lizmap-acl-35
-
-# Else if you work with lizmap 3.6
-# Install the wps module
+# Install the wps module (default version is lizmap web client 3.8)
 make install-module
 # Set Lizmap ACL
 make import-lizmap-acl

@@ -1,5 +1,14 @@
 version: '3'
 services:
+  pgsql:
+    image: 3liz/postgis:${POSTGIS_VERSION_TAG}
+    environment:
+      POSTGRES_PASSWORD: lizmap1234!
+    volumes:
+      - postgis-volume:/var/lib/postgresql/data
+      - ${LIZMAP_DIR}/initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - ${LZMPGPORT}:5432
   lizmap:
     image: 3liz/lizmap-web-client:${LIZMAP_VERSION_TAG}
     environment:
@@ -26,6 +35,8 @@ services:
     command:
       - php-fpm
     restart: unless-stopped
+    depends_on:
+      - pgsql
   map:
     image: 3liz/qgis-map-server:${QGIS_VERSION_TAG}
     environment:
@@ -86,3 +97,5 @@ services:
       - ${LIZMAP_PORT}:8080
     depends_on:
       - lizmap
+volumes:
+  postgis-volume:
