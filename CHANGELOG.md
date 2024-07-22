@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.5.0 - 2024-07-22
+
+### Changed
+
+* Dependencies : Lizmap Web Client 3.8 Minimum version
+
 ## 0.3.1 - 2024-07-11
 
 ### Fixed
