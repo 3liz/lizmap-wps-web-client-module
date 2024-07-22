@@ -1,0 +1,10 @@
+{
+    "model:centroides": {
+        "input": [
+            "france_parts tuilé en cache"
+        ],
+        "__job_label": "native:centroids_1:OUTPUT"
+    },
+    "model:Modèle": {
+    }
+}

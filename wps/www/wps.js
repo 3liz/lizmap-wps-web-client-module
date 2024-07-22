@@ -2,16 +2,19 @@ var Petra = function() {
 
     var config = null;
     var map = null;
+    let extGroupMapState = null;
     var capabilities = null;
     var process = null;
     var processes = {};
     var executedProcesses = {};
     var intervalStatusProcesses = null;
 
+    const processingSvgIcon = 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtMTEuMTU4IDEuNS0uODAzIDIuMjM0LjAxMi4xMy4zOSAxLjk0LTIuMjYuOTM0LTEuMDk1LTEuNjQ2LS4wODQtLjA5OC0yLjE0OC0xLjAxNC0xLjE5IDEuMTkgMS4wMTQgMi4xNDguMDk4LjA4NCAxLjY0NiAxLjA5Ni0uOTM1IDIuMjU4LTEuOTQtLjM5LS4xMy0uMDEtMi4yMzMuODAydjEuNjg0bDIuMjM0LjgwMy4xMy0uMDEyIDEuOTQtLjM5LjkzNCAyLjI2LTEuNjQ2IDEuMDk1LS4wOTguMDg0LTEuMDE0IDIuMTQ4IDEuMTkgMS4xOSAyLjE0OC0xLjAxNC4wODQtLjA5OCAxLjA5Ni0xLjY0NiAyLjI1OC45MzUtLjM5IDEuOTQtLjAxLjEzLjgwMiAyLjIzM2gxLjY4NGwuODAzLTIuMjM0LS4wMTItLjEzLS4zOS0xLjk0IDIuMjYtLjkzNCAxLjA5NSAxLjY0Ni4wODQuMDk4IDIuMTQ4IDEuMDE0IDEuMTktMS4xOS0xLjAxNC0yLjE0OC0uMDk4LS4wODQtMS42NDYtMS4wOTYuOTM1LTIuMjU4IDEuOTQuMzkuMTMuMDEgMi4yMzMtLjgwMnYtMS42ODRsLTIuMjM0LS44MDMtLjEzLjAxMi0xLjk0LjM5LS45MzQtMi4yNiAxLjY0Ni0xLjA5NS4wOTgtLjA4NCAxLjAxNC0yLjE0OC0xLjE5LTEuMTktMi4xNDggMS4wMTQtLjA4NC4wOTgtMS4wOTYgMS42NDYtMi4yNTgtLjkzNS4zOS0xLjk0LjAxLS4xMy0uODAyLTIuMjMzem0uODQyIDhhMi41IDIuNSAwIDAgMSAyLjUgMi41IDIuNSAyLjUgMCAwIDEgLTIuNSAyLjUgMi41IDIuNSAwIDAgMSAtMi41LTIuNSAyLjUgMi41IDAgMCAxIDIuNS0yLjV6IiBmaWxsPSIjOThiNWQ4IiBzdHJva2U9IiM0NTdhYmUiLz48L3N2Zz4K'
+
     // using OpenLayers.Format.WPSCapabilities to read the capabilitiescon
     function getCapabilities() {
         OpenLayers.Request.GET({
-            url: lizUrls['wps_wps'],
+            url: lizWpsUrls['wps_wps'],
             params: {
                 "SERVICE": "WPS",
                 "REQUEST": "GetCapabilities"
@@ -134,7 +137,7 @@ var Petra = function() {
         var selection = this.options[this.selectedIndex].value;
         if ( selection != '' ) {
             OpenLayers.Request.GET({
-                url: lizUrls['wps_wps'],
+                url: lizWpsUrls['wps_wps'],
                 params: {
                     "SERVICE": "WPS",
                     "REQUEST": "DescribeProcess",
@@ -161,7 +164,7 @@ var Petra = function() {
         if (!identifier || identifier == '') {
             return false;
         }
-        $.get(lizUrls['wps_wps_results'], {
+        $.get(lizWpsUrls['wps_wps_results'], {
             repository: lizUrls.params.repository,
             project: lizUrls.params.project,
             identifier: identifier
@@ -1033,7 +1036,7 @@ var Petra = function() {
         var data = new OpenLayers.Format.WPSExecute().write(theProcess);
         var requestTime = (new Date()).toISOString();
         OpenLayers.Request.POST({
-            url: lizUrls['wps_wps'],
+            url: lizWpsUrls['wps_wps'],
             params: lizUrls.params,
             data: data,
             success: function(response) {
@@ -1312,34 +1315,23 @@ var Petra = function() {
                     ,dpi:96
                 };
                 // Create OpenLayers WMS layer
-                var wmsLayer = new OpenLayers.Layer.WMS(layerName
-                    ,serviceUrl
-                    ,layerWmsParams
-                    ,{
-                        isBaseLayer:false
-                        ,visibility:true
-                        ,gutter:5
-                        ,buffer:0
-                        ,transitionEffect:'resize'
-                        ,removeBackBufferDelay:250
-                        ,singleTile:true
-                        ,ratio:1
-                    });
-                map.addLayer(wmsLayer);
-                // Get the vector layer index to push WMS layer just before
-                var zIndex = -1;
-                var vlayers = lizMap.map.getLayersByClass('OpenLayers.Layer.Vector');
-                for ( var j=0, jj= vlayers.length; j<jj; j++ ) {
-                    var vlayer = vlayers[j];
-                    if ( vlayer.isBaseLayer )
-                        continue;
-                    var vZIndex = lizMap.map.getLayerIndex(vlayer);
-                    if ( zIndex == -1 && vZIndex > 0 )
-                        zIndex = vZIndex;
-                    else if ( vZIndex < zIndex )
-                        zIndex = vZIndex;
+                const wmsLayer = new lizMap.ol.layer.Image({
+                    source: new lizMap.ol.source.ImageWMS({
+                        url: serviceUrl,
+                        params: layerWmsParams,
+                        ratio: 1,
+                        serverType: 'qgisserver',
+                    }),
+                    properties: {
+                        wpsLayerName: layerName,
+                        wmsTitle: processExecuted.title+' '+layerParam,
+                    }
+                });
+                if (extGroupMapState === null) {
+                    extGroupMapState = lizMap.mainLizmap.state.rootMapGroup.createExternalGroup('WPS Results');
                 }
-                lizMap.map.setLayerIndex(wmsLayer, zIndex);
+                const extLayer = extGroupMapState.addOlLayer(layerName, wmsLayer);
+                extLayer.icon = processingSvgIcon;
 
                 // Insert layer info in table layer results
                 var td = '<td class="'+uuid+'">';
@@ -1352,35 +1344,6 @@ var Petra = function() {
                 divResults.find('table.processing-results-layer-table tr[data-value="'+output.identifier+'"] td:last').after(td);
 
                 hasLayer = true;
-
-                // Add a line in the map layer tree
-                var trResults = $('#switcher table.tree #group-wps-results');
-                if ( trResults.length == 0 ) {
-                    $('<tr id="group-wps-results" class="liz-group expanded parent initialized"><td><a href="#" title="Réduire" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox partial checked" name="group" value="wps-results" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">Résultats</span></td><td></td><td></td><td></td></tr>')
-                        .insertBefore('#switcher table.tree tr:first');
-                    trResults = $('#switcher table.tree #group-wps-results');
-                    trResults.find(' td a.expander').click(function() {
-                        var btn = $(this);
-                        var tgroup = btn.parent().parent();
-                        var child = $('#switcher table.tree tr.child-of-'+tgroup.attr('id'));
-                        if( tgroup.hasClass('expanded') ) {
-                            tgroup.removeClass('expanded').addClass('collapsed');
-                            btn.attr('title', lizDict['tree.button.expand']);
-                            child.each(function() {
-                                if( $(this).is(".expanded.parent") )
-                                    $(this).find('td a.expander').click();
-                                $(this).addClass('ui-helper-hidden');
-                            });
-                        } else if( tgroup.hasClass('collapsed') ) {
-                            tgroup.removeClass('collapsed').addClass('expanded');
-                            btn.attr('title', lizDict['tree.button.collapse']);
-                            child.each(function() {
-                                $(this).removeClass('ui-helper-hidden');
-                            });
-                        }
-                        return false;
-                    });
-                }
 
                 // Build WMS GetLegendGraphic to add image in layer tree
                 var legendParams = {
@@ -1409,40 +1372,9 @@ var Petra = function() {
                     legendParams
                 );
                 legendParamsString = OpenLayers.Util.urlAppend(serviceUrl, legendParamsString);
-                trResults.after('<tr id="legend-wps-results-'+layerName+'" class="liz-layer child-of-layer-wps-results-'+layerName+' '+uuid+' legendGraphics initialized collapsed ui-helper-hidden"><td colspan="2" style="padding-left: 39px;"><div class="legendGraphics"><img data-src="" src="'+legendParamsString+'"></div></td></tr>');
-                trResults.after('<tr id="layer-wps-results-'+layerName+'" class="liz-layer child-of-group-wps-results '+uuid+' initialized parent collapsed visible"><td style="padding-left: 20px;"><a href="#" title="Déployer" style="margin-left: -19px; padding-left: 19px" class="expander"></a><button class="btn checkbox checked" name="layer" value="'+layerName+'" title="Afficher/Masquer"></button><span class="label" title="" data-original-title="">'+layerParam+'</span></td><td><span class="loading">&nbsp;</span></td><td></td><td></td></tr>');
-
-                $('#switcher table.tree #layer-wps-results-'+layerName+' button[name="layer"]').click(function() {
-                    var btn = $(this);
-                    if ( btn.hasClass('checked') ) {
-                        btn.removeClass('checked');
-                        lizMap.map.getLayersByName(btn.val())[0].setVisibility(false);
-                    } else {
-                        btn.addClass('checked');
-                        lizMap.map.getLayersByName(btn.val())[0].setVisibility(true);
-                    }
-                    return false;
-                });
-                $('#switcher table.tree #layer-wps-results-'+layerName+' td a.expander').click(function() {
-                    var btn = $(this);
-                    var tlayer = btn.parent().parent();
-                    var child = $('#switcher table.tree tr.child-of-'+tlayer.attr('id'));
-                    if( tlayer.hasClass('expanded') ) {
-                        tlayer.removeClass('expanded').addClass('collapsed');
-                        child.each(function() {
-                            $(this).addClass('ui-helper-hidden');
-                        });
-                    } else if( tlayer.hasClass('collapsed') ) {
-                        tlayer.removeClass('collapsed').addClass('expanded');
-                        child.each(function() {
-                            $(this).removeClass('ui-helper-hidden');
-                        });
-                    }
-                    return false;
-                });
             }
 
-            /*$('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerView').click(function() {
+            $('#processing-results-layer-table tr td[class="'+uuid+'"] button.layerView').click(function() {
                 var btn = $(this);
                 if ( btn.hasClass('checked') ) {
                     btn.removeClass('checked');
@@ -1452,7 +1384,7 @@ var Petra = function() {
                     lizMap.map.getLayersByName(btn.val())[0].setVisibility(true);
                 }
                 return false;
-            });*/
+            });
             divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button.layerDownload').click(function() {
                 var btn = $(this);
                 var btnVal = btn.val();
@@ -1561,17 +1493,13 @@ var Petra = function() {
 
             // Remove layer outputs
             // From the layer tree
-            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').unbind('click');
-            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' a.expander').unbind('click');
-            $('#switcher table.tree tr.liz-layer.child-of-group-wps-results.'+uuid+' button').each(function(i, b){
-                var layerName = $(b).val();
-                var layers = lizMap.map.getLayersByName( layerName );
-                if ( layers.length > 0 )
-                    lizMap.map.removeLayer( layers[0] );
-            });
-            $('#switcher table.tree tr.liz-layer.'+uuid).remove();
-            if ( $('#switcher table.tree tr.liz-layer.child-of-group-wps-results').length == 0 )
-                $('#switcher table.tree #group-wps-results').remove();
+            for (const extLayer of extGroupMapState.getChildren()) {
+                const wpsLayerName = extLayer.olLayer.get('wpsLayerName');
+                console.log(wpsLayerName+' '+uuid+' '+wpsLayerName.startsWith(uuid));
+                if (wpsLayerName.startsWith(uuid)) {
+                    extGroupMapState.removeOlLayer(extLayer.name);
+                }
+            }
 
             // From table layer results
             //divResults.find('table.processing-results-layer-table tr td[class="'+uuid+'"] button').unbind('click');
@@ -1670,10 +1598,10 @@ var Petra = function() {
         // Display actions buttons
         tr += '<td>';
         if (status == 'Succeeded'){
-            tr += '<button class="btn btn-mini checkbox" value="results-' + uuid + '" title="Toggle process results"></button>';
+            tr += '<input type="checkbox" class="" id="check-' + uuid + '" value="results-' + uuid + '" title="Toggle process results"></input>';
         }
         else if (status == 'Failed'){
-            tr += '<button class="btn btn-mini checkbox" value="failed-' + uuid + '" title="Toggle process information"></button>';
+            tr += '<input type="checkbox" class="" id="check-' + uuid + '" value="results-' + uuid + '" title="Toggle process information"></input>';
         }
         tr += '</td>';
 
@@ -1717,14 +1645,11 @@ var Petra = function() {
 
         // Display start time
         tr += '<td title="' + shortUUID + '">';
-        if (status == 'Succeeded'){
-            tr += '<button class="btn btn-mini btn-link" value="results-' + uuid + '" title="' + titleInfo.join(', ') + '">';
-        }
-        else if (status == 'Failed'){
-            tr += '<button class="btn btn-mini btn-link" value="failed-' + uuid + '" title="' + titleInfo.join(', ') + '">';
+        if (status == 'Succeeded' || status == 'Failed'){
+            tr += '<label class="" id="label-' + uuid + '" for="check-' + uuid + '" title="' + titleInfo.join(', ') + '"></input>';
         }
         tr += label
-        tr += '</button></td>';
+        tr += '</label></td>';
 
         // Display status
         if ( status == 'Accepted' || status == 'Started' )
@@ -1762,16 +1687,16 @@ var Petra = function() {
             }
         }
         else {
-            logTr.find('button').unbind('click');
-            var isChecked = logTr.find('button.checkbox').hasClass('checked');
+            logTr.find('input').unbind('click');
+            var isChecked = logTr.find('input').checked;
             logTr.replaceWith(tr);
         }
 
         logTr = $('#log-'+uuid);
         if (isChecked) {
-            logTr.find('button.checkbox').addClass('checked');
+            logTr.find('input').checked = true;
         }
-        logTr.find('button').click(function(){
+        logTr.find('input').click(function(){
             var self = $(this);
             var val = self.val();
             //console.log(val);
@@ -1804,7 +1729,7 @@ var Petra = function() {
         if ( !(uuid in executedProcesses) )
             return;
         var processExecuted = executedProcesses[uuid];
-        var url = lizUrls['wps_wps_results_update'];
+        var url = lizWpsUrls['wps_wps_results_update'];
         var identifier = processExecuted.identifier;
 
         var params = {
@@ -1832,7 +1757,7 @@ var Petra = function() {
         executedProcesses[uuid] = processExecuted;
         //console.log(processExecuted);
         OpenLayers.Request.GET({
-            url: lizUrls['wps_wps'],
+            url: lizWpsUrls['wps_wps'],
             params: {
                 "SERVICE": "WPS",
                 "REQUEST": "GetResults",
@@ -2008,7 +1933,7 @@ var Petra = function() {
             config = lizMap.config;
             map = lizMap.map;
 
-            if ( 'wps_wps' in lizUrls && $("#processing-processes").length) {
+            if ( 'wps_wps' in lizWpsUrls && $("#processing-processes").length) {
                 $('#button-processing span.icon').css('background-image', 'none').html('<i class="icon-cog icon-white" style="margin-left: 4px;"></i>');
 
                 $('#button-processing-results span.icon').css('background-image', 'none').html('<i class="icon-eye-open icon-white" style="margin-left: 4px;"></i>');
