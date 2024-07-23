@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+* Confirm delete & allow file update
+
 ### Fixed
 
 * OL serverType qgis
