@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+* Confirm delete & allow file update
+
 ## 0.3.1 - 2024-07-11
 
 ### Fixed
