@@ -1320,7 +1320,7 @@ var Petra = function() {
                         url: serviceUrl,
                         params: layerWmsParams,
                         ratio: 1,
-                        serverType: 'qgisserver',
+                        serverType: 'qgis',
                     }),
                     properties: {
                         wpsLayerName: layerName,
