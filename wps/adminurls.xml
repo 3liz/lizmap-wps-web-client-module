@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <suburls xmlns="http://jelix.org/ns/suburls/1.0">
     <url pathinfo="/wpsadmin/m3"   action="admin:list" />
-    <url pathinfo="/wpsadmin/m3/upload"   action="admin:showUpload" />
-    <url pathinfo="/wpsadmin/m3/upload-save"   action="admin:saveUpload" />
-    <url pathinfo="/wpsadmin/m3/confirm-deletion/:fileId"   action="admin:confirmDelete" />
-    <url pathinfo="/wpsadmin/m3/delete/:fileId"   action="admin:delete" />
+    <url pathinfo="/wpsadmin/m3/upload"   action="admin:showUploadModel" />
+    <url pathinfo="/wpsadmin/m3/upload-save"   action="admin:saveUploadModel" />
+    <url pathinfo="/wpsadmin/m3/confirm-deletion/:fileId"   action="admin:confirmDeleteModel" />
+    <url pathinfo="/wpsadmin/m3/delete/:fileId"   action="admin:deleteModel" />
+    <url pathinfo="/wpsadmin/m3/style/upload"   action="admin:showUploadStyle" />
+    <url pathinfo="/wpsadmin/m3/style/upload-save"   action="admin:saveUploadStyle" />
+    <url pathinfo="/wpsadmin/m3/style/confirm-deletion/:fileId"   action="admin:confirmDeleteStyle" />
+    <url pathinfo="/wpsadmin/m3/style/delete/:fileId"   action="admin:deleteStyle" />
     <!-- ctrler for projects restriction config -->
     <url pathinfo="/wpsadmin/projects/conf"   action="restrictionsAdmin:show" />
     <url pathinfo="/wpsadmin/projects/conf/pre"   action="restrictionsAdmin:prepare" />
