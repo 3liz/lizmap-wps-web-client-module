@@ -3,7 +3,7 @@
 {jlocale 'wps~wps.ui.page.confirmdelete.msg.html', array($file->fileName())}
 
 <br>
-<a href="{jurl 'wps~admin:delete', array('fileId' => $file->uniqueid())}" class="btn">{@jelix~ui.buttons.yes@}</a>
+<a href="{jurl 'wps~admin:deleteStyle', array('fileId' => $file->uniqueid())}" class="btn">{@jelix~ui.buttons.yes@}</a>
 
 <a href="{jurl 'wps~admin:list'}" class="btn">{@jelix~ui.buttons.no@}</a>
 </p>

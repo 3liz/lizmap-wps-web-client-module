@@ -1,5 +1,5 @@
-<h1>{@wps.ui.page.upload.title@}</h1>
-{form $form ,'wps~admin:saveUpload' , array('fileId' => $fileId), 'htmlbootstrap'}
+<h1>{@wps.ui.page.model3.upload.title@}</h1>
+{form $form ,'wps~admin:saveUploadModel' , array('fileId' => $fileId), 'htmlbootstrap'}
 <div>
     {formcontrols}
     <div class="control-group">

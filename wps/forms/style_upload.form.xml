@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://jelix.org/ns/forms/1.1">
-  <upload2 ref='modelfile' accept='.model3' required='true'>
-    <label locale="wps.ui.form.model3.file"/>
+  <upload2 ref='stylefile' accept='.qml' required='true'>
+    <label locale="wps.ui.form.qml.file"/>
   </upload2>
   <submit ref="submit">
     <label locale='jelix~ui.buttons.save'></label>
