@@ -188,7 +188,7 @@ class adminCtrl extends jController
         $uploadCtrl = $form->getControl('stylefile');
 
         try {
-            $finder->saveModel($uploadCtrl, $newFile);
+            $finder->saveStyle($uploadCtrl, $newFile);
         } catch (Exception $e) {
             $form->setErrorOn('stylefile', $e->getMessage());
 
