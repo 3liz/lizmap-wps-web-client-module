@@ -236,7 +236,12 @@ var Petra = function() {
                 supported = false;
             }
             if (input.minOccurs > 0) {
-                document.getElementById("processing-input-"+input.identifier.replaceAll(':', '_')+"-label").appendChild(document.createTextNode("* "));
+                var label = document.getElementById("processing-input-"+input.identifier.replaceAll(':', '_')+"-label");
+                label.classList.add('jforms-required');
+                var span = document.createElement('span');
+                span.classList.add('jforms-required-star');
+                span.appendChild(document.createTextNode("* "));
+                label.appendChild(span);
             }
             // inputs table
             var tr = '<tr>';
