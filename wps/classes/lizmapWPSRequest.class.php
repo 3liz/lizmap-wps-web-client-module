@@ -318,7 +318,7 @@ class lizmapWPSRequest extends lizmapOGCRequest
                         'wps~ows:index'
                     );
                     $sUrl = str_replace('&', '&amp;', $sUrl);
-                    $sUrl .= '?'.$oUrl;
+                    $sUrl .= $oUrl;
                     $data = str_replace($oUrl, $sUrl, $data);
                 }
             }
