@@ -267,6 +267,7 @@ class lizmapWPSRequest extends lizmapOGCRequest
             $store_url = $wps_url.'store/';
             $jobs_url = $wps_url.'jobs/';
             foreach ($matches[1] as $oUrl) {
+                \jLog::log($oUrl);
                 if (substr($oUrl, 0, strlen($store_url)) === $store_url) {
                     $exUrl = explode('/', explode('?', substr($oUrl, strlen($store_url)))[0]);
                     $sUrl = jUrl::getFull(
@@ -298,6 +299,26 @@ class lizmapWPSRequest extends lizmapOGCRequest
                     );
                     $sUrl = str_replace('&', '&amp;', $sUrl);
                     $sUrl .= '?'.explode('?', substr($oUrl, strlen($ows_url) - 1))[1];
+                    $data = str_replace($oUrl, $sUrl, $data);
+                } elseif ($ows_url && $ows_url !== ''
+                       && substr($oUrl, 0, strlen($wps_url)) === $wps_url
+                       && str_contains($oUrl, 'MAP=')
+                       && str_contains($oUrl, 'request=GetCapabilities')) {
+                    $sUrl = jUrl::getFull(
+                        'wps~ows:index'
+                    );
+                    $sUrl = str_replace('&', '&amp;', $sUrl);
+                    $sUrl .= '?'.explode('?', substr($oUrl, strlen($wps_url) - 1))[1];
+                    $data = str_replace($oUrl, $sUrl, $data);
+                } elseif ($ows_url && $ows_url !== ''
+                       && $oUrl[0] === '?'
+                       && str_contains($oUrl, 'MAP=')
+                       && str_contains($oUrl, 'request=GetCapabilities')) {
+                    $sUrl = jUrl::getFull(
+                        'wps~ows:index'
+                    );
+                    $sUrl = str_replace('&', '&amp;', $sUrl);
+                    $sUrl .= '?'.$oUrl;
                     $data = str_replace($oUrl, $sUrl, $data);
                 }
             }
