@@ -90,6 +90,9 @@ run: env install-plugins
 	docker compose up -V --force-recreate -d
 
 stop:
+	docker compose stop
+
+down:
 	docker compose down -v --remove-orphans
 
 _clean: stop
