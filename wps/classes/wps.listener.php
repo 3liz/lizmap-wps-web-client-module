@@ -89,10 +89,10 @@ class wpsListener extends jEventListener
         $content = array('wps~dock', $assign);
         $dock = new lizmapMapDockItem(
             'processing',
-            'WPS',
+            \jLocale::get('wps~wps.dock.main.title'),
             $content,
             15,
-            null, // fait via getMapAdditions
+            null, // done with getMapAdditions
             null
         );
         $event->add($dock);
@@ -109,10 +109,10 @@ class wpsListener extends jEventListener
         $content = array('wps~bottomdock', $assign);
         $dock = new lizmapMapDockItem(
             'processing-results',
-            'WPS results',
+            \jLocale::get('wps~wps.dock.results.title'),
             $content,
             15,
-            null, // fait via getMapAdditions
+            null, // done with getMapAdditions
             null
         );
         $event->add($dock);

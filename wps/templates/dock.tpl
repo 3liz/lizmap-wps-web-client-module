@@ -1,44 +1,45 @@
 <div style="color:white;padding:5px;">
-    Choose a process to run
-    </br><select id="processing-processes"><option value="">---</option></select>
+    {@ wps~wps.run.tab.dropdown @}
+    <br/>
+    <select id="processing-processes"><option value="">---</option></select>
 </div>
 <div class="menu-content">
     <ul class="nav nav-tabs" style="">
-        <li class="active"><a data-toggle="tab" href="#processing-form-container">Run</a></li>
-        <li><a data-toggle="tab" href="#processing-info">Help</a></li>
+        <li class="active"><a data-toggle="tab" href="#processing-form-container">{@ wps~wps.run.tab.execute.button @}</a></li>
+        <li><a data-toggle="tab" href="#processing-info">{@ wps~wps.run.tab.help.button @}</a></li>
     </ul>
 
     <div class="tab-content">
 
         <div id="processing-form-container" class="tab-pane active">
             <div id="processing-form-errors"></div>
-            <b>Please fill in the form and click the Execute button</b>
+            <b>{@ wps~wps.run.tab.processing.help @}</b>
             <div id="processing-input" class="form-horizontal"></div>
         </div>
 
         <div id="processing-info" class="tab-pane">
-            <b>Title</b>
+            <b>{@ wps~wps.run.tab.processing.title @}</b>
             <p id="processing-title"></p>
 
-            <b>Description</b>
+            <b>{@ wps~wps.run.tab.processing.description @}</b>
             <p id="processing-abstract"></p>
 
-            <b>Inputs</b>
+            <b>{@ wps~wps.run.tab.processing.inputs @}</b>
             <table id="processing-info-inputs" class="table table-condensed table-striped">
                 <tbody>
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Mandatory</th>
+                        <th>{@ wps~wps.run.tab.processing.input.name @}</th>
+                        <th>{@ wps~wps.run.tab.processing.input.type @}</th>
+                        <th>{@ wps~wps.run.tab.processing.input.required @}</th>
                     </tr>
                 </tbody>
             </table>
-            <b>Outputs</b>
+            <b>{@ wps~wps.run.tab.processing.outputs @}</b>
             <table id="processing-info-outputs" class="table table-condensed table-striped">
                 <tbody>
                     <tr>
-                        <th>Name</th>
-                        <th>Type</th>
+                        <th>{@ wps~wps.run.tab.processing.output.name @}</th>
+                        <th>{@ wps~wps.run.tab.processing.output.type @}</th>
                     </tr>
                 </tbody>
             </table>
