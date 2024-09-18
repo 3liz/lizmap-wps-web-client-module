@@ -64,7 +64,17 @@ var Petra = function() {
                     const divDetails = document.createElement("div");
                     divDetails.classList = "processing-results-detail";
                     divDetails.style = 'display:none;';
-                    divDetails.innerHTML = '<h4>Inputs</h4><table class="processing-results-detail-table table table-condensed table-striped"><tbody><tr><th>Name</th><th>Type</th></tr></tbody></table>';
+                    divDetails.innerHTML = `
+                        <h4>${wpsLocales['run.tab.processing.input']}</h4>
+                        <table class="processing-results-detail-table table table-condensed table-striped">
+                            <tbody>
+                                <tr>
+                                    <th>${wpsLocales['run.tab.processing.input.name']}</th>
+                                    <th>${wpsLocales['run.tab.processing.input.type']}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
                     div.appendChild(divDetails);
                     // The literals div
                     const divLiterals = document.createElement("div");
