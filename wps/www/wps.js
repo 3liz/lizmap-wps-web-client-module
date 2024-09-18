@@ -11,7 +11,7 @@ var Petra = function() {
 
     const processingSvgIcon = 'data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjE2IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIxNiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtMTEuMTU4IDEuNS0uODAzIDIuMjM0LjAxMi4xMy4zOSAxLjk0LTIuMjYuOTM0LTEuMDk1LTEuNjQ2LS4wODQtLjA5OC0yLjE0OC0xLjAxNC0xLjE5IDEuMTkgMS4wMTQgMi4xNDguMDk4LjA4NCAxLjY0NiAxLjA5Ni0uOTM1IDIuMjU4LTEuOTQtLjM5LS4xMy0uMDEtMi4yMzMuODAydjEuNjg0bDIuMjM0LjgwMy4xMy0uMDEyIDEuOTQtLjM5LjkzNCAyLjI2LTEuNjQ2IDEuMDk1LS4wOTguMDg0LTEuMDE0IDIuMTQ4IDEuMTkgMS4xOSAyLjE0OC0xLjAxNC4wODQtLjA5OCAxLjA5Ni0xLjY0NiAyLjI1OC45MzUtLjM5IDEuOTQtLjAxLjEzLjgwMiAyLjIzM2gxLjY4NGwuODAzLTIuMjM0LS4wMTItLjEzLS4zOS0xLjk0IDIuMjYtLjkzNCAxLjA5NSAxLjY0Ni4wODQuMDk4IDIuMTQ4IDEuMDE0IDEuMTktMS4xOS0xLjAxNC0yLjE0OC0uMDk4LS4wODQtMS42NDYtMS4wOTYuOTM1LTIuMjU4IDEuOTQuMzkuMTMuMDEgMi4yMzMtLjgwMnYtMS42ODRsLTIuMjM0LS44MDMtLjEzLjAxMi0xLjk0LjM5LS45MzQtMi4yNiAxLjY0Ni0xLjA5NS4wOTgtLjA4NCAxLjAxNC0yLjE0OC0xLjE5LTEuMTktMi4xNDggMS4wMTQtLjA4NC4wOTgtMS4wOTYgMS42NDYtMi4yNTgtLjkzNS4zOS0xLjk0LjAxLS4xMy0uODAyLTIuMjMzem0uODQyIDhhMi41IDIuNSAwIDAgMSAyLjUgMi41IDIuNSAyLjUgMCAwIDEgLTIuNSAyLjUgMi41IDIuNSAwIDAgMSAtMi41LTIuNSAyLjUgMi41IDAgMCAxIDIuNS0yLjV6IiBmaWxsPSIjOThiNWQ4IiBzdHJva2U9IiM0NTdhYmUiLz48L3N2Zz4K'
 
-    // using OpenLayers.Format.WPSCapabilities to read the capabilitiescon
+    // using OpenLayers.Format.WPSCapabilities to read the capabilities
     function getCapabilities() {
         OpenLayers.Request.GET({
             url: lizWpsUrls['wps_wps'],
@@ -457,7 +457,7 @@ var Petra = function() {
 
         container.appendChild(control);
         addValueHandlers(field, function() {
-            // parse field value: number,number,number,number ESPG:integer
+            // parse field value: number,number,number,number EPSG:integer
             var reg = /(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *\((EPSG:\d+)\)/gi;
             var matches = reg.exec(field.value);
             if (matches === undefined) {
@@ -596,7 +596,7 @@ var Petra = function() {
             container.insertBefore(field, previousSibling.nextSibling) :
             container.appendChild(control);
 
-        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
+//        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
         if ( qgisType == 'vector' || qgisType == 'source' ) {
             var option;
             option = document.createElement("option");
@@ -1073,8 +1073,8 @@ var Petra = function() {
             {},
             function(json){
                 if( 'errors' in json ){
-                    console.log('Dataviz configuration error');
-                    console.log(json.errors);
+                    console.error('Dataviz configuration error');
+                    console.error(json.errors);
                     return false;
                 }
                 if( !json.data || json.data.length < 1)
@@ -1196,7 +1196,7 @@ var Petra = function() {
                     }
                 }
                 // Add process inputs
-                // Fisrt the header
+                // First the header
                 divResults.find('table.processing-results-detail-table tr:first th:last')
                     .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
                 // Then the data
@@ -1240,7 +1240,7 @@ var Petra = function() {
                 }
             }
             // Add process literal results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-literal-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1282,7 +1282,7 @@ var Petra = function() {
                 }
             }
             // Add process layer results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-layer-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1303,7 +1303,7 @@ var Petra = function() {
                     continue;
                 // Create a layer name for the map
                 var layerName = uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_');
-                console.log(layerName);
+//                console.log(layerName);
                 // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                     ,OpenLayers.Util.getParameterString({map:mapParam})
@@ -1423,7 +1423,7 @@ var Petra = function() {
                 }
             }
             // Add process file results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-file-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1500,7 +1500,7 @@ var Petra = function() {
             // From the layer tree
             for (const extLayer of extGroupMapState.getChildren()) {
                 const wpsLayerName = extLayer.olLayer.get('wpsLayerName');
-                console.log(wpsLayerName+' '+uuid+' '+wpsLayerName.startsWith(uuid));
+//                console.log(wpsLayerName+' '+uuid+' '+wpsLayerName.startsWith(uuid));
                 if (wpsLayerName.startsWith(uuid)) {
                     extGroupMapState.removeOlLayer(extLayer.name);
                 }
@@ -1726,7 +1726,7 @@ var Petra = function() {
 
             }
             else
-                console.log('unknown uuid');
+                console.warn('unknown uuid');
         });
     }
 
