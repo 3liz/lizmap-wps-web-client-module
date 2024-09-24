@@ -13,7 +13,7 @@
 
             <div id="processing-log-failed" style="display:none;">
                 <h4 id="processing-log-failed-title" class="title"></h4>
-                <p>Contact the administrator with these informations to fix the error.</p>
+                <p>Contact the administrator with these information to fix the error.</p>
                 <div id="processing-log-failed-info" style="">
                     <div style="">
                         <h4>Informations</h4>

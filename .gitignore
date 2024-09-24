@@ -16,3 +16,6 @@ node_modules/
 
 .php-cs-fixer.php
 .php-cs-fixer.cache
+
+*.qgs~
+*_attachments.zip

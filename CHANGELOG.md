@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+### Added
+
+* French language
+
 ## 0.5.1 - 2024-07-23
 
 ### Changed
@@ -35,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 * Fixing the delete method of results controller
-* Supports outputs files and jobs
+* Support outputs files and jobs
 * UI: No output displayed for undefined layer name
 * UI: The triangle before title not cliquable in results
 * UI: Hide WPS if no algorithm available
@@ -48,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * Tests: enhancing Test input file destination algorithm
 * UI: Display file outputs
 * UI: Select default layer
-* UI: Update field parameter at stratup
+* UI: Update field parameter at startup
 * Config: Field parameter can be restricted
 * Tests: Algorithm to convert feature source to vector layer
 * Support WMS DescribeLayer request
@@ -61,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 * Job label based on input value
 * Select the algorithm if only one is available
 * UI: Admin page to upload model3 files
-* UI: Admin page to manage WPS enabling restictions on projects
+* UI: Admin page to manage WPS enabling restrictions on projects
 
 ## 0.2.0 - 2022-11-22
 
