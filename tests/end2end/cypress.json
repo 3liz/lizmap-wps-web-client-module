@@ -1,9 +1,0 @@
-{
-    "baseUrl": "http://localhost:9090",
-    "viewportWidth": 1280,
-    "viewportHeight": 800,
-    "video": false,
-    "retries": {
-        "runMode": 2
-    }
-}
