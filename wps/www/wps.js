@@ -468,7 +468,7 @@ var Petra = function() {
 
         container.appendChild(control);
         addValueHandlers(field, function() {
-            // parse field value: number,number,number,number ESPG:integer
+            // parse field value: number,number,number,number EPSG:integer
             var reg = /(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *\((EPSG:\d+)\)/gi;
             var matches = reg.exec(field.value);
             if (matches === undefined) {
@@ -607,7 +607,7 @@ var Petra = function() {
             container.insertBefore(field, previousSibling.nextSibling) :
             container.appendChild(control);
 
-        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
+//        console.log(name+' "'+dataType+'" "'+qgisType+'" '+(dataType == 'string' && !anyValue)+' '+(qgisType=='source'));
         if ( qgisType == 'vector' || qgisType == 'source' ) {
             var option;
             option = document.createElement("option");
@@ -1084,8 +1084,8 @@ var Petra = function() {
             {},
             function(json){
                 if( 'errors' in json ){
-                    console.log('Dataviz configuration error');
-                    console.log(json.errors);
+                    console.error('Dataviz configuration error');
+                    console.error(json.errors);
                     return false;
                 }
                 if( !json.data || json.data.length < 1)
@@ -1207,7 +1207,7 @@ var Petra = function() {
                     }
                 }
                 // Add process inputs
-                // Fisrt the header
+                // First the header
                 divResults.find('table.processing-results-detail-table tr:first th:last')
                     .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
                 // Then the data
@@ -1251,7 +1251,7 @@ var Petra = function() {
                 }
             }
             // Add process literal results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-literal-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1293,7 +1293,7 @@ var Petra = function() {
                 }
             }
             // Add process layer results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-layer-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1314,7 +1314,7 @@ var Petra = function() {
                     continue;
                 // Create a layer name for the map
                 var layerName = uuid+'-'+output.identifier.replaceAll(':', '_').replaceAll(' ', '_');
-                console.log(layerName);
+//                console.log(layerName);
                 // Create the base url
                 var serviceUrl = OpenLayers.Util.urlAppend( url.substring(0, url.indexOf('?') + 1)
                     ,OpenLayers.Util.getParameterString({map:mapParam})
@@ -1434,7 +1434,7 @@ var Petra = function() {
                 }
             }
             // Add process file results
-            // Fisrt the header
+            // First the header
             divResults.find('table.processing-results-file-table tr:first th:last')
                 .after('<th class="'+uuid+'">'+(new Date(processExecuted.startTime)).toLocaleString()+'</th>');
             // Then the data
@@ -1511,7 +1511,7 @@ var Petra = function() {
             // From the layer tree
             for (const extLayer of extGroupMapState.getChildren()) {
                 const wpsLayerName = extLayer.olLayer.get('wpsLayerName');
-                console.log(wpsLayerName+' '+uuid+' '+wpsLayerName.startsWith(uuid));
+//                console.log(wpsLayerName+' '+uuid+' '+wpsLayerName.startsWith(uuid));
                 if (wpsLayerName.startsWith(uuid)) {
                     extGroupMapState.removeOlLayer(extLayer.name);
                 }
@@ -1737,7 +1737,7 @@ var Petra = function() {
 
             }
             else
-                console.log('unknown uuid');
+                console.warn('unknown uuid');
         });
     }
 
