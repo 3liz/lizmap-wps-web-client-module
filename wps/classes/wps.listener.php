@@ -69,8 +69,8 @@ class wpsListener extends jEventListener
         }
 
         // Add translation
-        $locales = $this->getLocales();
-        $jscode[] = 'var wpsLocales = '.json_encode($locales).';';
+//         $locales = $this->getLocales();
+//         $jscode[] = 'var wpsLocales = '.json_encode($locales).';';
 
         $event->add(
             array(
