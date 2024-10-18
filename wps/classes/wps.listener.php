@@ -196,4 +196,27 @@ class wpsListener extends jEventListener
         }
         $event->add($sectionAuth);
     }
+
+    private function getLocales($lang = null)
+    {
+        if (!$lang) {
+            $lang = jLocale::getCurrentLocale();
+        }
+
+        $data = array();
+        $path = jApp::getModulePath('wps').'locales/'.$lang.'/wps.UTF-8.properties';
+        if (file_exists($path)) {
+            $lines = file($path);
+            foreach ($lines as $lineNumber => $lineContent) {
+                if (!empty($lineContent) and $lineContent != '\n') {
+                    $exp = explode('=', trim($lineContent));
+                    if (!empty($exp[0])) {
+                        $data[$exp[0]] = jLocale::get('wps~wps.'.$exp[0], null, $lang);
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
 }
