@@ -920,28 +920,41 @@ var Petra = function() {
     function updateDigitizingExtent(btnId) {
         var btn = document.getElementById(btnId);
         var select = btn.previousSibling;
-        var feat = lizMap.mainLizmap.digitizing.featureDrawn.pop();
-        var bounds = new OpenLayers.Bounds(feat.geometry.bounds.toArray());
-        bounds.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
-        btn.parentElement.firstChild.value = bounds.toString() + ' (' + select.value + ')';
+        var feat = lizMap.mainLizmap.digitizing.featureDrawn.at(-1);
+        feat.set('text', select.title);
+        var bounds = lizMap.ol.extent.applyTransform(
+            feat.getGeometry().getExtent(),
+            lizMap.ol.proj.getTransform(
+                lizMap.ol.proj.get(lizMap.mainLizmap.projection),
+                lizMap.ol.proj.get(select.value)
+            )
+        );
+        //new OpenLayers.Bounds(feat.geometry.bounds.toArray());
+        //bounds.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
+        //btn.parentElement.firstChild.value = bounds.toString() + ' (' + select.value + ')';
+        btn.parentElement.firstChild.value = bounds.join(',') + ' (' + select.value + ')';
         btn.parentElement.firstChild.onblur();
-        lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
-        btn.onclick();
+        //lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
+        //btn.onclick();
+        if (lizMap.mainLizmap.digitizing.featureDrawn.length > 1) {
+            lizMap.mainLizmap.digitizing._eraseFeature(lizMap.mainLizmap.digitizing.featureDrawn.at(0));
+        }
     }
 
     function updateDigitizingPoint(btnId) {
         var btn = document.getElementById(btnId);
         var select = btn.previousSibling;
-        var feat = lizMap.mainLizmap.digitizing.featureDrawn.pop();
-        var point = feat.geometry.clone();
-        point.transform(lizMap.mainLizmap.digitizing.drawLayer.projection, select.value);
-        var geojson = new OpenLayers.Format.GeoJSON();
-        //console.log(geojson.write(point));
-        //btn.parentElement.firstChild.value = 'CRS='+ select.value.split(':')[1] +';'+ point.toString();
-        btn.parentElement.firstChild.value = '{ "geometry": '+geojson.write(point)+',  "crs": { "type": "name", "properties": { "name": "'+select.value+'" } } }';
+        var feat = lizMap.mainLizmap.digitizing.featureDrawn.at(-1);
+        feat.set('text', select.title);
+        btn.parentElement.firstChild.value = '{ "geometry": '+
+            (new lizMap.ol.format.GeoJSON()).writeGeometry(
+                feat.getGeometry(),
+                {featureProjection: lizMap.mainLizmap.projection, dataProjection:select.value}
+            )+',  "crs": { "type": "name", "properties": { "name": "'+select.value+'" } } }';
         btn.parentElement.firstChild.onblur();
-        lizMap.mainLizmap.digitizing.drawLayer.removeFeatures([feat]);
-        btn.onclick();
+        if (lizMap.mainLizmap.digitizing.featureDrawn.length > 1) {
+            lizMap.mainLizmap.digitizing._eraseFeature(lizMap.mainLizmap.digitizing.featureDrawn.at(0));
+        }
     }
 
     // execute the process
