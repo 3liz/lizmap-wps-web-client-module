@@ -63,8 +63,15 @@ class wpsListener extends jEventListener
         if (!empty($rconfig)) {
             $config = json_decode($rconfig);
             $je = json_last_error();
-            if ($je === 0 and is_object($config)) {
-                $jscode[] = 'try{ var wps_wps_project_config = '.trim($rconfig).';}catch(e){console.log(e);}';
+            if ($je === JSON_ERROR_NONE && is_object($config)) {
+                $jsvars = array_merge($jsvars, array('wps_wps_project_config' => $config));
+            } else {
+                $errorMsg = 'Error in processing configuration file: '.$path;
+                $errorMsg .= ' - Error code: '.$je.' - '.json_last_error_msg();
+                if ($je === JSON_ERROR_NONE) {
+                    $errorMsg .= ' but parsing result is not an object';
+                }
+                jLog::log($errorMsg, 'error');
             }
         }
 
