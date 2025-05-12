@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Added
 
 * French language
+* Admin: Manage QGIS Style files for QGIS Models
+* UI: Mandatory processing inputs
+* WPS panel image
+* max Lizmap Web Client version 3.9.*
+
+### Fixed
+
+* GetResults response: OWS Url replacement
+* GetResults response: Empty OWS Url
+* JS variables for WPS
+
 
 ## 0.5.1 - 2024-07-23
 
