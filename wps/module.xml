@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="http://jelix.org/ns/module/1.0">
     <info id="lizmap-wps-web-client" name="wps" createdate="2017-12-16">
-        <version date="2025-03-13">0.5.2-pre</version>
+        <version date="2025-05-12">0.5.2</version>
         <label lang="en_US">WPS Web Client</label>
         <description lang="en_US" />
         <license URL="">Mozilla Public Licence</license>
-        <copyright>2017-2024 3liz</copyright>
+        <copyright>2017-2025 3liz</copyright>
         <creator name="your name" email="your-email@yourwebsite.undefined" active="true"/>
         <!--<contributor name="hisname" email="hisemail@yoursite.undefined" active="true" since="" role=""/>-->
         <homepageURL>http://3liz.com</homepageURL>

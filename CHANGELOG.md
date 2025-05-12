@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.5.2 - 2025-05-12
+
 ### Added
 
 * French language
