@@ -4,7 +4,8 @@
 [![🚀 Release](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml/badge.svg)](https://github.com/3liz/lizmap-wps-web-client-module/actions/workflows/release.yml)
 [![Packagist](https://img.shields.io/packagist/v/lizmap/lizmap-wps-web-client)](https://packagist.org/packages/lizmap/lizmap-wps-web-client)
 
-Lizmap WPS Web Client is a Lizmap module to add a WPS panel into [Lizmap Web Client](https://github.com/3liz/lizmap-web-client/).
+Lizmap WPS Web Client is a Lizmap module to add a WPS panel into [Lizmap Web Client](https://github.com/3liz/lizmap-web-client/) thanks to
+[Py-QGIS-WPS](https://github.com/3liz/py-qgis-wps)
 
 This is an example showing the QGIS Processing Buffer algorithm, exposed as a WPS algorithm within Lizmap Web Client:
 
@@ -15,6 +16,10 @@ This is an example showing the QGIS Processing Buffer algorithm, exposed as a WP
 ![Demo gif](docs/media/demo.gif)
 
 It's also providing another panel showing you the results which have been executed on the Lizmap instance.
+
+## Usage
+
+Once Py-QGIS-WPS and this Lizmap module are installed, you can jump to the [docs/README.md](./docs/README.md).
 
 ## Installation
 
