@@ -59,7 +59,7 @@ class wpsListener extends jEventListener
 
         // Check if there is a processing configuration for this project
         $path = $this->lproj->getPath().'.json';
-        $rconfig = jFile::read($path);
+        $rconfig = file_exists($path) ? jFile::read($path) : null;
         if (!empty($rconfig)) {
             $config = json_decode($rconfig);
             $je = json_last_error();
