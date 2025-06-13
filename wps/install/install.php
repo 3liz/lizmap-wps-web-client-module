@@ -14,6 +14,7 @@ class wpsModuleInstaller extends \Jelix\Installer\Module\Installer
         $rights = array(
             'wps.modelfile.manage' => 'wps~wps.acl2.model.manage',
             'wps.options.manage' => 'wps~wps.acl2.options.manage',
+            'wps.urlserver.manage' => 'wps~wps.acl2.urlserver.manage',
         );
         foreach ($rights as $rightName => $rightLocale) {
             // Add right subject

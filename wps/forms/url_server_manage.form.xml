@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://jelix.org/ns/forms/1.1">
+    <input ref="pygiswps_server_url">
+        <label locale="wps~wps.form.url_server_pyqgiswps.label"/>
+    </input>
+    <input ref="map_server_url">
+        <label locale="wps~wps.form.url_server_map.label"/>
+    </input>
+    <submit ref="submit">
+        <label locale="jelix~ui.buttons.save"></label>
+    </submit>
+</form>
