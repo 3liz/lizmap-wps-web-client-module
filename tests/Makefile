@@ -8,7 +8,7 @@ LIZMAP_DIR=$(shell pwd)/lizmap
 LIZMAP_USER_ID:=$(shell id -u)
 LIZMAP_USER_GID:=$(shell id -g)
 
-LIZMAP_VERSION_TAG:=3.8
+LIZMAP_VERSION_TAG:=3.9.0-rc.3
 QGIS_VERSION_TAG:=ltr-rc
 POSTGIS_VERSION_TAG:=15-3
 
