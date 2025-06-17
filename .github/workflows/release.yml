@@ -15,7 +15,7 @@ jobs:
 
       - name: Changelog
         id: changelog
-        uses: 3liz/changelog-release@0.3.0
+        uses: 3liz/changelog-release@0.4.0
 
       - name: Create release on GitHub
         uses: ncipollo/release-action@v1.16.0
