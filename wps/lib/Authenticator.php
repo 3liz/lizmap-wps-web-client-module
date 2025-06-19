@@ -37,10 +37,7 @@ class Authenticator
      */
     private static function retrieveAuthorization()
     {
-        $file = \jApp::varConfigPath('liveconfig.ini.php');
-        $iniFile = new \Jelix\IniFile\IniModifier($file);
-
-        if ($iniFile->getValue('restrict_to_authenticated_users', 'wps') == 'on') {
+        if (\jApp::config()->wps['restrict_to_authenticated_users'] == 'on') {
             return true;
         }
 

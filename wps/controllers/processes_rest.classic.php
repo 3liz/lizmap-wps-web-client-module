@@ -29,7 +29,7 @@ class processes_restCtrl extends RestApiCtrl
         $rep = $this->getResponse('json');
 
         if (!Authenticator::verify()) {
-            return Error::setError($rep, 401);
+            return Error::setJSONError($rep, 401);
         }
 
         $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'processes';
@@ -50,7 +50,7 @@ class processes_restCtrl extends RestApiCtrl
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
-            return Error::setError($rep, $e->getCode(), $e->getMessage());
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
         }
 
         return $rep;
