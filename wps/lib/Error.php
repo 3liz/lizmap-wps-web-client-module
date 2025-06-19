@@ -53,7 +53,7 @@ class Error
     }
 
     /**
-     * Build an array about the error furnished
+     * Build an array about the error furnished.
      *
      * @param object $rep                the response object to which the error details will be assigned
      * @param mixed  $errorCode          the error code used to identify the error details from the predefined array

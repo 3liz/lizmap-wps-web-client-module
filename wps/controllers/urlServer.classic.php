@@ -31,7 +31,7 @@ class urlServerCtrl extends jController
         $rep = $this->getResponse('html');
 
         if (\lizmap::getServices()->hideSensitiveProperties()) {
-            return Error::setHTMLError($rep, "403");
+            return Error::setHTMLError($rep, '403');
         }
 
         // Create the form
@@ -64,7 +64,7 @@ class urlServerCtrl extends jController
         $rep = $this->getResponse('html');
 
         if (\lizmap::getServices()->hideSensitiveProperties()) {
-            return Error::setHTMLError($rep, "403");
+            return Error::setHTMLError($rep, '403');
         }
 
         // Create the form
