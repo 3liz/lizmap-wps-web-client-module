@@ -28,7 +28,7 @@ class jobs_results_restCtrl extends RestApiCtrl
         $rep = $this->getResponse('json');
 
         if (!Authenticator::verify()) {
-            return Error::setError($rep, 401);
+            return Error::setJSONError($rep, 401);
         }
 
         $jobID = $this->param('jobid');
@@ -38,13 +38,13 @@ class jobs_results_restCtrl extends RestApiCtrl
                 $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'jobs/'.$jobID.'/results';
                 $response = RequestHandler::curlRequestGET($url);
             } else {
-                $response = Error::setError($rep, '400', 'Job id not found.');
+                $response = Error::setJSONError($rep, '400', 'Job id not found.');
             }
             $rep->data = json_decode($response, true);
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
-            return Error::setError($rep, $e->getCode(), $e->getMessage());
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
         }
 
         return $rep;

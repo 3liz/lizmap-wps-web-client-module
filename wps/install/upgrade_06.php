@@ -1,22 +1,23 @@
 <?php
 /**
  * @author    3liz
- * @copyright 2024 3liz
+ * @copyright 2025 3liz
  *
  * @see      https://3liz.com
  *
  * @license    GPL 3
  */
-class wpsModuleUpgrader_03 extends \Jelix\Installer\Module\Installer
+class wpsModuleUpgrader_06 extends \Jelix\Installer\Module\Installer
 {
     public $targetVersions = array(
-        '0.3.0',
+        '0.6.0',
     );
-    public $date = '2024-02-15';
+    public $date = '2025-06-18';
 
     public function install(Jelix\Installer\Module\API\InstallHelpers $helpers)
     {
         $rights = array(
+            'wps.urlserver.manage' => 'wps~wps.acl2.urlserver.manage',
             'wps.modelfile.manage' => 'wps~wps.acl2.model.manage',
             'wps.options.manage' => 'wps~wps.acl2.options.manage',
         );

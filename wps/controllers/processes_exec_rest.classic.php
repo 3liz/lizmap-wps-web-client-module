@@ -28,7 +28,7 @@ class processes_exec_restCtrl extends RestApiCtrl
         $rep = $this->getResponse('json');
 
         if (!Authenticator::verify()) {
-            return Error::setError($rep, 401);
+            return Error::setJSONError($rep, 401);
         }
 
         $processID = $this->param('processid');
@@ -45,13 +45,13 @@ class processes_exec_restCtrl extends RestApiCtrl
                     $map;
                 $response = RequestHandler::curlRequestPOST($url, $data);
             } else {
-                $response = Error::setError($rep, '400', 'Process id not found.');
+                $response = Error::setJSONError($rep, '400', 'Process id not found.');
             }
             $rep->data = json_decode($response, true);
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
-            return Error::setError($rep, $e->getCode(), $e->getMessage());
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
         }
 
         return $rep;

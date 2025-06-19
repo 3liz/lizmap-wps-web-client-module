@@ -16,7 +16,7 @@ use Lizmap\Request\Proxy;
 class Error
 {
     /**
-     * Sets the error in the provided response object based on the given error code.
+     * Sets the error through JSON in the provided response object based on the given error code.
      *
      * @param object $rep                the response object to which the error details will be assigned
      * @param mixed  $errorCode          the error code used to identify the error details from the predefined array
@@ -24,7 +24,44 @@ class Error
      *
      * @return object returns the updated response object containing the error details
      */
-    public static function setError(object $rep, mixed $errorCode, string $errorCustomMessage = ''): object
+    public static function setJSONError(object $rep, mixed $errorCode, string $errorCustomMessage = ''): object
+    {
+        $rep->data = self::prepareError($rep, $errorCode, $errorCustomMessage);
+
+        return $rep;
+    }
+
+    /**
+     * Sets the error through HTML in the provided response object based on the given error code.
+     *
+     * @param object $rep                the response object to which the error details will be assigned
+     * @param mixed  $errorCode          the error code used to identify the error details from the predefined array
+     * @param string $errorCustomMessage custom message, for example about specific vars that would be bad written
+     *
+     * @return jResponseHtml returns the updated response object containing the error details
+     */
+    public static function setHTMLError(object $rep, mixed $errorCode, string $errorCustomMessage = ''): object
+    {
+        $errorArray = self::prepareError($rep, $errorCode, $errorCustomMessage);
+
+        $rep->body->append(
+            'MAIN',
+            '<h3>Error '.$errorArray['status'].' : '.$errorArray['message'].'</h3>'
+        );
+
+        return $rep;
+    }
+
+    /**
+     * Build an array about the error furnished
+     *
+     * @param object $rep                the response object to which the error details will be assigned
+     * @param mixed  $errorCode          the error code used to identify the error details from the predefined array
+     * @param string $errorCustomMessage custom message, for example about specific vars that would be bad written
+     *
+     * @return array returns an array containing the error details
+     */
+    private static function prepareError(object $rep, mixed $errorCode, string $errorCustomMessage = ''): array
     {
         $error = Error::getErrorFromCode($errorCode);
 
@@ -42,13 +79,11 @@ class Error
             $errorMessage = $errorMessage.' '.$errorCustomMessage;
         }
 
-        $rep->data = array(
+        return array(
             'code' => Proxy::getHttpStatusMsg($error['code']),
             'status' => $error['code'],
             'message' => $errorMessage,
         );
-
-        return $rep;
     }
 
     public static function getErrorFromCode(string $errorCode): array
@@ -64,6 +99,11 @@ class Error
             '401' => array(
                 'code' => 401,
                 'message' => 'Unauthorized. Authentication is required to access this resource.',
+                'http' => true,
+            ),
+            '403' => array(
+                'code' => 403,
+                'message' => 'Forbidden. No access to this resource.',
                 'http' => true,
             ),
             '404' => array(

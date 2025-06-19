@@ -29,7 +29,7 @@ class jobs_restCtrl extends RestApiCtrl
         $rep = $this->getResponse('json');
 
         if (!Authenticator::verify()) {
-            return Error::setError($rep, 401);
+            return Error::setJSONError($rep, 401);
         }
 
         $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'jobs';
@@ -45,7 +45,7 @@ class jobs_restCtrl extends RestApiCtrl
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
-            return Error::setError($rep, $e->getCode(), $e->getMessage());
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
         }
 
         return $rep;
@@ -62,7 +62,7 @@ class jobs_restCtrl extends RestApiCtrl
         $rep = $this->getResponse('json');
 
         if (!Authenticator::verify()) {
-            return Error::setError($rep, 401);
+            return Error::setJSONError($rep, 401);
         }
 
         $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'jobs';
@@ -72,13 +72,13 @@ class jobs_restCtrl extends RestApiCtrl
             if ($jobID != null) {
                 $response = RequestHandler::curlRequestDELETE($url.'/'.$jobID);
             } else {
-                $response = Error::setError($rep, '400', 'Job ID not found');
+                $response = Error::setJSONError($rep, '400', 'Job ID not found');
             }
             $rep->data = json_decode($response, true);
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
-            return Error::setError($rep, $e->getCode(), $e->getMessage());
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
         }
 
         return $rep;

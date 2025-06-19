@@ -1,5 +1,7 @@
 <?php
 
+use LizmapWPS\WPS\Error;
+
 class urlServerCtrl extends jController
 {
     // Configure access via jacl2 rights management
@@ -28,6 +30,10 @@ class urlServerCtrl extends jController
         /** @var jResponseHtml $rep */
         $rep = $this->getResponse('html');
 
+        if (\lizmap::getServices()->hideSensitiveProperties()) {
+            return Error::setHTMLError($rep, "403");
+        }
+
         // Create the form
         $form = jForms::create('wps~url_server_manage');
 
@@ -42,6 +48,10 @@ class urlServerCtrl extends jController
 
     public function prepare()
     {
+        if (\lizmap::getServices()->hideSensitiveProperties()) {
+            return $this->redirect('urlServer:show');
+        }
+
         $form = jForms::create('wps~url_server_manage');
         $this->initFormWithIni($form);
 
@@ -52,6 +62,10 @@ class urlServerCtrl extends jController
     {
         /** @var jResponseHtml $rep */
         $rep = $this->getResponse('html');
+
+        if (\lizmap::getServices()->hideSensitiveProperties()) {
+            return Error::setHTMLError($rep, "403");
+        }
 
         // Create the form
         $form = jForms::create('wps~url_server_manage');
@@ -71,6 +85,10 @@ class urlServerCtrl extends jController
 
     public function save()
     {
+        if (\lizmap::getServices()->hideSensitiveProperties()) {
+            return $this->redirect('urlServer:show');
+        }
+
         $form = jForms::fill('wps~url_server_manage');
         if (is_null($form)) {
             // redirect to default page
