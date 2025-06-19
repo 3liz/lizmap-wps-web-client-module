@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - add-ogc-wps-api-on-php
   pull_request:
     branches:
       - master
@@ -13,21 +14,18 @@ jobs:
     name: "🐘 PHP-CS-Fixer"
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: "PHP-CS-Fixer"
-      uses: docker://oskarstark/php-cs-fixer-ga:3.8.0
-      with:
-        args: --config=.php-cs-fixer.dist.php --allow-risky=yes --dry-run --diff -- wps
+      - uses: actions/checkout@v4
+      - name: "PHP-CS-Fixer"
+        uses: docker://oskarstark/php-cs-fixer-ga:3.8.0
+        with:
+          args: --config=.php-cs-fixer.dist.php --allow-risky=yes --dry-run --diff -- wps
 
-#  eslint:
-#    name: "🔶 EsLint"
-#    runs-on: ubuntu-latest
-#    steps:
-#
-#    - uses: actions/checkout@v2
-#
-#    - name: Install modules
-#      run: npm install
-#
-#    - name: Run ESLint
-#      run: npx eslint wps/
+  eslint:
+    name: "🔶 EsLint"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install modules
+        run: npm install
+      - name: Run ESLint
+        run: npm run eslint

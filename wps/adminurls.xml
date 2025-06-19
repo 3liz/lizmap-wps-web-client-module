@@ -14,4 +14,8 @@
     <url pathinfo="/wpsadmin/projects/conf/pre"   action="restrictionsAdmin:prepare" />
     <url pathinfo="/wpsadmin/projects/conf/edit"   action="restrictionsAdmin:edit" />
     <url pathinfo="/wpsadmin/projects/conf/save"   action="restrictionsAdmin:save" />
+
+    <url pathinfo="/wpsadmin/url"   action="urlServer:show" />
+    <url pathinfo="/wpsadmin/url/edit"   action="urlServer:edit" />
+    <url pathinfo="/wpsadmin/url/save"   action="urlServer:save" />
 </suburls>
