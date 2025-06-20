@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="http://jelix.org/ns/module/1.0">
     <info id="lizmap-wps-web-client" name="wps" createdate="2017-12-16">
-        <version date="2025-05-12">0.5.2</version>
+        <version date="2025-06-20">0.5.3</version>
         <label lang="en_US">WPS Web Client</label>
         <description lang="en_US" />
         <license URL="">Mozilla Public Licence</license>

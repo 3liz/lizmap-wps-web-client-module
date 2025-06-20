@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.5.3 - 2025-06-20
+
+### Fixed 
+
+* Check WPS project config file exists
+
 ## 0.5.2 - 2025-05-12
 
 ### Added
