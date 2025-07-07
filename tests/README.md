@@ -44,6 +44,14 @@ Open your browser at http://localhost:9090
 
 For more information, refer to the [docker compose documentation](https://docs.docker.com/compose/)
 
+## Develop with NPM
+
+In order to improve JavaScript code, you'll need to run the `npm run watch` command in `wps/www` to build JS files dynamically.
+
+You can also use `npm run build` for production. It will generate files in `wps/www/dist`. The built wps file located
+in `dist` directory is the one used when installing the module.
+
+
 ## End-to-End tests with Cypress
 
 The `end2end` directory contains some end-to-end tests made for Cypress.
