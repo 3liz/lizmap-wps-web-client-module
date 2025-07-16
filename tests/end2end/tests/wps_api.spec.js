@@ -35,7 +35,8 @@ test.describe('Test WPS OGC API', () => {
             request,
             url +
             "/processes/model:centroides/execution" +
-            "?map=test_france_parts/france_parts.qgs",
+            "?repository=tests"+
+            "&project=france_parts",
             JSON.stringify({ "inputs": { "input": "france_parts tuilé en cache", "native:centroids_1:OUTPUT": "job"}})
         )
 
@@ -57,7 +58,8 @@ test.describe('Test WPS OGC API', () => {
             request,
             url +
             "/processes/model:centroides/execution" +
-            "?map=test_france_parts/france_parts.qgs",
+            "?repository=tests"+
+            "&project=france_parts",
             JSON.stringify({
                 "inputs": {
                     "input": "france_parts tuilé en cache",
@@ -78,7 +80,8 @@ test.describe('Test WPS OGC API', () => {
             request,
             url +
             "/processes/model:centroides/execution" +
-            "?map=test_france_parts/france_parts.qgs",
+            "?repository=tests"+
+            "&project=france_parts",
             JSON.stringify({
                 "inputs": {
                     "input": "france_parts tuilé en cache",
