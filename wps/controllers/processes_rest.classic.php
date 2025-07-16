@@ -9,6 +9,7 @@
  * @license   https://www.mozilla.org/MPL/ Mozilla Public Licence
  */
 
+use LizmapApi\Utils;
 use LizmapWPS\WPS\Authenticator;
 use LizmapWPS\WPS\Error;
 use LizmapWPS\WPS\RequestHandler;
@@ -20,6 +21,7 @@ class processes_restCtrl extends RestApiCtrl
     /**
      * Retrieves all processes.
      * If a specific processID is set, return it.
+     * Optionals 'repository' and 'project' to build map path.
      *
      * @return jResponseJson|object the response object containing processes information
      */
@@ -34,13 +36,19 @@ class processes_restCtrl extends RestApiCtrl
 
         $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'processes';
         $processID = $this->param('processid');
-        $map = $this->param('map');
+        $repository = $this->param('repository');
+        $project = $this->param('project');
 
         try {
             if ($processID != null) {
                 $url = $url.'/'.$processID;
-                if ($map != null) {
-                    $url = $url.'?map='.$map;
+                if ($repository != null && $project != null) {
+                    $repositoryObject = lizmap::getRepository($repository);
+                    if (is_null($repositoryObject)) {
+                        throw new \Exception('No repository "'.$repository.'" found', 404);
+                    }
+                    $path = Utils::getLastPartPath($repositoryObject->getOriginalPath());
+                    $url = $url.'?map='.$path.$project.'.qgs';
                 }
                 $response = RequestHandler::curlRequestGET($url);
             } else {
