@@ -42,7 +42,7 @@ test.describe('Test WPS OGC API', () => {
 
         const json = await checkJson(response);
 
-        await expect(json["native:centroids_1:OUTPUT"]).toBeDefined();
+        await expect(json["created"]).toBeDefined();
     });
 
     test('GET a list of jobs', async ({request }) => {

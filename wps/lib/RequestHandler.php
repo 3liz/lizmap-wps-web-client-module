@@ -52,6 +52,7 @@ class RequestHandler
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Accept: application/json',
+            'Prefer: respond-async',
         ));
 
         $response = curl_exec($ch);

@@ -56,7 +56,8 @@ class processes_exec_restCtrl extends RestApiCtrl
                     'processes/'.
                     $processID.
                     '/execution'.
-                    '?map='.$project->getRelativeQgisPath();
+                    '?mode=async'.
+                    '&map='.$project->getRelativeQgisPath();
                 $response = RequestHandler::curlRequestPOST($url, $data);
             } else {
                 $response = Error::setJSONError($rep, '400', 'Process id not found.');
