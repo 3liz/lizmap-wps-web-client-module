@@ -9,8 +9,7 @@ async function initializeServersURLs(page, wps, map) {
 
 setup('authenticate as admin and add map', async ({ page }) => {
     const WPS_URL = "http://tests-wps-1:8080/";
-    const MAP_URL = "";
 
     await authUsingLogin(page, 'admin', 'admin', getAuthStorageStatePath('admin'));
-    await initializeServersURLs(page, WPS_URL, MAP_URL);
+    await initializeServersURLs(page, WPS_URL);
 });

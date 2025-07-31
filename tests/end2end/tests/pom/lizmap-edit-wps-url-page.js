@@ -7,7 +7,6 @@ export class LizmapEditionWPSURLPage {
     constructor(page) {
         this.page = page;
         this.inputFieldPyQGIS_WPSServer = page.locator('#jforms_wps_url_server_manage_pygiswps_server_url');
-        this.inputFieldMapServer = page.locator('#jforms_wps_url_server_manage_map_server_url');
         this.saveButton = page.locator('#jforms_wps_url_server_manage_submit');
     }
 
@@ -28,15 +27,6 @@ export class LizmapEditionWPSURLPage {
     }
 
     /**
-     * Fills the Map server URL input field with the provided URL.
-     *
-     * @param {string} url - The URL to be filled in the Map server input field.
-     */
-    async fillMapURL(url) {
-        await this.inputFieldMapServer.fill(url);
-    }
-
-    /**
      * Performs the action of clicking the save button.
      */
     async save() {
@@ -47,13 +37,11 @@ export class LizmapEditionWPSURLPage {
      * Initializes the URLs for the application by setting up a WPS URL and a Map URL.
      *
      * @param {string} wpsURL - The URL for the Web Processing Service (WPS) server.
-     * @param {string} mapURL - The URL for the map server.
      */
-    async initializeURLS(wpsURL, mapURL) {
+    async initializeURLS(wpsURL) {
         await this.goto();
 
         await this.fillPyQGIS_WPS_URL(wpsURL);
-        await this.fillMapURL(mapURL);
 
         await this.save();
     }

@@ -1,7 +1,5 @@
 <?php
 
-use LizmapWPS\WPS\UrlServerUtil;
-
 $lproj = null;
 
 class wpsListener extends jEventListener
@@ -49,7 +47,6 @@ class wpsListener extends jEventListener
                 'wps_ogc_processes' => jUrl::get('wps~processes_rest:get'),
                 'wps_ogc_jobs' => jUrl::get('wps~jobs_rest:get'),
             ),
-            'mapURL' => UrlServerUtil::retrieveServerURL('map_server_url'),
         );
         $css = array(
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'wps.css')),
