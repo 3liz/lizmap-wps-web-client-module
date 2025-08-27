@@ -44,6 +44,18 @@ Open your browser at http://localhost:9090
 
 For more information, refer to the [docker compose documentation](https://docs.docker.com/compose/)
 
+## Javascript build
+
+Javascript has to be built with webpack.
+
+### Development
+
+Run `npm run watch` in `wps/www/` directory. Files will be built and put in `tests/lizmap/www/assets/js/wps`.
+
+### Production
+
+When ready for production run `npm run build` in `wps/www/` directory. Files will be built and put in `wps/www/dist/`.
+
 ## End-to-End tests with Playwright for API
 
 The `end2end` directory contains some end-to-end tests made for Playwright.

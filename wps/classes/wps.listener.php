@@ -32,7 +32,7 @@ class wpsListener extends jEventListener
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WPSExecute.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WPSCapabilities.js')),
             jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'OpenLayers/Format/WPSCapabilities/v1_0_0.js')),
-            jUrl::get('jelix~www:getfile', array('targetmodule' => 'wps', 'file' => 'wps.js')),
+            \jApp::urlBasePath().'assets/js/wps/wps.js',
         );
         $jscode = array(
         );
