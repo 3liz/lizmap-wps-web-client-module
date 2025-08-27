@@ -62,7 +62,12 @@ class processes_exec_restCtrl extends RestApiCtrl
             } else {
                 $response = Error::setJSONError($rep, '400', 'Process id not found.');
             }
-            $rep->data = json_decode($response, true);
+
+            $json = json_decode($response, true);
+
+            $json = $this->removeImportantInformation($json);
+
+            $rep->data = $json;
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
@@ -70,5 +75,20 @@ class processes_exec_restCtrl extends RestApiCtrl
         }
 
         return $rep;
+    }
+
+    /**
+     * Removes link-related and path data.
+     *
+     * @param array $json JSON array containing answer data with 'links' and 'map' fields
+     *
+     * @return array The modified JSON array with 'links' and 'map' fields removed
+     */
+    private function removeImportantInformation(array $json): array
+    {
+        $json['links'] = null;
+        $json['map'] = null;
+
+        return $json;
     }
 }

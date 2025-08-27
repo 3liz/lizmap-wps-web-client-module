@@ -18,6 +18,8 @@ class RequestHandler
      *
      * @param string $url the URL to which the GET request will be sent
      *
+     * @throws \Exception if the response is `null`
+     *
      * @return string the response returned from the server
      */
     public static function curlRequestGET(string $url): string
@@ -32,6 +34,8 @@ class RequestHandler
         $response = curl_exec($ch);
         curl_close($ch);
 
+        self::verifyRequest($response);
+
         return $response;
     }
 
@@ -40,6 +44,8 @@ class RequestHandler
      *
      * @param string $url  the URL to send the POST request to
      * @param string $data the data to be sent in the POST request body
+     *
+     * @throws \Exception if the response is `null`
      *
      * @return string the response returned by the request
      */
@@ -58,6 +64,8 @@ class RequestHandler
         $response = curl_exec($ch);
         curl_close($ch);
 
+        self::verifyRequest($response);
+
         return $response;
     }
 
@@ -65,6 +73,8 @@ class RequestHandler
      * Sends a DELETE request to the specified URL.
      *
      * @param string $url the URL to send the DELETE request to
+     *
+     * @throws \Exception if the response is `null`
      *
      * @return string the response returned by the request
      */
@@ -81,6 +91,22 @@ class RequestHandler
         $response = curl_exec($ch);
         curl_close($ch);
 
+        self::verifyRequest($response);
+
         return $response;
+    }
+
+    /**
+     * Verifies the integrity of the given response.
+     *
+     * @param bool|string $response the response to verify, which can be a boolean or a string
+     *
+     * @throws \Exception if the provided response is null
+     */
+    private static function verifyRequest(bool|string $response): void
+    {
+        if ($response == null) {
+            throw new \Exception('', 500);
+        }
     }
 }

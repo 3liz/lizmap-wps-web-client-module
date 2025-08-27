@@ -41,7 +41,12 @@ class jobs_restCtrl extends RestApiCtrl
             } else {
                 $response = RequestHandler::curlRequestGET($url);
             }
-            $rep->data = json_decode($response, true);
+
+            $json = json_decode($response, true);
+
+            $json = $this->removeImportantInformation($json);
+
+            $rep->data = $json;
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
@@ -74,7 +79,12 @@ class jobs_restCtrl extends RestApiCtrl
             } else {
                 $response = Error::setJSONError($rep, '400', 'Job ID not found');
             }
-            $rep->data = json_decode($response, true);
+
+            $json = json_decode($response, true);
+
+            $json = $this->removeImportantInformation($json);
+
+            $rep->data = $json;
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
@@ -82,5 +92,27 @@ class jobs_restCtrl extends RestApiCtrl
         }
 
         return $rep;
+    }
+
+    /**
+     * Removes link-related and path data.
+     *
+     * @param array $json JSON array containing answer data with 'links' and 'map' fields
+     *
+     * @return array The modified JSON array with 'links' and 'map' fields removed
+     */
+    private function removeImportantInformation(array $json): array
+    {
+        $json['links'] = null;
+        $json['map'] = null;
+
+        if ($json['jobs']) {
+            for ($i = 0; $i < count($json['jobs']); ++$i) {
+                $json['jobs'][$i]['links'] = null;
+                $json['jobs'][$i]['map'] = null;
+            }
+        }
+
+        return $json;
     }
 }

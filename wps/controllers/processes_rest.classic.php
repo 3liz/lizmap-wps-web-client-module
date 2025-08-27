@@ -61,7 +61,12 @@ class processes_restCtrl extends RestApiCtrl
             } else {
                 $response = RequestHandler::curlRequestGET($url);
             }
-            $rep->data = json_decode($response, true);
+
+            $json = json_decode($response, true);
+
+            $json = $this->removeLinks($json);
+
+            $rep->data = $json;
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
@@ -69,5 +74,25 @@ class processes_restCtrl extends RestApiCtrl
         }
 
         return $rep;
+    }
+
+    /**
+     * Removes link-related data that could contain server adress.
+     *
+     * @param array $json JSON array containing process data with 'links' fields
+     *
+     * @return array The modified JSON array with 'links' fields removed
+     */
+    private function removeLinks(array $json): array
+    {
+        $json['links'] = null;
+
+        if ($json['processes']) {
+            for ($i = 0; $i < count($json['processes']); ++$i) {
+                $json['processes'][$i]['links'] = null;
+            }
+        }
+
+        return $json;
     }
 }
