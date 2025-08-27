@@ -1,23 +1,41 @@
 export class ApiBasics {
 
     static async GETMethod(url) {
-        return fetch(window.location.origin + url);
+        const request = await fetch(window.location.origin + url);
+
+       return await this.verifyResponse(request);
     }
 
     static async POSTMethod(url, dataBody = '') {
-        return await fetch(
+        const request = await fetch(
             window.location.origin + url,
             {
                 method: "POST",
                 body: dataBody
             });
+
+        return await this.verifyResponse(request);
     }
 
     static async DELETEMethod(url) {
-        return fetch(
+        const request = await fetch(
             window.location.origin + url,
             {
                 method: "DELETE"
             });
+
+        return await this.verifyResponse(request);
+    }
+
+    static async verifyResponse(request) {
+        let response = await request.json();
+
+        if (!response) {
+            throw new Error("Wrong WPS Server URL.",);
+        } else if (request.status >= 400) {
+            throw new Error(response.status + ", " + response.message)
+        }
+
+        return response
     }
 }

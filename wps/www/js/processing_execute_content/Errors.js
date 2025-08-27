@@ -47,8 +47,4 @@ export class Errors {
 
         errorHTMLElement.innerHTML = div;
     }
-
-    static hasError() {
-        return Object.keys(this.ERRORS_ARRAY).length > 0;
-    }
 }

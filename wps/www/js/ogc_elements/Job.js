@@ -1,5 +1,3 @@
-import {ApiJob} from "../api/ApiJob";
-
 export class Job {
 
     constructor(options) {
@@ -33,7 +31,7 @@ export class Job {
         }
     }
 
-    async getResults() {
+    areResultsUp() {
         return this._message === "Task finished";
     }
 
