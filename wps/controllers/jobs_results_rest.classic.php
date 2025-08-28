@@ -40,7 +40,11 @@ class jobs_results_restCtrl extends RestApiCtrl
             } else {
                 $response = Error::setJSONError($rep, '400', 'Job id not found.');
             }
-            $rep->data = json_decode($response, true);
+            $json = json_decode($response, true);
+
+            $json = $this->handleTypes($json);
+
+            $rep->data = $json;
         } catch (\Exception $e) {
             jLog::logEx($e, 'error');
 
@@ -48,5 +52,29 @@ class jobs_results_restCtrl extends RestApiCtrl
         }
 
         return $rep;
+    }
+
+    /**
+     * Handle types like JSON or GEOPACKAGE where we have the WPS Server address in the 'href'.
+     *
+     * @param array $json JSON array containing result's information
+     *
+     * @return array JSON array without the WPS Server address
+     */
+    private function handleTypes(array $json): array
+    {
+        $WPSurl = UrlServerUtil::retrieveServerURL('pygiswps_server_url');
+
+        foreach ($json as &$item) {
+            if (isset($item['href'])) {
+                $href = $item['href'];
+                if (str_contains($href, $WPSurl)) {
+                    $item['href'] = explode($this->param('jobid').'/', $href)[1];
+                }
+            }
+        }
+        unset($item);
+
+        return $json;
     }
 }
