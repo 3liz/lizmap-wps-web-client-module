@@ -2,13 +2,16 @@ import { LiteralData } from "./LiteralData";
 import { BoundingboxData } from "./BoundingboxData";
 import { ComplexData } from "./ComplexData";
 
+/**
+ * Class used to create a form based on a process.
+ */
 export class ProcessingContent {
 
     /**
+     * Build the form thanks to other class.
      *
-     * @param {object} inputJSON
-     * @returns {HTMLElement[]}
-     * @constructor
+     * @param {Object} inputJSON - List of inputs.
+     * @returns {HTMLElement[]} - HTML form.
      */
     static GetProcessingForm(inputJSON) {
         let listInput = [];

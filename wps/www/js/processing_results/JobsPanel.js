@@ -3,8 +3,23 @@ import {HandleResults} from "./HandleResults";
 import {ApiJob} from "../api/ApiJob";
 import "./LoadingSpinner";
 
+/**
+ * Custom HTML element representing the result's pane.
+ *
+ * @extends {LitElement}
+ *
+ * @typedef {Object} TemplateResult
+ */
 class JobsPanel extends LitElement {
 
+    /**
+     * Observable values.
+     *
+     * - `Object` jobArray - Job ID as 'key' and `Job` object as 'value'.
+     * - `Object` jobByProcess - Process ID as 'key' and list of Job IDs as 'value'.
+     * - `Array` activeProcesses - List of Process opened in the pane.
+     * - `Array` jobsSelected - List of Job IDs selected.
+     */
     static properties = {
         jobArray: {type: Object},
         jobByProcess: {type: Object},
@@ -12,6 +27,15 @@ class JobsPanel extends LitElement {
         jobsSelected: {type: Array},
     };
 
+    /**
+     * Initializes a new instance of the class through the HTML element.
+     * The constructor sets up various properties to manage jobs and processes.
+     *
+     * @property {Object} activeJobByProcesses - Number of active Job for each process.
+     * @property {Object} results - Var used to gather results given by HandleResults.
+     *
+     * @return {Object} A new instance of the class with initialized properties.
+     */
     constructor() {
         super();
         this.jobArray = {};
@@ -22,6 +46,13 @@ class JobsPanel extends LitElement {
         this.results = {};
     }
 
+    /**
+     * Generates and processes an HTML template for a list of processes, including their associated jobs and statuses.
+     *
+     * @param {Array<string>} listProcesses - Keys from `jobByProcess`.
+     *
+     * @return {TemplateResult} An HTML code for a list of processes.
+     */
     processesTemplate(listProcesses) {
         let res = html``;
 
@@ -112,6 +143,14 @@ class JobsPanel extends LitElement {
         return res;
     }
 
+    /**
+     * Generates a job template for the specified job ID.
+     * Injected in a `processesTemplate`.
+     *
+     * @param {string} jobId - The `jobID` of the job.
+     *
+     * @return {TemplateResult} An HTML code for a single job.
+     */
     jobTemplate(jobId) {
         const job = this.jobArray[jobId];
 
@@ -125,6 +164,16 @@ class JobsPanel extends LitElement {
         `;
     }
 
+    /**
+     * Generates the template for the right panel based on the selected jobs.
+     *
+     * If no jobs are selected, the method returns a default message prompting the user to select a job.
+     * If jobs are selected, it generates structured HTML content that includes job details, such as job ID,
+     * messages, timestamps, and results.
+     *
+     * @return {TemplateResult} A Lit HTML template containing the right panel content. Returns either a
+     * message prompting job selection or detailed job information depending on the selection state.
+     */
     rightPanelTemplate() {
         if (this.jobsSelected.length < 1) {
             return html`
@@ -227,6 +276,12 @@ class JobsPanel extends LitElement {
         }
     }
 
+
+    /**
+     * Renders a visual component based on the current state of vars.
+     *
+     * @return {TemplateResult} A template result containing the entire pane.
+     */
     render() {
         return html`
             <div id="jobs-info-left-panel">
@@ -241,6 +296,13 @@ class JobsPanel extends LitElement {
         `;
     }
 
+    /**
+     * Updates the `activeJobByProcesses` property based on the selected jobs.
+     * Checks if `jobsSelected` has changed and updates the processes accordingly.
+     * Triggers a re-render by calling `requestUpdate`.
+     *
+     * @param {Map<String, any>} changedProps - A map of the changed properties and their previous values.
+     */
     updated(changedProps) {
         if (changedProps.has('jobsSelected')) {
             for (let [process, jobs] of Object.entries(this.jobByProcess)) {
@@ -255,12 +317,23 @@ class JobsPanel extends LitElement {
         }
     }
 
+    /**
+     * Updates some `Object` vars. We need to re-define them because Lit observes this value.
+     *
+     * @param {Object} jobA - New jobArray
+     * @param {Object} jobBP - New jobByProcess
+     */
     async updatePanel(jobA, jobBP) {
         this.jobArray = jobA;
         this.jobByProcess = jobBP;
         this.requestUpdate();
     }
 
+    /**
+     * Action to do when a user clicks on a process in the left panel.
+     *
+     * @param {string} process - Process ID
+     */
     async actionOnProcess(process) {
         const el = this.renderRoot.getElementById("proc-panel-" + process);
 
@@ -276,6 +349,11 @@ class JobsPanel extends LitElement {
         }
     }
 
+    /**
+     * Action to do when a user clicks on a job in the left panel.
+     *
+     * @param {Event} event - Click event
+     */
     async actionOnJob(event) {
         const el = event.target.closest(".job-element");
 
@@ -299,6 +377,11 @@ class JobsPanel extends LitElement {
         this.requestUpdate();
     }
 
+    /**
+     * Populate `this.results` using `HandleResults`.
+     *
+     * @param {Job} job - Job object
+     */
     async showResults(job) {
         let resultJSON = {};
         try {
@@ -318,6 +401,13 @@ class JobsPanel extends LitElement {
         this.results[job.getJobID()] = HandleResults.showResults(resultJSON, job.getProcessID());
     }
 
+    /**
+     * Removes the first occurrence of a specific string from an array.
+     *
+     * @param {Array} array - The array from which the string will be removed.
+     * @param {string} string - The specific string to be removed from the array.
+     * @return {Array} A new array with the specific string removed.
+     */
     removeSpecificStringFromArray(array, string) {
         const indexToRemove = array.indexOf(string);
         const left = array.slice(0, indexToRemove);
@@ -326,6 +416,9 @@ class JobsPanel extends LitElement {
         return left.concat(right);
     }
 
+    /**
+     * CSS code for JobsPanel's visual aspect.
+     */
     static styles = css`
         :host {
             width: 100%;

@@ -1,6 +1,20 @@
+/**
+ * The HandleResults class provides methods to handle and display WPS results on the map.
+ */
 export class HandleResults {
+    /**
+     * Represents the state of the WPS external group mapping.
+     */
     static extGroupMapState;
 
+    /**
+     * Processes the provided JSON object to differentiate between "text" and "layer" types
+     * and handles layers based on their properties. Returns a structured result.
+     *
+     * @param {Object} json - The input JSON object containing data to be processed.
+     * @param {string} processID - The identifier for the processing operation.
+     * @return {{text: {[key: string]: string}, layer: {[key: string]: "On the map"}}} - Results object.
+     */
     static showResults(json, processID) {
         let res = {
             "text": {},
@@ -20,6 +34,14 @@ export class HandleResults {
         return res;
     }
 
+    /**
+     * Handles the creation and addition of a new WMS layer to the map based on the provided layer type and other parameters.
+     *
+     * @param {string} key - The key identifying the specific layer.
+     * @param {string} link - The URL link containing layer information including WMS parameters.
+     * @param {string} type - The type of layer.
+     * @param {string} processID - The process identifier.
+     */
     static handleLayerType(key, link, type, processID) {
         if (type !== "application/x-ogc-wms") {
             console.error(type + " not supported.");
@@ -70,6 +92,11 @@ export class HandleResults {
         }
     }
 
+    /**
+     * Removes the layer(s) from the map state that match the given UUID.
+     *
+     * @param {string} uuid - The unique identifier to match layers for removal.
+     */
     static removeLayer(uuid) {
         const layersToRemove = [];
 
@@ -87,6 +114,14 @@ export class HandleResults {
         }
     }
 
+    /**
+     * Extracts the value of a specific query parameter from the provided URL.
+     *
+     * @param {string} url - The URL containing the query parameters.
+     * @param {string} key - The name of the query parameter to retrieve the value for.
+     * @return {string|undefined} The value of the specified query parameter if it exists,
+     * or undefined if the parameter is not found.
+     */
     static getQueryParam(url, key) {
         const queryStartPos = url.indexOf('?');
         if (queryStartPos === -1) {
@@ -101,6 +136,12 @@ export class HandleResults {
         }
     }
 
+    /**
+     * Extracts the UUID from a given link string containing the "wps-results:" prefix.
+     *
+     * @param {string} link - The link string from which the UUID is to be extracted.
+     * @return {string} The extracted UUID from the provided link.
+     */
     static getUuidFromLink(link) {
         let uuid = link.split("wps-results:")[1];
         return uuid.split('/')[0];

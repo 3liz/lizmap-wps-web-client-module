@@ -1,7 +1,19 @@
 import {BuildHelper} from "./BuildHelper";
 
+/**
+ * Class representing the `literalData` entry type.
+ *
+ * @extends {BuildHelper}
+ */
 export class LiteralData extends BuildHelper {
 
+    /**
+     * Creates an input using `BuildHelper`.
+     * @param {string} id - Entry id.
+     * @param {Object} input - Input object.
+     * @param {number} occurrence - Current occurrence (minOccurs).
+     * @return {LiteralData} An instance of the entry.
+     */
     constructor(id, input, occurrence) {
         super(id, input, occurrence);
 
@@ -78,6 +90,14 @@ export class LiteralData extends BuildHelper {
         this.dispatchInputValueUpdate(input.processId, id, field.value);
     }
 
+    /**
+     * Verify values written in the input.
+     *
+     * @param {HTMLInputElement} field - Current input field.
+     * @param {string} inputId - Input ID.
+     * @param {Object} input - Input object.
+     * @param {string} type - Input type.
+     */
     checkValues(field, inputId,  input, type) {
         if (field.value === '') {
             this.addError(field.id, input, "value is empty.");
@@ -120,6 +140,12 @@ export class LiteralData extends BuildHelper {
         this.dispatchInputValueUpdate(input.processId, inputId, field.value);
     }
 
+    /**
+     * Handle if the QGIS type is `source`.
+     * @param {HTMLInputElement} field - Current input field.
+     * @param {string} id - Input ID.
+     * @param {Object} input - Input object.
+     */
     handleSourceType(field, id, input) {
         const br = document.createElement('br');
 
@@ -133,7 +159,7 @@ export class LiteralData extends BuildHelper {
         checkBox.disabled = true;
 
         field.addEventListener("change", (e) => {
-            const docCheckBox = document.getElementById('processing-input-' + id + '-selection');
+            const docCheckBox = document.getElementById('processing-input-' + id + '-selection-' + this.occurrence);
             if (field.value === "") {
                 docCheckBox.disabled = true
                 label.classList.add("disabled");
@@ -155,8 +181,15 @@ export class LiteralData extends BuildHelper {
         field.parentNode.insertBefore(br, field.nextSibling);
     }
 
+    /**
+     * Handles the event triggered by selecting or deselecting a checkbox for processing input selections.
+     *
+     * @param {string} id - Input ID.
+     * @param {Object} input - Input object.
+     * @param {HTMLInputElement} field - Current input field.
+     */
     selectionCheckBoxEvent(id, input, field) {
-        const docCheckBox = document.getElementById('processing-input-' + id + '-selection');
+        const docCheckBox = document.getElementById('processing-input-' + id + '-selection-' + this.occurrence);
         if (docCheckBox.checked && !docCheckBox.disabled) {
             let theValue = input.data;
             let layerName = theValue;
@@ -180,6 +213,12 @@ export class LiteralData extends BuildHelper {
         }
     }
 
+    /**
+     * Populates a select field with options derived from a list of layers.
+     *
+     * @param {HTMLInputElement} field - Current input field selector.
+     * @param {string[]} layersList An array of layer names to generate options for the select field.
+     */
     fillSelectField(field, layersList) {
         const baseOption = document.createElement("option");
         baseOption.innerHTML = '';
@@ -199,6 +238,14 @@ export class LiteralData extends BuildHelper {
         }
     }
 
+    /**
+     * Verify the entry type and retrieves a list of layers categorized into vectors and rasters.
+     *
+     * @param {string} type - QGIS Entry type.
+     * @param {Array<string>} restrictedLayers - Array of restricted layers.
+     * @return {Array<Array<string>>} A two-dimensional array where the first element contains vector layers
+     * and the second element contains raster layers.
+     */
     getLayersList(type, restrictedLayers) {
         let vectorsAndRasters = [[], []];
         if (["vector", "source", "raster"].includes(type)) {
@@ -218,6 +265,14 @@ export class LiteralData extends BuildHelper {
         return vectorsAndRasters;
     }
 
+    /**
+     * Retrieves a list of restricted layers based on the specified inputId and input object.
+     *
+     * @param {string} inputId - Input ID..
+     * @param {Object} input - Input object.
+     * @return {Array} An array of restricted layers.
+     * Returns an empty array if no restricted layers are found or if the configuration is invalid.
+     */
     getRestrictedLayers(inputId, input) {
         let restrictedLayers = [];
         if (

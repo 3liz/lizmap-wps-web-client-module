@@ -1,15 +1,42 @@
 import {css, html, LitElement} from 'lit';
 
+/**
+ * A custom element that displays a loading spinner with different visual states
+ * and optional progress indication. The spinner can adapt its appearance based
+ * on its state property to convey various statuses.
+ *
+ * @extends {LitElement}
+ *
+ * @typedef {Object} TemplateResult
+ */
 class LoadingSpinner extends LitElement {
+
+    /**
+     * Observable values.
+     * - `string` state: The current state of the spinner. Possible values include:
+     * "accepted", "running", "successful", "failed", "dismissed", and "undefined".
+     * - `string` progress: A string representation of the spinner's progress in percentage
+     * (0–100). This value determines the fill effect for the "running" state.
+     */
     static properties = {
         state: {type: String},
         progress: {type: String},
     };
 
+    /**
+     * Initializes a new instance of a LoadingSpinner and invokes the parent class constructor.
+     *
+     * @return {Object} A new instance of a LoadingSpinner.
+     */
     constructor() {
         super();
     }
 
+    /**
+     * Renders an SVG graphic representation based on the current state of the component.
+     *
+     * @return {TemplateResult} An SVG graphic corresponding to the component's state.
+     */
     fillSvg() {
         switch (this.state) {
             case "accepted":
@@ -72,6 +99,11 @@ class LoadingSpinner extends LitElement {
         }
     }
 
+    /**
+     * Renders a visual component based on the current state and progress.
+     *
+     * @return {TemplateResult} A template result containing the spinner.
+     */
     render() {
         const state = this.getState();
         let style = '';
@@ -90,17 +122,32 @@ class LoadingSpinner extends LitElement {
         `;
     }
 
+    /**
+     * Retrieves the current state of the instance if it matches one of the predefined valid states.
+     *
+     * @return {string} The current state if valid, or "undefined" if the state is not recognized.
+     */
     getState() {
         if (["accepted", "running", "successful", "failed", "dismissed"].includes(this.state))
             return this.state;
         return "undefined";
     }
 
+    /**
+     * Calculates the progress in degrees based on the current percentage.
+     * The method converts the progress value to an integer, and then calculates
+     * the corresponding angle in degrees over a 360-degree circle.
+     *
+     * @return {number} The calculated progress in degrees.
+     */
     calculateProgress() {
         const progressInt = parseInt(this.progress);
         return (progressInt * 360) / 100;
     }
 
+    /**
+     * CSS styles to render the spinner.
+     */
     static styles = css`
         .circle {
             width: 28px;

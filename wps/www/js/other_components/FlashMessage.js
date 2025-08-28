@@ -1,5 +1,18 @@
+/**
+ * A FlashMessage class to create and manage temporary notification UI elements.
+ */
 export class FlashMessage {
 
+    /**
+     * Creates an instance of a FlashMessage.
+     *
+     * @param {string} message - The message text to be displayed.
+     * @param {"info" | "success" | "danger"} type - The type of the message.
+     * @param {boolean} closable - Determines if the message should be manually closable by the user.
+     * @param {number} duration - Duration in milliseconds for how long the message should remain
+     * visible before disappearing.
+     * @return {FlashMessage} An instance of the FlashMessage.
+     */
     constructor(message, type, closable, duration) {
 
         this.uuid = window.crypto.randomUUID();
@@ -38,10 +51,19 @@ export class FlashMessage {
         }, 50)
     }
 
+    /**
+     * Retrieves the unique identifier for the flash message.
+     *
+     * @return {string} The unique identifier in the format `flash-message-<uuid>`.
+     */
     getId() {
         return `flash-message-${this.uuid}`;
     }
 
+    /**
+     * Removes the specified element from the DOM after applying a fade-out animation.
+     * The element's opacity is reduced to 0% over a specified duration before it is removed.
+     */
     removeElement() {
         const closeAnimationDuration = 500;
 

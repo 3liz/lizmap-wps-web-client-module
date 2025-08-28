@@ -1,7 +1,19 @@
 import {BuildHelper} from "./BuildHelper";
 
+/**
+ * First class used to build `boundingBoxData` and `complexData` form entries
+ *
+ * @extends {BuildHelper}
+ */
 export class ComplexBuildHelper extends BuildHelper {
 
+    /**
+     * Creates a second part for entries (CRS selector + drawing button).
+     * @param {string} id - Entry id.
+     * @param {Object} input - Input object.
+     * @param {number} occurrence - Current occurrence (minOccurs).
+     * @return {ComplexBuildHelper} An instance of the entry.
+     */
     constructor(id, input, occurrence) {
         super(id, input, occurrence);
 
@@ -18,6 +30,13 @@ export class ComplexBuildHelper extends BuildHelper {
     // | Complex & Extent partial input builder |
     // *----------------------------------------*
 
+    /**
+     * Builder for the second part of some entries (CRS selector + drawing button).
+     *
+     * @param {string} id - Formatted entry ID.
+     * @param {Object} input - Input object.
+     * @return {HTMLDivElement[]} - CRS selector and drawing button.
+     */
     partialPartBuilder(id, input) {
 
         // Defined the field
@@ -70,8 +89,10 @@ export class ComplexBuildHelper extends BuildHelper {
     // *---------------------------------*
 
     /**
+     * Adds an event handler to the provided button based on its class name.
      *
-     * @param {HTMLButtonElement} btn
+     * @param {HTMLButtonElement} btn - The button element to which the event handler will be added.
+     *                             The class name of the button determines the type of handler added.
      */
     addEventOnButton(btn) {
         if (btn.className.includes('extent')) {
@@ -82,8 +103,9 @@ export class ComplexBuildHelper extends BuildHelper {
     }
 
     /**
+     * Toggles the digitizing extent handler by activating or deactivating it based on the button's state.
      *
-     * @param {HTMLButtonElement} btn
+     * @param {HTMLButtonElement} btn - The button element used to toggle the digitizing extent handler.
      */
     addDigitizingExtentHandler(btn) {
         if (btn.className.includes('active')) {
@@ -97,8 +119,10 @@ export class ComplexBuildHelper extends BuildHelper {
     }
 
     /**
+     * Toggles the digitizing tool to handle point selection. Activates or deactivates the tool based on the current
+     * state of the button.
      *
-     * @param {HTMLButtonElement} btn
+     * @param {HTMLButtonElement} btn - The button element that triggers the digitizing point handler.
      */
     addDigitizingPointHandler(btn) {
         if (btn.className.includes('active')) {
@@ -111,6 +135,9 @@ export class ComplexBuildHelper extends BuildHelper {
         }
     }
 
+    /**
+     * Updates the digitizing process based on the currently active button and its class.
+     */
     updateDigitizing() {
         const btn = document.querySelector('#processing-input button.wps-digitizing.active');
         if (btn.className.includes('extent')) {
@@ -120,6 +147,12 @@ export class ComplexBuildHelper extends BuildHelper {
         }
     }
 
+    /**
+     * Updates the digitizing extent based on user interaction with the active button
+     * and synchronizes the geometry bounds with the appropriate projection.
+     *
+     * @param {HTMLButtonElement} activeBtn The button element that triggered the update.
+     */
     updateDigitizingExtent(activeBtn) {
         const select = activeBtn.previousSibling;
         const feat = lizMap.mainLizmap.digitizing.featureDrawn.at(-1);
@@ -138,6 +171,11 @@ export class ComplexBuildHelper extends BuildHelper {
         }
     }
 
+    /**
+     * Updates the digitizing point based on the provided active button.
+     *
+     * @param {HTMLButtonElement} activeBtn The active button element triggering the update.
+     */
     updateDigitizingPoint(activeBtn) {
         const select = activeBtn.previousSibling;
         const feat = lizMap.mainLizmap.digitizing.featureDrawn.at(-1);

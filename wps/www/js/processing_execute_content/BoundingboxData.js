@@ -1,7 +1,19 @@
 import {ComplexBuildHelper} from "./ComplexBuildHelper";
 
+/**
+ * Class representing the `boundingBoxData` entry type.
+ *
+ * @extends {ComplexBuildHelper}
+ */
 export class BoundingboxData extends ComplexBuildHelper {
 
+    /**
+     * Creates an input using `ComplexBuildHelper`.
+     * @param {string} id - Entry id.
+     * @param {Object} input - Input object.
+     * @param {number} occurrence - Current occurrence (minOccurs).
+     * @return {BoundingboxData} An instance of the entry.
+     */
     constructor(id, input, occurrence) {
         super(id, input, occurrence);
 
@@ -19,8 +31,15 @@ export class BoundingboxData extends ComplexBuildHelper {
 
     }
 
-    // Parse field value: number,number,number,number EPSG:integer
+    /**
+     * Verify values written in the input.
+     *
+     * @param {HTMLInputElement} field - Current input field.
+     * @param {string} id - Entry id.
+     * @param {Object} input - Input object.
+     */
     checkValues(field, id, input) {
+        // Parse field value: number,number,number,number EPSG:integer
         let reg = /(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *, *(-?\d+\.?\d*) *\((EPSG:\d+)\)/gi;
         let matches = reg.exec(field.value);
 
