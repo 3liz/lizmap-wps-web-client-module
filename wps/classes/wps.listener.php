@@ -44,6 +44,8 @@ class wpsListener extends jEventListener
                 'wps_wps_results_delete' => jUrl::get('wps~results:delete'),
                 'wps_wps_status' => jUrl::get('wps~service:status'),
                 'wps_wps_store' => jUrl::get('wps~service:store'),
+                'wps_ogc_processes' => jUrl::get('wps~processes_rest:get'),
+                'wps_ogc_jobs' => jUrl::get('wps~jobs_rest:get'),
             ),
         );
         $css = array(
@@ -200,6 +202,12 @@ class wpsListener extends jEventListener
         if (jAcl2::check('wps.options.manage')) {
             // add config page for projects restriction options
             $sectionAuth->childItems[] = new masterAdminMenuItem('wps_proj_restrict', \jLocale::get('wps~wps.ui.admin.menu.project_restriction'), jUrl::get('wps~restrictionsAdmin:show'), 160, 'wps_admin');
+        }
+        if (!\lizmap::getServices()->hideSensitiveProperties()) {
+            if (jAcl2::check('wps.urlserver.manage')) {
+                // add config page
+                $sectionAuth->childItems[] = new masterAdminMenuItem('wps_url_change', \jLocale::get('wps~wps.ui.admin.menu.url_server'), jUrl::get('wps~urlServer:show'), 150, 'wps_admin');
+            }
         }
         $event->add($sectionAuth);
     }
