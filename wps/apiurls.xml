@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<suburls xmlns="http://jelix.org/ns/suburls/1.1">
+    <!-- URLs for processes API -->
+    <url pathinfo="/processes" action="processes_rest:get"/>
+    <url pathinfo="/processes/:processid" action="processes_rest:get"/>
+    <url pathinfo="/processes/:processid/execution" action="processes_exec_rest:post"/>
+    <!-- URLs for jobs API -->
+    <url pathinfo="/jobs" action="jobs_rest:get"/>
+    <url pathinfo="/jobs/:jobid" action="jobs_rest:get"/>
+    <url pathinfo="/jobs/:jobid/results" action="jobs_results_rest:get"/>
+</suburls>

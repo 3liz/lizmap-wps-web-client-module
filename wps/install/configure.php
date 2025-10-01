@@ -38,6 +38,14 @@ class wpsModuleConfigurator extends \Jelix\Installer\Module\Configurator
             )
         )
         ;
+
+        $registerOnEntryPoint->havingName(
+            'api',
+            array(
+                new MapInclude('apiurls.xml'),
+            )
+        )
+        ;
     }
 
     public function configure(Jelix\Installer\Module\API\ConfigurationHelpers $helpers)

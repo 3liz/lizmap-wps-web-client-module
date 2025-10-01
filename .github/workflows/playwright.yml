@@ -1,0 +1,45 @@
+name: "End2end Tests for API 🚗"
+on:
+  push:
+    branches:
+      - master
+      - add-ogc-wps-api-on-php
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  e2e:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Initialize and run Docker
+        run: |
+          make pull
+          make run
+      - name: Wait for Lizmap to be ready
+        run: |
+          sleep 20
+      - name: Install module
+        run: |
+          make install-module
+          make import-lizmap-acl
+      - name: Install E2E dependencies
+        run: |
+          cd end2end
+          npm ci
+      - name: Install Playwright Browsers
+        run: |
+          cd end2end
+          npx playwright install --with-deps chromium
+      - name: Run Playwright tests
+        run: |
+          cd end2end
+          npx playwright test --project=chromium

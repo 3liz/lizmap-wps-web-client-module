@@ -44,20 +44,27 @@ Open your browser at http://localhost:9090
 
 For more information, refer to the [docker compose documentation](https://docs.docker.com/compose/)
 
-## End-to-End tests with Cypress
+## Javascript build
 
-The `end2end` directory contains some end-to-end tests made for Cypress.
-Go in `end2end` directory and execute `npm install` to install Cypress (only the first time).
-You can then :
-- execute `npm run cy:open` to open Cypress window.
-- select the target browser then click one of the integration tests or 'Run n integration specs' to run all.
+Javascript has to be built with webpack.
 
-or
+### Development
 
-- execute `npm run cy:test` to automatically open Cypress window and run tests in Electron browser.
+Run `npm run watch` in `wps/www/` directory. Files will be built and put in `tests/lizmap/www/assets/js/wps`.
 
-You can also use GNU Parallel to parallelize Cypress tests execution on 8 cores for example:
+### Production
 
-`find cypress/integration/ -name '*.js' | parallel -j8 --group  npx cypress run --spec {}`
+When ready for production run `npm run build` in `wps/www/` directory. Files will be built and put in `wps/www/dist/`.
 
-Output colors can be kept with `--tty` parameter, but it won't work with `--group` which is useful to not mix outputs from different tests.
+## End-to-End tests with Playwright for API
+
+The `end2end` directory contains some end-to-end tests made for Playwright.
+Go in `end2end` directory and execute `npm install` to install Playwright (only the first time).
+
+### Playwright
+
+You have to install the browsers with npx playwright install (only the first time or after an update) You can then :
+
+* `npx playwright test --ui --project=chromium` to open a UI as in Cypress which ease testing
+* `npx playwright test` to execute all tests with all browsers
+* `npx playwright test --project=chromium` to execute all tests with the Chromium browser

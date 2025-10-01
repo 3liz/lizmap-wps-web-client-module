@@ -131,3 +131,109 @@
     50%  { width:   0%; }
     100% { width: 100%; }
 }
+
+
+/* Flash messages */
+
+.flash-message {
+    width: fit-content;
+    max-width: 250px;
+    cursor: default;
+    margin: 5px;
+    opacity: 1;
+}
+
+.flash-message-text {
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding: 12px 23px;
+    border-radius: 7px 7px 0 0;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.flash-message-text:hover {
+    transition: 0.2s;
+}
+
+.flash-message:not(.closable) > .flash-message-text {
+    cursor: default;
+}
+
+.flash-message-text.type-info {
+    background-color: rgb(210 226 255);
+}
+
+.flash-message-text.type-danger {
+    background-color: rgb(255 210 210);
+}
+
+.flash-message-text.type-success {
+    background-color: rgb(191 244 197);
+}
+
+
+.closable > .flash-message-text.type-info:hover {
+    background-color: rgb(200 216 255);
+}
+
+.closable > .flash-message-text.type-danger:hover {
+    background-color: rgb(255 200 200);
+}
+
+.closable > .flash-message-text.type-success:hover {
+    background-color: rgb(181 234 187);
+}
+
+
+.closable > .flash-message-text.type-info:active {
+    background-color: rgb(184 200 255);
+}
+
+.closable > .flash-message-text.type-danger:active {
+    background-color: rgb(255 184 184);
+}
+
+.closable > .flash-message-text.type-success:active {
+    background-color: rgb(165 225 161);
+}
+
+
+.timer-bar-holder {
+    width: 100%;
+    height: 5px;
+    border-radius: 0 0 7px 7px;
+}
+
+.timer-bar-holder.type-info {
+    background-color: rgb(171 198 255);
+}
+
+.timer-bar-holder.type-danger {
+    background-color: rgb(255 171 171);
+}
+
+.timer-bar-holder.type-success {
+    background-color: rgb(136 228 146);
+}
+
+
+.timer-bar-scroller {
+    width: 100%;
+    height: 5px;
+    border-radius: 0 0 0 7px;
+
+    /* add a transition: linear ...s into a js script */
+}
+
+.timer-bar-scroller.type-info {
+    background-color: rgb(84 142 255);
+}
+
+.timer-bar-scroller.type-danger {
+    background-color: rgb(255 76 76);
+}
+
+.timer-bar-scroller.type-success {
+    background-color: rgb(44 179 62);
+}

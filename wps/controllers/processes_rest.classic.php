@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * @author    3liz.com
+ * @copyright 2011-2025 3Liz
+ *
+ * @see      https://3liz.com
+ *
+ * @license   https://www.mozilla.org/MPL/ Mozilla Public Licence
+ */
+
+use LizmapWPS\WPS\Authenticator;
+use LizmapWPS\WPS\Error;
+use LizmapWPS\WPS\RequestHandler;
+use LizmapWPS\WPS\RestApiCtrl;
+use LizmapWPS\WPS\UrlServerUtil;
+
+class processes_restCtrl extends RestApiCtrl
+{
+    /**
+     * Retrieves all processes.
+     * If a specific processID is set, return it.
+     * Optionals 'repository' and 'project' to build map path.
+     *
+     * @return jResponseJson|object the response object containing processes information
+     */
+    public function get(): object
+    {
+        /** @var jResponseJson $rep */
+        $rep = $this->getResponse('json');
+
+        if (!Authenticator::verify()) {
+            return Error::setJSONError($rep, 401);
+        }
+
+        $url = UrlServerUtil::retrieveServerURL('pygiswps_server_url').'processes';
+        $processID = $this->param('processid');
+        $repository = $this->param('repository');
+        $projectName = $this->param('project');
+        $project = null;
+
+        if (!is_null($projectName) && !is_null($repository)) {
+            try {
+                $repoObj = lizmap::getRepository($repository);
+                if (is_null($repoObj)) {
+                    throw new Exception('Repository not found.');
+                }
+                $project = $repoObj->getProject($projectName);
+            } catch (Exception $e) {
+                return Error::setJSONError($rep, 404, $e->getMessage());
+            }
+        }
+
+        try {
+            if ($processID != null) {
+                $url = $url.'/'.$processID;
+                if (!is_null($project)) {
+                    $url = $url.'?map='.$project->getRelativeQgisPath();
+                }
+                $response = RequestHandler::curlRequestGET($url);
+            } else {
+                $response = RequestHandler::curlRequestGET($url);
+            }
+
+            $json = json_decode($response, true);
+
+            $json = $this->removeLinks($json);
+
+            $rep->data = $json;
+        } catch (\Exception $e) {
+            jLog::logEx($e, 'error');
+
+            return Error::setJSONError($rep, $e->getCode(), $e->getMessage());
+        }
+
+        return $rep;
+    }
+
+    /**
+     * Removes link-related data that could contain server adress.
+     *
+     * @param array $json JSON array containing process data with 'links' fields
+     *
+     * @return array The modified JSON array with 'links' fields removed
+     */
+    private function removeLinks(array $json): array
+    {
+        $json['links'] = null;
+
+        if ($json['processes']) {
+            for ($i = 0; $i < count($json['processes']); ++$i) {
+                $json['processes'][$i]['links'] = null;
+            }
+        }
+
+        return $json;
+    }
+}
