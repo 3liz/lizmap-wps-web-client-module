@@ -22,5 +22,6 @@ class wpsModuleInstaller extends \Jelix\Installer\Module\Installer
             // Add right on admins group
             jAcl2DbManager::addRight('admins', $rightName);
         }
+        $helpers->copyDirectoryContent('../www/dist', \jApp::wwwPath('assets/js/wps'), true);
     }
 }

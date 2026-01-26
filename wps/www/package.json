@@ -1,0 +1,17 @@
+{
+  "name": "wps",
+  "version": "1.0.0",
+  "main": "wps.js",
+  "scripts": {
+    "watch": "webpack --watch --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "author": "3Liz",
+  "license": "ISC",
+  "dependencies": {
+    "webpack": "^5.99.9"
+  },
+  "devDependencies": {
+    "webpack-cli": "^6.0.1"
+  }
+}
